@@ -11,7 +11,7 @@
 
   const SHAKE_PEAKS = [0.55, 1.75, 2.95, 4.15];
   const SHAKE_MS = 5400;
-  const IDLE_SRC = "/tube-clean.webp?v=105";
+  const IDLE_SRC = "/tube-clean.webp?v=106";
 
   let shakeRaf = 0;
 

@@ -1,6 +1,6 @@
-/* v105 — 恢复原版摇签/出签音色（44100 wav + 均衡）；氛围音仍轻量流式 */
+/* v106 — 恢复原版摇签/出签音色（44100 wav + 均衡）；氛围音仍轻量流式 */
 (() => {
-  const bust = "?v=105";
+  const bust = "?v=106";
   const SHAKE_SEC = 5.4;
 
   const AudioEngine = {

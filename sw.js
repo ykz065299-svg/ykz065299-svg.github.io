@@ -1,9 +1,9 @@
-/* v105 — 资源缓存加速二次打开；HTML 网络优先防卡旧版 */
-const CACHE = "kanshan-v105";
+/* v106 — 资源缓存加速二次打开；HTML 网络优先防卡旧版 */
+const CACHE = "kanshan-v106";
 const ASSETS = [
-  "./boot.js?v=105",
-  "./cover-mobile.jpg?v=105",
-  "./cover.jpg?v=105",
+  "./boot.js?v=106",
+  "./cover-mobile.jpg?v=106",
+  "./cover.jpg?v=106",
 ];
 self.addEventListener("install", (e) => {
   e.waitUntil(caches.open(CACHE).then((c) => c.addAll(ASSETS)).then(() => self.skipWaiting()));
