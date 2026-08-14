@@ -1,4 +1,4 @@
-/* v101 — 看山跟签筒同峰值节奏；烛火/香烟雾对齐画面 */
+/* v20 — 看山求签：仅大小浮动，不跟签筒摇晃 */
 (() => {
   const tube = document.getElementById("tube");
   const tubeArt = document.getElementById("tubeArt");
@@ -86,17 +86,7 @@
           `translate3d(${tx.toFixed(2)}px, ${ty.toFixed(2)}px, 0) ` +
           `rotate(${rot.toFixed(2)}deg) scale(${squish.toFixed(3)}, ${(1 + amp * 0.018).toFixed(3)})`;
 
-        // 看山：同峰值、略轻、相位微反，像在帮着摇
-        if (kanshanSeer) {
-          const kAmp = amp * 0.72;
-          const kRot = Math.sin(t * 16 + 0.35) * kAmp * 6.2 + Math.sin(t * 6.2) * kAmp * 1.4;
-          const kTx = Math.sin(t * 12.5 + 0.25) * kAmp * 4.2;
-          const kTy = Math.abs(Math.cos(t * 10)) * kAmp * 3.4;
-          kanshanSeer.style.transform =
-            `translate3d(${(-kTx).toFixed(2)}px, ${(-kTy * 0.85).toFixed(2)}px, 0) ` +
-            `rotate(${(-kRot).toFixed(2)}deg)`;
-        }
-
+        // 看山：不跟摇晃，仅靠 CSS casting 做大小浮动
         shakeRaf = requestAnimationFrame(tick);
       };
 

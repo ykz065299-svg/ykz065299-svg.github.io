@@ -550,22 +550,22 @@ body::after {
   pointer-events: none;
   transform-origin: 42% 90%;
   filter: drop-shadow(0 12px 18px rgba(0,0,0,.45));
-  animation: kanshanIdle 5.6s ease-in-out infinite;
+  animation: kanshanIdle 4.8s ease-in-out infinite;
   will-change: transform, filter;
 }
 .kanshan-seer.casting {
-  animation: none; /* 摇签时由 ritual.js 按峰值驱动，避免另套丑动画 */
+  animation: kanshanFloat 1.2s ease-in-out infinite; /* 与摇签峰值间隔相近 */
   filter:
     drop-shadow(0 10px 14px rgba(0,0,0,.4))
     drop-shadow(0 0 14px rgba(255,170,70,.28));
 }
 .kanshan-seer.casting .kanshan-aura {
-  animation-duration: 1.6s;
-  opacity: .9;
+  animation-duration: 1.2s;
+  opacity: .95;
 }
 .kanshan-seer.casting .kanshan-aura.ring {
   animation-duration: 4.8s;
-  opacity: .7;
+  opacity: .75;
   border-color: rgba(255,210,140,.45);
 }
 .kanshan-aura {
@@ -632,12 +632,16 @@ body::after {
 }
 
 @keyframes kanshanIdle {
-  0%, 100% { transform: translate3d(0, 0, 0) rotate(0.4deg); }
-  50% { transform: translate3d(0, -3px, 0) rotate(-0.4deg); }
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+  50% { transform: translate3d(0, -2px, 0) scale(1.03); }
+}
+@keyframes kanshanFloat {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+  50% { transform: translate3d(0, -3px, 0) scale(1.07); }
 }
 @keyframes kanshanBless {
   0% { transform: translate3d(0, 0, 0) scale(1); }
-  40% { transform: translate3d(0, -6px, 0) scale(1.03); }
+  40% { transform: translate3d(0, -4px, 0) scale(1.05); }
   100% { transform: translate3d(0, 0, 0) scale(1); }
 }
 @keyframes kanshanAura {
