@@ -1,4 +1,4 @@
-/* v101 — 签面居中；按内容预计算高度后 scale 展开；二页特效按需开 */
+/* v102 — 签面居中；按内容预计算高度后 scale 展开；二页特效按需开 */
 const drawBtn = document.getElementById("drawBtn");
 const againBtn = document.getElementById("againBtn");
 const btnLabel = document.getElementById("btnLabel");

@@ -1,4 +1,4 @@
-/* v101 — PE 竖版封面全脸；JPG 轻量背景；手机减特效 */
+/* v102 — 去掉烟雾动画；不改图片像素 */
 :root {
   --gold: #e7c16a;
   --gold-soft: #f3dfaa;
@@ -36,11 +36,6 @@ body:not(.ritual-visible) .page2-bg .page2-props {
   animation: none !important;
   visibility: hidden;
 }
-body:not(.ritual-visible) .page2-bg .smoke-wisp,
-body:not(.ritual-visible) .page2-bg .smoke-curl,
-body:not(.ritual-visible) .page2-bg .ash-spark,
-body:not(.ritual-visible) .page2-bg .censer-glow,
-body:not(.ritual-visible) .page2-bg .censer-coal,
 body:not(.ritual-visible) .page2-bg .moon-shimmer,
 body:not(.ritual-visible) .page2-bg .table-warmth,
 body:not(.ritual-visible) .page2-bg .prop-talisman {
@@ -69,7 +64,7 @@ body:not(.ritual-visible) .page2-bg .prop-talisman {
 }
 .page1-bg {
   top: 0;
-  background-image: url("/cover.jpg?v=101");
+  background-image: url("/cover.jpg?v=102");
   background-position: 36% 26%;
   filter: saturate(1.06) contrast(1.05) brightness(1.03);
 }
@@ -92,7 +87,7 @@ body:not(.ritual-visible) .page2-bg .prop-talisman {
 .page2-bg {
   top: 100vh;
   top: 100dvh;
-  background-image: url("/page2-bg.jpg?v=101");
+  background-image: url("/page2-bg.jpg?v=102");
   background-position: 50% 60%;
   filter: saturate(1.06) contrast(1.04) brightness(.9);
 }
@@ -123,7 +118,7 @@ body:not(.ritual-visible) .page2-bg .prop-talisman {
   100% { transform: translate3d(0, 0, 0); }
 }
 
-/* —— 第二页香炉烟雾（已去掉动态烛火） —— */
+/* —— 第二页氛围道具（烟雾动画已移除） —— */
 .page2-props {
   position: absolute;
   inset: 0;
@@ -131,106 +126,6 @@ body:not(.ritual-visible) .page2-bg .prop-talisman {
   z-index: 2;
   overflow: hidden;
 }
-.prop-censer {
-  position: absolute;
-  right: 14%;
-  bottom: 33%;
-  width: 108px;
-  height: 250px;
-  transform: translateX(50%);
-}
-.censer-glow {
-  position: absolute;
-  left: 50%;
-  bottom: -6px;
-  width: 90px;
-  height: 56px;
-  transform: translateX(-50%);
-  background: radial-gradient(ellipse, rgba(255,140,50,.2), transparent 72%);
-  filter: blur(9px);
-  animation: censerPulse 2.8s ease-in-out infinite;
-}
-.censer-coal {
-  position: absolute;
-  left: 50%;
-  bottom: 4px;
-  width: 14px;
-  height: 6px;
-  transform: translateX(-50%);
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(255,200,120,.7), rgba(255,90,20,.3) 55%, transparent 82%);
-  box-shadow: 0 0 12px rgba(255,90,20,.35);
-  animation: coalBreath 2.2s ease-in-out infinite;
-  opacity: .65;
-  mix-blend-mode: screen;
-  z-index: 1;
-}
-.smoke-stack {
-  position: absolute;
-  left: 50%;
-  bottom: 10px;
-  width: 110px;
-  height: 230px;
-  transform: translateX(-50%);
-  z-index: 2;
-  mask-image: linear-gradient(180deg, transparent 0%, #000 10%, #000 82%, transparent 100%);
-  -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 10%, #000 82%, transparent 100%);
-}
-.smoke-wisp {
-  position: absolute;
-  left: 50%;
-  bottom: 0;
-  width: 28px;
-  height: 160px;
-  transform: translateX(-50%);
-  border-radius: 60% 60% 40% 40%;
-  background:
-    radial-gradient(ellipse at 40% 30%, rgba(245,248,255,.62), transparent 55%),
-    linear-gradient(180deg, transparent 0%, rgba(230,235,245,.48) 26%, rgba(200,208,220,.22) 68%, transparent);
-  filter: blur(7px);
-  opacity: 0;
-  mix-blend-mode: screen;
-  animation: smokeRise 5.4s ease-in-out infinite;
-}
-.smoke-wisp.s1 { animation-delay: 0s; margin-left: -10px; width: 24px; }
-.smoke-wisp.s2 { animation-delay: .85s; margin-left: 12px; width: 34px; animation-duration: 6.1s; }
-.smoke-wisp.s3 { animation-delay: 1.7s; margin-left: -16px; width: 22px; animation-duration: 4.8s; }
-.smoke-wisp.s4 { animation-delay: 2.5s; margin-left: 4px; width: 30px; animation-duration: 5.7s; }
-.smoke-wisp.s5 { animation-delay: 3.3s; margin-left: -4px; width: 40px; animation-duration: 6.6s; }
-.smoke-wisp.s6 { animation-delay: 4.1s; margin-left: 18px; width: 26px; animation-duration: 5.2s; }
-.smoke-curl {
-  position: absolute;
-  left: 50%;
-  bottom: 40px;
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  background: radial-gradient(circle at 30% 40%, rgba(230,235,245,.34), transparent 62%);
-  filter: blur(7px);
-  opacity: 0;
-  mix-blend-mode: screen;
-  animation: smokeCurl 7s ease-in-out infinite;
-}
-.smoke-curl.c1 { animation-delay: .4s; margin-left: -20px; }
-.smoke-curl.c2 { animation-delay: 2.2s; margin-left: 14px; width: 68px; height: 68px; animation-duration: 8.2s; }
-.smoke-curl.c3 { animation-delay: 4s; margin-left: -6px; width: 48px; height: 48px; animation-duration: 6.4s; }
-.ash-spark {
-  position: absolute;
-  left: 50%;
-  bottom: 14px;
-  width: 2px;
-  height: 2px;
-  border-radius: 50%;
-  background: rgba(255,230,180,.95);
-  box-shadow: 0 0 6px rgba(255,180,80,.85);
-  opacity: 0;
-  animation: ashFloat 3.8s linear infinite;
-  z-index: 3;
-}
-.ash-spark.a1 { animation-delay: .3s; margin-left: -10px; }
-.ash-spark.a2 { animation-delay: 1.2s; margin-left: 8px; }
-.ash-spark.a3 { animation-delay: 2.2s; margin-left: -2px; }
-.ash-spark.a4 { animation-delay: 3s; margin-left: 12px; animation-duration: 4.4s; }
 
 .prop-talisman {
   position: absolute;
@@ -272,37 +167,6 @@ body:not(.ritual-visible) .page2-bg .prop-talisman {
   mix-blend-mode: soft-light;
 }
 
-@keyframes censerPulse {
-  0%, 100% { opacity: .5; transform: translateX(-50%) scale(1); }
-  50% { opacity: .95; transform: translateX(-50%) scale(1.12); }
-}
-@keyframes coalBreath {
-  0%, 100% { opacity: .62; filter: brightness(1); }
-  50% { opacity: 1; filter: brightness(1.35); }
-}
-@keyframes smokeRise {
-  0% {
-    opacity: 0;
-    transform: translateX(-50%) translateY(4px) scaleX(.55) scaleY(.45) rotate(0deg);
-  }
-  14% { opacity: .78; }
-  55% { opacity: .42; }
-  100% {
-    opacity: 0;
-    transform: translateX(calc(-50% + 22px)) translateY(-210px) scaleX(1.7) scaleY(1.55) rotate(8deg);
-  }
-}
-@keyframes smokeCurl {
-  0% { opacity: 0; transform: translateX(-50%) translateY(0) scale(.4); }
-  20% { opacity: .45; }
-  70% { opacity: .18; }
-  100% { opacity: 0; transform: translateX(calc(-50% + 22px)) translateY(-96px) scale(1.6); }
-}
-@keyframes ashFloat {
-  0% { opacity: 0; transform: translateY(0) scale(1); }
-  10% { opacity: .9; }
-  100% { opacity: 0; transform: translateY(-78px) translateX(16px) scale(.4); }
-}
 @keyframes talismanSway {
   0%, 100% { translate: 0 0; rotate: -8deg; }
   50% { translate: 0 8px; rotate: 6deg; }
@@ -314,10 +178,6 @@ body:not(.ritual-visible) .page2-bg .prop-talisman {
 @keyframes tableWarm {
   0%, 100% { opacity: .75; }
   50% { opacity: 1; }
-}
-
-@media (max-width: 480px) {
-  .prop-censer { right: 10%; bottom: 32%; width: 88px; height: 210px; }
 }
 
 .audio-toggle {
@@ -641,23 +501,6 @@ body:not(.ritual-visible) .page2-bg .prop-talisman {
 @keyframes runeGlow {
   0%, 100% { opacity: .35; }
   50% { opacity: 1; }
-}
-
-.tube-smoke {
-  position: absolute;
-  left: 50%;
-  top: 12%;
-  width: 110px;
-  height: 90px;
-  transform: translateX(-50%);
-  background: radial-gradient(ellipse at 50% 80%, rgba(255,230,180,.16), transparent 70%);
-  filter: blur(10px);
-  animation: smokeLift 4.5s ease-in-out infinite;
-  z-index: 1;
-}
-@keyframes smokeLift {
-  0%, 100% { opacity: .3; transform: translateX(-50%) translateY(0); }
-  50% { opacity: .65; transform: translateX(-48%) translateY(-8px); }
 }
 
 .tube {
@@ -1134,7 +977,7 @@ body:not(.ritual-visible) .page2-bg .prop-talisman {
 @media (max-width: 720px) {
   .page1-bg {
     /* 竖版专用封面：完整露出看山脸 + 标题，不再半张脸裁切 */
-    background-image: url("/cover-mobile.jpg?v=101");
+    background-image: url("/cover-mobile.jpg?v=102");
     background-position: center center;
     background-size: cover;
     filter: saturate(1.04) contrast(1.03) brightness(1.0);
@@ -1148,15 +991,8 @@ body:not(.ritual-visible) .page2-bg .prop-talisman {
   .prop-talisman,
   .moon-shimmer,
   .table-warmth,
-  .ash-spark,
-  .smoke-curl,
   .kanshan-aura.ring {
     display: none !important;
-  }
-  .incense-smoke,
-  .smoke-wisp {
-    animation-duration: 7s !important;
-    filter: blur(4px);
   }
   .fate-ring {
     animation: none;

@@ -1,6 +1,6 @@
-/* v101 — 轻量音频；氛围音流式播放，避免解码 3MB wav 卡顿 */
+/* v102 — 轻量音频；氛围音流式播放，避免解码 3MB wav 卡顿 */
 (() => {
-  const bust = "?v=101";
+  const bust = "?v=102";
   const SHAKE_SEC = 5.4;
 
   const AudioEngine = {
