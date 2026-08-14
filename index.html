@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>看山今日一签</title>
+    <link rel="stylesheet" href="/style.css?v=23" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Noto+Serif+SC:wght@500;700&family=ZCOOL+XiaoWei&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div class="world-bg" aria-hidden="true">
+      <div class="page-bg page1-bg"></div>
+      <div class="page-seam"></div>
+      <div class="page-bg page2-bg">
+        <div class="page2-mood"></div>
+        <div class="page2-dust"></div>
+        <div class="page2-props" aria-hidden="true">
+          <div class="prop-candle">
+            <span class="candle-glow"></span>
+            <span class="candle-wick"></span>
+            <span class="candle-flame"></span>
+            <span class="candle-flame tip"></span>
+            <span class="candle-ember e1"></span>
+            <span class="candle-ember e2"></span>
+            <span class="candle-ember e3"></span>
+          </div>
+          <div class="prop-censer">
+            <span class="censer-glow"></span>
+            <span class="censer-coal"></span>
+            <span class="incense-smoke s1"></span>
+            <span class="incense-smoke s2"></span>
+            <span class="incense-smoke s3"></span>
+            <span class="incense-smoke s4"></span>
+            <span class="ash-spark a1"></span>
+            <span class="ash-spark a2"></span>
+            <span class="ash-spark a3"></span>
+          </div>
+          <div class="prop-talisman t1"></div>
+          <div class="prop-talisman t2"></div>
+          <div class="prop-talisman t3"></div>
+          <div class="moon-shimmer"></div>
+          <div class="table-warmth"></div>
+        </div>
+      </div>
+    </div>
+
+    <button type="button" class="audio-toggle" id="audioToggle">氛围音 · 关</button>
+
+    <main class="world">
+      <section class="page page-cover" id="pageCover">
+        <div class="cover-spacer" aria-hidden="true"></div>
+        <p class="scroll-cue" id="scrollCue">下滑开筒</p>
+      </section>
+
+      <!-- 第二页：签面绝对居中于整页 -->
+      <section class="page page-ritual" id="pageRitual">
+        <p class="phase" id="phaseText">静候开筒</p>
+
+        <div class="ritual" id="ritual">
+          <div class="tube-stage" id="tubeStage">
+            <div class="fate-ring" aria-hidden="true">
+              <span style="--i:0">命</span><span style="--i:1">数</span>
+              <span style="--i:2">已</span><span style="--i:3">定</span>
+              <span style="--i:4">山</span><span style="--i:5">门</span>
+              <span style="--i:6">自</span><span style="--i:7">开</span>
+              <span style="--i:8">缘</span><span style="--i:9">来</span>
+              <span style="--i:10">如</span><span style="--i:11">是</span>
+            </div>
+            <div class="tube-smoke" aria-hidden="true"></div>
+            <div class="tube" id="tube">
+              <div class="tube-glow" aria-hidden="true"></div>
+              <img
+                id="tubeArt"
+                src="/tube-clean.png?v=22"
+                alt=""
+                class="tube-art"
+                width="460"
+                height="995"
+                draggable="false"
+                decoding="async"
+                onerror="this.style.visibility='hidden'"
+              />
+              <div class="emerging" id="emerging" hidden>
+                <div class="emerging-stick"><span class="emerging-tip">签</span></div>
+              </div>
+            </div>
+            <p class="tube-label">百签同栖 · 一签认主</p>
+          </div>
+        </div>
+
+        <!-- 签：相对第二页 100vh 居中 -->
+        <div class="slip-scroll" id="fortuneCard" hidden>
+          <div class="scroll-glow" aria-hidden="true"></div>
+          <div class="slip-edge left" aria-hidden="true">宿命</div>
+          <div class="slip-edge right" aria-hidden="true">天机</div>
+          <div class="scroll-roll top" aria-hidden="true"></div>
+          <div class="scroll-body">
+            <div class="scroll-inner">
+              <div class="slip-grade" id="slipGrade"></div>
+              <h2 class="slip-no" id="slipNo"></h2>
+              <p class="slip-motto" id="slipMotto"></p>
+              <div class="gold-line" id="goldLine"></div>
+              <p class="slip-oracle" id="oracleText"></p>
+              <h3 class="slip-title" id="topicTitle"></h3>
+              <p class="slip-summary" id="topicSummary" hidden></p>
+              <div class="slip-meta">热榜第 <span id="rank">?</span> 位</div>
+              <div class="actions">
+                <a class="link-out" id="topicLink" href="#" target="_blank" rel="noopener">上山看原题</a>
+                <button type="button" class="again" id="againBtn">再求一签</button>
+              </div>
+              <div class="stamp" id="stamp">山</div>
+            </div>
+          </div>
+          <div class="scroll-roll bot" aria-hidden="true"></div>
+        </div>
+
+        <div class="ritual-footer">
+          <button type="button" class="draw-btn" id="drawBtn">
+            <span class="btn-glow" aria-hidden="true"></span>
+            <span class="btn-label" id="btnLabel">求签</span>
+          </button>
+          <p class="hint" id="hint">求签 → 摇签 → 取签 → 开签</p>
+          <p class="source">知乎开放平台 CLI · hot · v23</p>
+        </div>
+      </section>
+    </main>
+
+    <script src="/audio.js?v=23"></script>
+    <script src="/ritual.js?v=23"></script>
+    <script src="/app.js?v=23"></script>
+  </body>
+</html>
