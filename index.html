@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>看山今日一签</title>
-    <link rel="stylesheet" href="/style.css?v=100" />
+    <link rel="stylesheet" href="/style.css?v=101" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -64,15 +64,18 @@
           <aside class="kanshan-seer" id="kanshanSeer" aria-hidden="true">
             <span class="kanshan-aura"></span>
             <span class="kanshan-aura ring"></span>
-            <img
-              class="kanshan-seer-art"
-              src="/art/kanshan-daoshi-bugua-cut.png?v=100"
-              alt=""
-              width="833"
-              height="913"
-              draggable="false"
-              decoding="async"
-            />
+            <picture>
+              <source srcset="/art/kanshan-daoshi-bugua-cut.webp?v=101" type="image/webp" />
+              <img
+                class="kanshan-seer-art"
+                src="/art/kanshan-daoshi-bugua-cut.png?v=101"
+                alt=""
+                width="420"
+                height="459"
+                draggable="false"
+                decoding="async"
+              />
+            </picture>
             <span class="kanshan-seer-caption">看山卜卦</span>
           </aside>
           <div class="tube-stage" id="tubeStage">
@@ -87,17 +90,20 @@
             <div class="tube-smoke" aria-hidden="true"></div>
             <div class="tube" id="tube">
               <div class="tube-glow" aria-hidden="true"></div>
-              <img
-                id="tubeArt"
-                src="/tube-clean.png?v=100"
-                alt=""
-                class="tube-art"
-                width="460"
-                height="995"
-                draggable="false"
-                decoding="async"
-                onerror="this.style.visibility='hidden'"
-              />
+              <picture>
+                <source srcset="/tube-clean.webp?v=101" type="image/webp" />
+                <img
+                  id="tubeArt"
+                  src="/tube-clean.png?v=101"
+                  alt=""
+                  class="tube-art"
+                  width="320"
+                  height="692"
+                  draggable="false"
+                  decoding="async"
+                  onerror="this.style.visibility='hidden'"
+                />
+              </picture>
               <div class="emerging" id="emerging" hidden>
                 <div class="emerging-stick"><span class="emerging-tip">签</span></div>
               </div>
@@ -142,8 +148,8 @@
       </section>
     </main>
 
-    <script src="/audio.js?v=100"></script>
-    <script src="/ritual.js?v=100"></script>
-    <script src="/app.js?v=100"></script>
+    <script src="/audio.js?v=101"></script>
+    <script src="/ritual.js?v=101"></script>
+    <script src="/app.js?v=101"></script>
   </body>
 </html>

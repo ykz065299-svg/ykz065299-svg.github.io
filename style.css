@@ -1,4 +1,4 @@
-/* v100 — 看山更大更右；整体比例抛光；隐藏 CLI 脚注 */
+/* v101 — PE 竖版封面全脸；JPG 轻量背景；手机减特效 */
 :root {
   --gold: #e7c16a;
   --gold-soft: #f3dfaa;
@@ -30,6 +30,22 @@ body::after {
   mix-blend-mode: overlay;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
+/* 第一页时冻结第二页特效，避免双页同时烧 GPU */
+body:not(.ritual-visible) .page2-bg .page2-dust,
+body:not(.ritual-visible) .page2-bg .page2-props {
+  animation: none !important;
+  visibility: hidden;
+}
+body:not(.ritual-visible) .page2-bg .smoke-wisp,
+body:not(.ritual-visible) .page2-bg .smoke-curl,
+body:not(.ritual-visible) .page2-bg .ash-spark,
+body:not(.ritual-visible) .page2-bg .censer-glow,
+body:not(.ritual-visible) .page2-bg .censer-coal,
+body:not(.ritual-visible) .page2-bg .moon-shimmer,
+body:not(.ritual-visible) .page2-bg .table-warmth,
+body:not(.ritual-visible) .page2-bg .prop-talisman {
+  animation: none !important;
+}
 
 .world-bg {
   position: absolute;
@@ -53,7 +69,7 @@ body::after {
 }
 .page1-bg {
   top: 0;
-  background-image: url("/cover.png?v=22");
+  background-image: url("/cover.jpg?v=101");
   background-position: 36% 26%;
   filter: saturate(1.06) contrast(1.05) brightness(1.03);
 }
@@ -76,7 +92,7 @@ body::after {
 .page2-bg {
   top: 100vh;
   top: 100dvh;
-  background-image: url("/page2-bg.png?v=22");
+  background-image: url("/page2-bg.jpg?v=101");
   background-position: 50% 60%;
   filter: saturate(1.06) contrast(1.04) brightness(.9);
 }
@@ -1117,16 +1133,43 @@ body::after {
 
 @media (max-width: 720px) {
   .page1-bg {
-    /* 横版封面在竖屏会被 cover 裁切：偏左保住标题 */
-    background-position: 20% 40%;
+    /* 竖版专用封面：完整露出看山脸 + 标题，不再半张脸裁切 */
+    background-image: url("/cover-mobile.jpg?v=101");
+    background-position: center center;
+    background-size: cover;
+    filter: saturate(1.04) contrast(1.03) brightness(1.0);
   }
   .page-cover .scroll-cue {
     margin-bottom: max(8px, env(safe-area-inset-bottom));
   }
   .page2-bg { background-position: 50% 70%; }
-  .tube { width: 196px; height: 308px; margin-bottom: 42px; }
+  /* 手机减负：少模糊少动画 */
+  .page2-dust,
+  .prop-talisman,
+  .moon-shimmer,
+  .table-warmth,
+  .ash-spark,
+  .smoke-curl,
+  .kanshan-aura.ring {
+    display: none !important;
+  }
+  .incense-smoke,
+  .smoke-wisp {
+    animation-duration: 7s !important;
+    filter: blur(4px);
+  }
+  .fate-ring {
+    animation: none;
+    opacity: .7;
+  }
+  .fate-ring span { animation: none; opacity: .65; }
+  .tube { width: 196px; height: 308px; margin-bottom: 42px; will-change: auto; }
   .tube-stage { width: 232px; height: 372px; top: 50%; }
   .fate-ring { width: 208px; height: 208px; }
+  .kanshan-seer { will-change: auto; filter: drop-shadow(0 10px 14px rgba(0,0,0,.45)); }
+  body::after { opacity: .02; }
+  .audio-toggle,
+  .scroll-cue { backdrop-filter: none; }
   .fate-ring span {
     transform:
       rotate(calc(var(--i) * 30deg))

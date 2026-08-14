@@ -1,6 +1,6 @@
-/* v20 — 道士看山重绘 + PC/PE 同框 */
+/* v101 — 轻量音频；氛围音流式播放，避免解码 3MB wav 卡顿 */
 (() => {
-  const bust = "?v=20";
+  const bust = "?v=101";
   const SHAKE_SEC = 5.4;
 
   const AudioEngine = {
@@ -32,7 +32,7 @@
     },
 
     async loadBuffer(name, url) {
-      const res = await fetch(url + bust, { cache: "reload" });
+      const res = await fetch(url + bust, { cache: "force-cache" });
       if (!res.ok) throw new Error("load fail " + url);
       const arr = await res.arrayBuffer();
       const buf = await this.ctx.decodeAudioData(arr.slice(0));
@@ -40,19 +40,19 @@
       return buf;
     },
 
-    async preload() {
+    async preloadSfx() {
       await this.ensure();
+      // 只预加载短音效；氛围音用流式 Audio，避免一次解码大文件卡死主线程
       await Promise.all([
-        this.loadBuffer("ambient", "/audio/ambient.wav"),
-        this.loadBuffer("shake", "/audio/shake.wav"),
-        this.loadBuffer("reveal", "/audio/reveal.wav"),
+        this.loadBuffer("shake", "/audio/shake-lite.wav"),
+        this.loadBuffer("reveal", "/audio/reveal-lite.wav"),
       ]);
     },
 
     async enable() {
       await this.ensure();
       try {
-        await this.preload();
+        await this.preloadSfx();
       } catch (e) {
         console.warn("audio preload", e);
       }
@@ -82,28 +82,24 @@
     startAmbient() {
       this.stopAmbient();
       if (!this.enabled) return;
-      const buf = this.buffers.ambient;
-      if (buf && this.ctx) {
-        const src = this.ctx.createBufferSource();
-        src.buffer = buf;
-        src.loop = true;
-        const lp = this.ctx.createBiquadFilter();
-        lp.type = "lowpass";
-        lp.frequency.value = 2400;
-        src.connect(lp);
-        lp.connect(this.musicGain);
-        src.start();
-        this.ambientSrc = src;
-        return;
-      }
-      const a = new Audio("/audio/ambient.wav" + bust);
+      // 流式播放轻量氛围音
+      const a = new Audio("/audio/ambient-lite.wav" + bust);
       a.loop = true;
       a.volume = 0.25;
+      a.preload = "auto";
       a.play().catch(() => {});
       this.ambient = a;
     },
 
     duckMusic(seconds = SHAKE_SEC) {
+      if (this.ambient) {
+        const prev = this.ambient.volume;
+        this.ambient.volume = 0.08;
+        clearTimeout(this._duckTimer);
+        this._duckTimer = setTimeout(() => {
+          if (this.ambient) this.ambient.volume = prev || 0.25;
+        }, (seconds + 0.55) * 1000);
+      }
       if (!this.ctx || !this.musicGain) return;
       const now = this.ctx.currentTime;
       this.musicGain.gain.cancelScheduledValues(now);
@@ -119,14 +115,13 @@
       this.duckMusic(SHAKE_SEC);
       const buf = this.buffers.shake;
       if (!buf) {
-        const a = new Audio("/audio/shake.wav" + bust);
+        const a = new Audio("/audio/shake-lite.wav" + bust);
         a.volume = 0.85;
         a.play().catch(() => {});
         return;
       }
       const src = this.ctx.createBufferSource();
       src.buffer = buf;
-      // 竹签短促碰撞：保留中频清晰，去掉空灵糊感与刺耳高
       const hp = this.ctx.createBiquadFilter();
       hp.type = "highpass";
       hp.frequency.value = 80;
@@ -159,7 +154,7 @@
       if (!this.enabled) return;
       const buf = this.buffers.reveal;
       if (!buf) {
-        const a = new Audio("/audio/reveal.wav" + bust);
+        const a = new Audio("/audio/reveal-lite.wav" + bust);
         a.volume = 0.8;
         a.play().catch(() => {});
         return;

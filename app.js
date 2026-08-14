@@ -1,4 +1,4 @@
-/* v23 — 签面居中；按内容预计算高度后 scale 展开 */
+/* v101 — 签面居中；按内容预计算高度后 scale 展开；二页特效按需开 */
 const drawBtn = document.getElementById("drawBtn");
 const againBtn = document.getElementById("againBtn");
 const btnLabel = document.getElementById("btnLabel");
@@ -47,6 +47,17 @@ audioToggle.addEventListener("click", async () => {
 scrollCue?.addEventListener("click", () => {
   pageRitual?.scrollIntoView({ behavior: "smooth", block: "start" });
 });
+
+// 第一页时关掉第二页烟雾/尘埃动画，减轻手机卡顿
+if (pageRitual && "IntersectionObserver" in window) {
+  const io = new IntersectionObserver(
+    ([entry]) => {
+      document.body.classList.toggle("ritual-visible", entry.isIntersecting && entry.intersectionRatio > 0.2);
+    },
+    { threshold: [0, 0.2, 0.5] }
+  );
+  io.observe(pageRitual);
+}
 
 function setBusy(on) {
   busy = on;

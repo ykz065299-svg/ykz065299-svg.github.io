@@ -11,14 +11,19 @@
 
   const SHAKE_PEAKS = [0.55, 1.75, 2.95, 4.15];
   const SHAKE_MS = 5400;
-  const IDLE_SRC = "/tube-clean.png?v=20";
+  const IDLE_SRC = "/tube-clean.webp?v=101";
+  const IDLE_FALLBACK = "/tube-clean.png?v=101";
 
   let shakeRaf = 0;
 
   if (tubeArt) {
-    tubeArt.src = IDLE_SRC;
+    const preferWebp = tubeArt.closest("picture")?.querySelector('source[type="image/webp"]');
+    tubeArt.src = preferWebp ? IDLE_SRC : IDLE_FALLBACK;
+    tubeArt.onerror = () => {
+      if (tubeArt.src.indexOf(".webp") !== -1) tubeArt.src = IDLE_FALLBACK;
+    };
     const pre = new Image();
-    pre.src = IDLE_SRC;
+    pre.src = tubeArt.src;
   }
 
   function setSeer(mode) {
