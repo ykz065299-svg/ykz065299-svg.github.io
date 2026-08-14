@@ -4,29 +4,26 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>看山今日一签</title>
-    <link rel="stylesheet" href="/style.css?v=102" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- 去掉 Google Fonts：国内加载极慢，改用系统字体 -->
     <link
-      href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Noto+Serif+SC:wght@500;700&family=ZCOOL+XiaoWei&display=swap"
-      rel="stylesheet"
+      rel="preload"
+      as="image"
+      href="/cover-mobile.jpg?v=103"
+      media="(max-width: 720px)"
     />
+    <link
+      rel="preload"
+      as="image"
+      href="/cover.jpg?v=103"
+      media="(min-width: 721px)"
+    />
+    <link rel="stylesheet" href="/style.css?v=103" />
   </head>
   <body>
     <div class="world-bg" aria-hidden="true">
       <div class="page-bg page1-bg"></div>
       <div class="page-seam"></div>
-      <div class="page-bg page2-bg">
-        <div class="page2-mood"></div>
-        <div class="page2-dust"></div>
-        <div class="page2-props" aria-hidden="true">
-          <div class="prop-talisman t1"></div>
-          <div class="prop-talisman t2"></div>
-          <div class="prop-talisman t3"></div>
-          <div class="moon-shimmer"></div>
-          <div class="table-warmth"></div>
-        </div>
-      </div>
+      <div class="page-bg page2-bg" id="page2Bg"></div>
     </div>
 
     <button type="button" class="audio-toggle" id="audioToggle">氛围音 · 关</button>
@@ -37,53 +34,38 @@
         <p class="scroll-cue" id="scrollCue">下滑开筒</p>
       </section>
 
-      <!-- 第二页：签面绝对居中于整页 -->
       <section class="page page-ritual" id="pageRitual">
         <p class="phase" id="phaseText">静候开筒</p>
 
         <div class="ritual" id="ritual">
           <aside class="kanshan-seer" id="kanshanSeer" aria-hidden="true">
-            <span class="kanshan-aura"></span>
-            <span class="kanshan-aura ring"></span>
-            <picture>
-              <source srcset="/art/kanshan-daoshi-bugua-cut.webp?v=102" type="image/webp" />
-              <img
-                class="kanshan-seer-art"
-                src="/art/kanshan-daoshi-bugua-cut.png?v=102"
-                alt=""
-                width="420"
-                height="459"
-                draggable="false"
-                decoding="async"
-              />
-            </picture>
+            <img
+              class="kanshan-seer-art"
+              src="/art/kanshan-daoshi-bugua-cut.webp?v=103"
+              alt=""
+              width="420"
+              height="459"
+              draggable="false"
+              decoding="async"
+              loading="lazy"
+            />
             <span class="kanshan-seer-caption">看山卜卦</span>
           </aside>
           <div class="tube-stage" id="tubeStage">
-            <div class="fate-ring" aria-hidden="true">
-              <span style="--i:0">命</span><span style="--i:1">数</span>
-              <span style="--i:2">已</span><span style="--i:3">定</span>
-              <span style="--i:4">山</span><span style="--i:5">门</span>
-              <span style="--i:6">自</span><span style="--i:7">开</span>
-              <span style="--i:8">缘</span><span style="--i:9">来</span>
-              <span style="--i:10">如</span><span style="--i:11">是</span>
-            </div>
             <div class="tube" id="tube">
               <div class="tube-glow" aria-hidden="true"></div>
-              <picture>
-                <source srcset="/tube-clean.webp?v=102" type="image/webp" />
-                <img
-                  id="tubeArt"
-                  src="/tube-clean.png?v=102"
-                  alt=""
-                  class="tube-art"
-                  width="320"
-                  height="692"
-                  draggable="false"
-                  decoding="async"
-                  onerror="this.style.visibility='hidden'"
-                />
-              </picture>
+              <img
+                id="tubeArt"
+                src="/tube-clean.webp?v=103"
+                alt=""
+                class="tube-art"
+                width="320"
+                height="692"
+                draggable="false"
+                decoding="async"
+                loading="lazy"
+                onerror="this.style.visibility='hidden'"
+              />
               <div class="emerging" id="emerging" hidden>
                 <div class="emerging-stick"><span class="emerging-tip">签</span></div>
               </div>
@@ -92,7 +74,6 @@
           </div>
         </div>
 
-        <!-- 签：相对第二页 100vh 居中 -->
         <div class="slip-scroll" id="fortuneCard" hidden>
           <div class="scroll-glow" aria-hidden="true"></div>
           <div class="slip-edge left" aria-hidden="true">宿命</div>
@@ -128,8 +109,8 @@
       </section>
     </main>
 
-    <script src="/audio.js?v=102"></script>
-    <script src="/ritual.js?v=102"></script>
-    <script src="/app.js?v=102"></script>
+    <script src="/audio.js?v=103" defer></script>
+    <script src="/ritual.js?v=103" defer></script>
+    <script src="/app.js?v=103" defer></script>
   </body>
 </html>

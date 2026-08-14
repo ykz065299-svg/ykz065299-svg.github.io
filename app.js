@@ -1,4 +1,4 @@
-/* v102 — 签面居中；按内容预计算高度后 scale 展开；二页特效按需开 */
+/* v103 — 二页资源懒加载；求签不阻塞等音频 */
 const drawBtn = document.getElementById("drawBtn");
 const againBtn = document.getElementById("againBtn");
 const btnLabel = document.getElementById("btnLabel");
@@ -19,6 +19,7 @@ const fortuneCard = document.getElementById("fortuneCard");
 
 let busy = false;
 let audioOn = false;
+let ritualAssetsReady = false;
 
 const PHASE_HINT = {
   求签: "心诚则灵…",
@@ -30,6 +31,12 @@ const PHASE_HINT = {
 
 function setAudioUi() {
   audioToggle.textContent = audioOn ? "氛围音 · 开" : "氛围音 · 关";
+}
+
+function ensureRitualAssets() {
+  if (ritualAssetsReady) return;
+  ritualAssetsReady = true;
+  document.body.classList.add("ritual-assets-ready");
 }
 
 audioToggle.addEventListener("click", async () => {
@@ -45,18 +52,31 @@ audioToggle.addEventListener("click", async () => {
 });
 
 scrollCue?.addEventListener("click", () => {
+  ensureRitualAssets();
   pageRitual?.scrollIntoView({ behavior: "smooth", block: "start" });
 });
 
-// 第一页时关掉第二页烟雾/尘埃动画，减轻手机卡顿
+// 接近第二页再加载背景；第一页时关掉二页可见性
 if (pageRitual && "IntersectionObserver" in window) {
   const io = new IntersectionObserver(
     ([entry]) => {
-      document.body.classList.toggle("ritual-visible", entry.isIntersecting && entry.intersectionRatio > 0.2);
+      const near = entry.isIntersecting || entry.intersectionRatio > 0;
+      if (entry.boundingClientRect.top < window.innerHeight * 1.35) ensureRitualAssets();
+      document.body.classList.toggle("ritual-visible", entry.isIntersecting && entry.intersectionRatio > 0.15);
     },
-    { threshold: [0, 0.2, 0.5] }
+    { threshold: [0, 0.15, 0.5], rootMargin: "40% 0px 0px 0px" }
   );
   io.observe(pageRitual);
+} else {
+  ensureRitualAssets();
+  document.body.classList.add("ritual-visible");
+}
+
+// 空闲时预热二页（不挡首屏）
+if ("requestIdleCallback" in window) {
+  requestIdleCallback(() => ensureRitualAssets(), { timeout: 2500 });
+} else {
+  setTimeout(ensureRitualAssets, 1800);
 }
 
 function setBusy(on) {
@@ -266,15 +286,18 @@ async function draw() {
   if (busy) return;
   setBusy(true);
   clearSlip();
+  ensureRitualAssets();
   window.KanshanScene?.resetRitualVisual?.();
   pageRitual?.scrollIntoView({ behavior: "smooth", block: "start" });
 
-  if (!audioOn) {
-    try {
-      await window.KanshanAudio.enable();
-      audioOn = true;
-      setAudioUi();
-    } catch (_) {}
+  // 不阻塞摇签：音频后台开，避免等 音频解码卡死
+  if (!audioOn && window.KanshanAudio) {
+    window.KanshanAudio.enable()
+      .then(() => {
+        audioOn = true;
+        setAudioUi();
+      })
+      .catch(() => {});
   }
 
   const fetchPromise = fetchDraw().catch((err) => ({ __err: err }));

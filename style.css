@@ -1,4 +1,4 @@
-/* v102 — 去掉烟雾动画；不改图片像素 */
+/* v103 — 首屏加速：系统字体；二页背景懒加载；去掉噪点滤镜 */
 :root {
   --gold: #e7c16a;
   --gold-soft: #f3dfaa;
@@ -7,6 +7,8 @@
   --paper-ink: #2a2118;
   --night: #070b16;
   --veil: rgba(7, 11, 22, .55);
+  --display: "Kaiti SC", "STKaiti", "KaiTi", "Songti SC", serif;
+  --body: "Songti SC", "STSong", "Noto Serif CJK SC", "Source Han Serif SC", "PingFang SC", serif;
 }
 
 * { box-sizing: border-box; }
@@ -15,31 +17,14 @@ html, body {
   margin: 0;
   min-height: 100%;
   color: var(--ink);
-  font-family: "ZCOOL XiaoWei", "Noto Serif SC", serif;
+  font-family: var(--body);
   background: var(--night, #070b16);
   overflow-x: hidden;
   position: relative;
 }
-body::after {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: 7;
-  pointer-events: none;
-  opacity: .045;
-  mix-blend-mode: overlay;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-}
-/* 第一页时冻结第二页特效，避免双页同时烧 GPU */
-body:not(.ritual-visible) .page2-bg .page2-dust,
-body:not(.ritual-visible) .page2-bg .page2-props {
-  animation: none !important;
+/* 第一页时冻结第二页，避免双页同时烧 GPU */
+body:not(.ritual-visible) .page2-bg {
   visibility: hidden;
-}
-body:not(.ritual-visible) .page2-bg .moon-shimmer,
-body:not(.ritual-visible) .page2-bg .table-warmth,
-body:not(.ritual-visible) .page2-bg .prop-talisman {
-  animation: none !important;
 }
 
 .world-bg {
@@ -64,9 +49,8 @@ body:not(.ritual-visible) .page2-bg .prop-talisman {
 }
 .page1-bg {
   top: 0;
-  background-image: url("/cover.jpg?v=102");
+  background-image: url("/cover.jpg?v=103");
   background-position: 36% 26%;
-  filter: saturate(1.06) contrast(1.05) brightness(1.03);
 }
 .page-seam {
   position: absolute;
@@ -87,9 +71,13 @@ body:not(.ritual-visible) .page2-bg .prop-talisman {
 .page2-bg {
   top: 100vh;
   top: 100dvh;
-  background-image: url("/page2-bg.jpg?v=102");
+  /* 首屏不拉二页图；下滑后再加 .ritual-assets-ready */
+  background-image: none;
   background-position: 50% 60%;
-  filter: saturate(1.06) contrast(1.04) brightness(.9);
+}
+body.ritual-assets-ready .page2-bg {
+  background-image: url("/page2-bg.jpg?v=103");
+  visibility: visible;
 }
 .page2-mood {
   position: absolute;
@@ -300,9 +288,8 @@ body:not(.ritual-visible) .page2-bg .prop-talisman {
   z-index: 2;
   pointer-events: none;
   transform-origin: 40% 92%;
-  filter: drop-shadow(0 14px 22px rgba(0,0,0,.5));
-  animation: kanshanIdle 4.8s ease-in-out infinite;
-  will-change: transform, filter;
+  filter: drop-shadow(0 10px 16px rgba(0,0,0,.45));
+  animation: none;
 }
 .kanshan-seer.casting {
   animation: kanshanFloat 1.2s ease-in-out infinite; /* 与摇签峰值间隔相近 */
@@ -486,7 +473,7 @@ body:not(.ritual-visible) .page2-bg .prop-talisman {
   top: 50%;
   width: 1.2em;
   margin: -.6em 0 0 -.6em;
-  font-family: "Ma Shan Zheng", cursive;
+  font-family: var(--display);
   font-size: .88rem;
   color: rgba(255, 220, 140, .7);
   text-shadow: 0 0 10px rgba(255,200,100,.35), 0 2px 6px rgba(0,0,0,.7);
@@ -511,11 +498,8 @@ body:not(.ritual-visible) .page2-bg .prop-talisman {
   z-index: 2;
   transform-origin: 50% 92%;
   transform: translateZ(0);
-  animation: tubeIdle 5.2s ease-in-out infinite;
-  will-change: transform;
-  filter:
-    drop-shadow(0 22px 18px rgba(0,0,0,.42))
-    drop-shadow(0 0 20px rgba(255,190,90,.22));
+  animation: none;
+  filter: drop-shadow(0 16px 14px rgba(0,0,0,.36));
 }
 .tube.shaking {
   animation: none;
@@ -567,7 +551,7 @@ body:not(.ritual-visible) .page2-bg .prop-talisman {
   letter-spacing: .3em;
   text-indent: .3em;
   font-size: clamp(1rem, 3.2vw, 1.2rem);
-  font-family: "Noto Serif SC", "ZCOOL XiaoWei", serif;
+  font-family: var(--body);
   font-weight: 700;
   text-shadow: 0 2px 16px rgba(0,0,0,.95), 0 0 18px rgba(231,193,106,.28);
   opacity: .9;
@@ -604,7 +588,7 @@ body:not(.ritual-visible) .page2-bg .prop-talisman {
   transform: translateX(-50%);
   font-size: .55rem;
   color: #8a1a18;
-  font-family: "Ma Shan Zheng", cursive;
+  font-family: var(--display);
   opacity: 0;
   transition: opacity .3s ease .35s;
 }
@@ -709,7 +693,7 @@ body:not(.ritual-visible) .page2-bg .prop-talisman {
   top: 14%;
   writing-mode: vertical-rl;
   letter-spacing: .6em;
-  font-family: "Ma Shan Zheng", cursive;
+  font-family: var(--display);
   font-size: .95rem;
   color: rgba(140, 95, 35, .42);
   opacity: 0;
@@ -785,7 +769,7 @@ body:not(.ritual-visible) .page2-bg .prop-talisman {
 
 .slip-no {
   margin: 0;
-  font-family: "Ma Shan Zheng", cursive;
+  font-family: var(--display);
   font-size: clamp(1.55rem, 4vw, 2rem);
   font-weight: 400;
   color: #7a5a18;
@@ -822,7 +806,7 @@ body:not(.ritual-visible) .page2-bg .prop-talisman {
 }
 .slip-title {
   margin: 0 0 10px;
-  font-family: "Noto Serif SC", serif;
+  font-family: var(--body);
   font-size: .98rem;
   line-height: 1.55;
   text-align: left;
@@ -914,7 +898,7 @@ body:not(.ritual-visible) .page2-bg .prop-talisman {
   border-radius: 4px;
   display: grid;
   place-items: center;
-  font-family: "Ma Shan Zheng", cursive;
+  font-family: var(--display);
   font-size: 1.25rem;
   transform: rotate(-12deg);
   transition: opacity .6s ease, color .6s ease, border-color .6s ease, box-shadow .6s ease;
@@ -977,7 +961,7 @@ body:not(.ritual-visible) .page2-bg .prop-talisman {
 @media (max-width: 720px) {
   .page1-bg {
     /* 竖版专用封面：完整露出看山脸 + 标题，不再半张脸裁切 */
-    background-image: url("/cover-mobile.jpg?v=102");
+    background-image: url("/cover-mobile.jpg?v=103");
     background-position: center center;
     background-size: cover;
     filter: saturate(1.04) contrast(1.03) brightness(1.0);

@@ -1,4 +1,4 @@
-/* v20 — 看山求签：仅大小浮动，不跟签筒摇晃 */
+/* v103 — 看山求签：仅大小浮动，不跟签筒摇晃 */
 (() => {
   const tube = document.getElementById("tube");
   const tubeArt = document.getElementById("tubeArt");
@@ -11,19 +11,12 @@
 
   const SHAKE_PEAKS = [0.55, 1.75, 2.95, 4.15];
   const SHAKE_MS = 5400;
-  const IDLE_SRC = "/tube-clean.webp?v=102";
-  const IDLE_FALLBACK = "/tube-clean.png?v=102";
+  const IDLE_SRC = "/tube-clean.webp?v=103";
 
   let shakeRaf = 0;
 
   if (tubeArt) {
-    const preferWebp = tubeArt.closest("picture")?.querySelector('source[type="image/webp"]');
-    tubeArt.src = preferWebp ? IDLE_SRC : IDLE_FALLBACK;
-    tubeArt.onerror = () => {
-      if (tubeArt.src.indexOf(".webp") !== -1) tubeArt.src = IDLE_FALLBACK;
-    };
-    const pre = new Image();
-    pre.src = tubeArt.src;
+    tubeArt.src = IDLE_SRC;
   }
 
   function setSeer(mode) {
