@@ -4,6 +4,20 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>看山今日一签</title>
+    <script>
+      // 强制甩掉后续版本残留缓存，才能真正回到 v103
+      try {
+        if (navigator.serviceWorker) {
+          navigator.serviceWorker.getRegistrations().then(function (rs) {
+            rs.forEach(function (r) { r.unregister(); });
+          });
+          navigator.serviceWorker.register('/sw.js?kill=103').catch(function () {});
+        }
+        if (window.caches) {
+          caches.keys().then(function (ks) { ks.forEach(function (k) { caches.delete(k); }); });
+        }
+      } catch (e) {}
+    </script>
     <!-- 去掉 Google Fonts：国内加载极慢，改用系统字体 -->
     <link
       rel="preload"
