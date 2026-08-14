@@ -1,4 +1,4 @@
-/* v25 — 柔和宿命摇筒声；动画峰值与音频严格对齐 */
+/* v101 — 看山跟签筒同峰值节奏；烛火/香烟雾对齐画面 */
 (() => {
   const tube = document.getElementById("tube");
   const tubeArt = document.getElementById("tubeArt");
@@ -6,12 +6,12 @@
   const emerging = document.getElementById("emerging");
   const fortuneCard = document.getElementById("fortuneCard");
   const pageRitual = document.getElementById("pageRitual");
+  const kanshanSeer = document.getElementById("kanshanSeer");
   const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 
-  // 与 static/audio/shake-peaks.json / 合成脚本一致
   const SHAKE_PEAKS = [0.55, 1.75, 2.95, 4.15];
   const SHAKE_MS = 5400;
-  const IDLE_SRC = "/tube-clean.png?v=23";
+  const IDLE_SRC = "/tube-clean.png?v=20";
 
   let shakeRaf = 0;
 
@@ -21,6 +21,18 @@
     pre.src = IDLE_SRC;
   }
 
+  function setSeer(mode) {
+    if (!kanshanSeer) return;
+    kanshanSeer.classList.remove("casting", "blessing");
+    if (mode) kanshanSeer.classList.add(mode);
+  }
+
+  function clearSeerMotion() {
+    if (!kanshanSeer) return;
+    kanshanSeer.style.transform = "";
+    kanshanSeer.style.filter = "";
+  }
+
   function stopShake() {
     cancelAnimationFrame(shakeRaf);
     shakeRaf = 0;
@@ -28,11 +40,26 @@
       tube.style.transform = "";
       tube.style.filter = "";
     }
+    clearSeerMotion();
+  }
+
+  function peakAmp(t, peaks) {
+    let amp = 0;
+    for (const p of peaks) {
+      const d = Math.abs(t - p);
+      if (d < 0.4) {
+        amp = Math.max(amp, Math.cos((d / 0.4) * (Math.PI / 2)));
+      }
+    }
+    // 低底噪，保持呼吸感但不抢峰值
+    amp = Math.max(amp, 0.06 * Math.abs(Math.sin(t * 7.5)));
+    return Math.min(1, amp);
   }
 
   function animateShake(durationMs = SHAKE_MS) {
     return new Promise((resolve) => {
       tube.classList.add("shaking");
+      setSeer("casting");
       const start = performance.now();
       const peaks = SHAKE_PEAKS;
 
@@ -42,21 +69,14 @@
           stopShake();
           tube.classList.remove("shaking");
           tube.style.transform = "rotate(0deg) translate3d(0,0,0)";
+          setSeer(null);
           resolve();
           return;
         }
 
-        // 与声效簇击对齐；保留灵动，不过度压抑
-        let amp = 0;
-        for (const p of peaks) {
-          const d = Math.abs(t - p);
-          if (d < 0.4) {
-            amp = Math.max(amp, Math.cos((d / 0.4) * (Math.PI / 2)));
-          }
-        }
-        amp = Math.max(amp, 0.07 * Math.abs(Math.sin(t * 8)));
-        amp = Math.min(1, amp);
+        const amp = peakAmp(t, peaks);
 
+        // 签筒主律动
         const rot = Math.sin(t * 16) * amp * 11.5 + Math.sin(t * 6.2) * amp * 2.6;
         const tx = Math.sin(t * 12.5) * amp * 8;
         const ty = Math.abs(Math.cos(t * 10)) * amp * 5.5;
@@ -65,6 +85,17 @@
         tube.style.transform =
           `translate3d(${tx.toFixed(2)}px, ${ty.toFixed(2)}px, 0) ` +
           `rotate(${rot.toFixed(2)}deg) scale(${squish.toFixed(3)}, ${(1 + amp * 0.018).toFixed(3)})`;
+
+        // 看山：同峰值、略轻、相位微反，像在帮着摇
+        if (kanshanSeer) {
+          const kAmp = amp * 0.72;
+          const kRot = Math.sin(t * 16 + 0.35) * kAmp * 6.2 + Math.sin(t * 6.2) * kAmp * 1.4;
+          const kTx = Math.sin(t * 12.5 + 0.25) * kAmp * 4.2;
+          const kTy = Math.abs(Math.cos(t * 10)) * kAmp * 3.4;
+          kanshanSeer.style.transform =
+            `translate3d(${(-kTx).toFixed(2)}px, ${(-kTy * 0.85).toFixed(2)}px, 0) ` +
+            `rotate(${(-kRot).toFixed(2)}deg)`;
+        }
 
         shakeRaf = requestAnimationFrame(tick);
       };
@@ -75,6 +106,7 @@
 
   function resetRitualVisual() {
     stopShake();
+    setSeer(null);
     tubeStage.classList.remove("leaving");
     emerging.hidden = true;
     emerging.classList.remove("show");
@@ -94,18 +126,21 @@
 
     onPhase?.("摇签");
     tube.style.willChange = "transform";
-    // 声画同帧启动
+    if (kanshanSeer) kanshanSeer.style.willChange = "transform";
     const shakeAudio = window.KanshanAudio?.playShake?.() || Promise.resolve();
     const shakeMotion = animateShake(SHAKE_MS);
     await Promise.all([shakeAudio, shakeMotion]);
     tube.style.willChange = "auto";
+    if (kanshanSeer) kanshanSeer.style.willChange = "auto";
 
     onPhase?.("取签");
+    setSeer("blessing");
     emerging.hidden = false;
     void emerging.offsetWidth;
     emerging.classList.add("show");
     window.KanshanAudio?.playReveal?.();
     await wait(1050);
+    setSeer(null);
   }
 
   async function revealSlip(onPhase, opts = {}) {

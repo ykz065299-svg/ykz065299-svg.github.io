@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>看山今日一签</title>
-    <link rel="stylesheet" href="/style.css?v=23" />
+    <link rel="stylesheet" href="/style.css?v=101" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -21,24 +21,38 @@
         <div class="page2-dust"></div>
         <div class="page2-props" aria-hidden="true">
           <div class="prop-candle">
-            <span class="candle-glow"></span>
+            <span class="candle-halo"></span>
             <span class="candle-wick"></span>
-            <span class="candle-flame"></span>
-            <span class="candle-flame tip"></span>
+            <span class="flame-stack">
+              <span class="flame layer outer"></span>
+              <span class="flame layer mid"></span>
+              <span class="flame layer core"></span>
+              <span class="flame layer tip"></span>
+            </span>
             <span class="candle-ember e1"></span>
             <span class="candle-ember e2"></span>
             <span class="candle-ember e3"></span>
+            <span class="candle-ember e4"></span>
+            <span class="candle-ember e5"></span>
           </div>
           <div class="prop-censer">
             <span class="censer-glow"></span>
             <span class="censer-coal"></span>
-            <span class="incense-smoke s1"></span>
-            <span class="incense-smoke s2"></span>
-            <span class="incense-smoke s3"></span>
-            <span class="incense-smoke s4"></span>
+            <span class="smoke-stack">
+              <span class="smoke-wisp s1"></span>
+              <span class="smoke-wisp s2"></span>
+              <span class="smoke-wisp s3"></span>
+              <span class="smoke-wisp s4"></span>
+              <span class="smoke-wisp s5"></span>
+              <span class="smoke-wisp s6"></span>
+              <span class="smoke-curl c1"></span>
+              <span class="smoke-curl c2"></span>
+              <span class="smoke-curl c3"></span>
+            </span>
             <span class="ash-spark a1"></span>
             <span class="ash-spark a2"></span>
             <span class="ash-spark a3"></span>
+            <span class="ash-spark a4"></span>
           </div>
           <div class="prop-talisman t1"></div>
           <div class="prop-talisman t2"></div>
@@ -62,6 +76,20 @@
         <p class="phase" id="phaseText">静候开筒</p>
 
         <div class="ritual" id="ritual">
+          <aside class="kanshan-seer" id="kanshanSeer" aria-hidden="true">
+            <span class="kanshan-aura"></span>
+            <span class="kanshan-aura ring"></span>
+            <img
+              class="kanshan-seer-art"
+              src="/art/kanshan-daoshi-bugua-cut.png?v=101"
+              alt=""
+              width="833"
+              height="913"
+              draggable="false"
+              decoding="async"
+            />
+            <span class="kanshan-seer-caption">看山卜卦</span>
+          </aside>
           <div class="tube-stage" id="tubeStage">
             <div class="fate-ring" aria-hidden="true">
               <span style="--i:0">命</span><span style="--i:1">数</span>
@@ -76,7 +104,7 @@
               <div class="tube-glow" aria-hidden="true"></div>
               <img
                 id="tubeArt"
-                src="/tube-clean.png?v=22"
+                src="/tube-clean.png?v=101"
                 alt=""
                 class="tube-art"
                 width="460"
@@ -125,13 +153,13 @@
             <span class="btn-label" id="btnLabel">求签</span>
           </button>
           <p class="hint" id="hint">求签 → 摇签 → 取签 → 开签</p>
-          <p class="source">知乎开放平台 CLI · hot · v23</p>
+          <p class="source">知乎开放平台 CLI · hot · v101</p>
         </div>
       </section>
     </main>
 
-    <script src="/audio.js?v=23"></script>
-    <script src="/ritual.js?v=23"></script>
-    <script src="/app.js?v=23"></script>
+    <script src="/audio.js?v=101"></script>
+    <script src="/ritual.js?v=101"></script>
+    <script src="/app.js?v=101"></script>
   </body>
 </html>

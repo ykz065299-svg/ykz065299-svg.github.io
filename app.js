@@ -165,16 +165,31 @@ function prepareSlipSize() {
 }
 
 async function localDrawFallback() {
-  const r = await fetch("data/hot-seed.json", { cache: "no-store" });
-  if (!r.ok) throw new Error("本地签库不可用");
-  const payload = await r.json();
-  const items = payload.Items || payload.items || [];
+  // Pages 无后端：优先最近热榜缓存，再退回 seed
+  let items = [];
+  let source = "static-seed";
+  for (const [path, tag] of [
+    ["data/hot-cache.json", "hot-cache"],
+    ["data/hot-seed.json", "static-seed"],
+  ]) {
+    try {
+      const r = await fetch(path, { cache: "no-store" });
+      if (!r.ok) continue;
+      const payload = await r.json();
+      const list = payload.Items || payload.items || [];
+      if (list.length) {
+        items = list;
+        source = tag;
+        break;
+      }
+    } catch (_) {}
+  }
   if (!items.length) throw new Error("签库为空");
   const pick = items[Math.floor(Math.random() * items.length)];
   const title = pick.Title || pick.title || "";
   const url = pick.Url || pick.url || "https://www.zhihu.com/hot";
   const summary = cleanMediaPlaceholder(pick.Summary || pick.summary || "");
-  const rank = items.indexOf(pick) + 1;
+  const rank = Math.max(1, items.indexOf(pick) + 1);
   const slipNo = 1 + Math.floor(Math.random() * 100);
   const grades = [
     { label: "上上签", key: "supreme", motto: "天时正盛，宜顺势探问" },
@@ -216,7 +231,7 @@ async function localDrawFallback() {
       motto: g.motto,
     },
     item: { title, url, summary },
-    source: "static-seed",
+    source,
   };
 }
 
@@ -231,7 +246,7 @@ async function fetchDraw() {
     }
     if (r.ok && data?.ok) return data;
   } catch (_) {
-    /* GitHub Pages 无 Python 后端，走静态签库 */
+    /* GitHub Pages 无 Python 后端 */
   }
   return localDrawFallback();
 }

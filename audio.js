@@ -1,6 +1,6 @@
 /* v20 — 道士看山重绘 + PC/PE 同框 */
 (() => {
-  const bust = "?v=23";
+  const bust = "?v=20";
   const SHAKE_SEC = 5.4;
 
   const AudioEngine = {
