@@ -1,4 +1,4 @@
-/* v21 — 去烛火叠加；PC/PE 舞台尺寸对齐竖屏构图 */
+/* v22 — 去烛火；恢复 PC 全宽；修 PE 封面取景 */
 :root {
   --gold: #e7c16a;
   --gold-soft: #f3dfaa;
@@ -7,9 +7,6 @@
   --paper-ink: #2a2118;
   --night: #070b16;
   --veil: rgba(7, 11, 22, .55);
-  /* PC 居中竖屏舞台；PE 接近全宽 */
-  --stage-w: 430px;
-  --stage-pad: 20px;
 }
 
 * { box-sizing: border-box; }
@@ -36,16 +33,13 @@ body::after {
 
 .world-bg {
   position: absolute;
-  top: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: min(var(--stage-w), 100%);
+  inset: 0 auto auto 0;
+  width: 100%;
   height: 200vh;
   height: 200dvh;
   z-index: 0;
   pointer-events: none;
   background: #070b16;
-  overflow: hidden;
 }
 .page-bg {
   position: absolute;
@@ -335,7 +329,7 @@ body::after {
 .world {
   position: relative;
   z-index: 2;
-  width: min(var(--stage-w), calc(100% - var(--stage-pad) * 2));
+  width: min(440px, calc(100% - 28px));
   margin: 0 auto;
 }
 
@@ -531,23 +525,6 @@ body::after {
 @keyframes kanshanRing {
   0% { transform: translate(-50%, -50%) rotate(0deg) scale(1); }
   100% { transform: translate(-50%, -50%) rotate(360deg) scale(1); }
-}
-
-/* PE：全宽竖屏；PC：居中 430 舞台 */
-@media (max-width: 480px) {
-  :root {
-    --stage-w: 100%;
-    --stage-pad: 14px;
-  }
-  .world-bg { width: 100%; left: 0; transform: none; }
-  .world { width: calc(100% - var(--stage-pad) * 2); }
-  .audio-toggle { right: 12px; top: 12px; }
-}
-@media (min-width: 481px) and (max-width: 900px) {
-  :root { --stage-w: 400px; --stage-pad: 16px; }
-}
-@media (min-width: 901px) {
-  :root { --stage-w: 430px; --stage-pad: 20px; }
 }
 
 @media (max-width: 720px) {
@@ -1142,7 +1119,13 @@ body::after {
 }
 
 @media (max-width: 720px) {
-  .page1-bg { background-position: 42% 20%; }
+  .page1-bg {
+    /* 横版封面在竖屏会被 cover 裁切：偏左保住标题 */
+    background-position: 20% 40%;
+  }
+  .page-cover .scroll-cue {
+    margin-bottom: max(8px, env(safe-area-inset-bottom));
+  }
   .page2-bg { background-position: 50% 70%; }
   .tube { width: 190px; height: 300px; margin-bottom: 40px; }
   .tube-stage { width: 220px; height: 360px; top: 52%; }
