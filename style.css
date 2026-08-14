@@ -1,4 +1,4 @@
-/* v20 — 恢复全宽网页端背景；内容栏居中 */
+/* v21 — 去烛火叠加；PC/PE 舞台尺寸对齐竖屏构图 */
 :root {
   --gold: #e7c16a;
   --gold-soft: #f3dfaa;
@@ -7,6 +7,9 @@
   --paper-ink: #2a2118;
   --night: #070b16;
   --veil: rgba(7, 11, 22, .55);
+  /* PC 居中竖屏舞台；PE 接近全宽 */
+  --stage-w: 430px;
+  --stage-pad: 20px;
 }
 
 * { box-sizing: border-box; }
@@ -33,13 +36,16 @@ body::after {
 
 .world-bg {
   position: absolute;
-  inset: 0 auto auto 0;
-  width: 100%;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(var(--stage-w), 100%);
   height: 200vh;
   height: 200dvh;
   z-index: 0;
   pointer-events: none;
   background: #070b16;
+  overflow: hidden;
 }
 .page-bg {
   position: absolute;
@@ -107,7 +113,7 @@ body::after {
   100% { transform: translate3d(0, 0, 0); }
 }
 
-/* —— 第二页动态烛火 / 香炉（v101：对齐画面烛尖 / 炉盖） —— */
+/* —— 第二页香炉烟雾（已去掉动态烛火） —— */
 .page2-props {
   position: absolute;
   inset: 0;
@@ -115,120 +121,20 @@ body::after {
   z-index: 2;
   overflow: hidden;
 }
-/* 锚点 = 画面烛焰尖（cover + bg-position 50% 60% 映射） */
-.prop-candle {
-  position: absolute;
-  left: 10%;
-  bottom: 64.5%;
-  width: 48px;
-  height: 72px;
-  transform: translateX(-50%);
-  z-index: 3;
-}
-.candle-halo {
-  position: absolute;
-  left: 50%;
-  bottom: -8px;
-  width: 120px;
-  height: 120px;
-  transform: translateX(-50%);
-  background:
-    radial-gradient(circle at 50% 58%, rgba(255,200,90,.48) 0%, rgba(255,120,30,.16) 36%, transparent 70%);
-  filter: blur(8px);
-  animation: candleHalo 2.1s ease-in-out infinite;
-  mix-blend-mode: screen;
-}
-.candle-wick {
-  display: none; /* 背景图已有烛芯 */
-}
-.flame-stack {
-  position: absolute;
-  left: 50%;
-  bottom: 0;
-  width: 30px;
-  height: 54px;
-  transform: translateX(-50%);
-  z-index: 2;
-}
-.flame.layer {
-  position: absolute;
-  left: 50%;
-  bottom: 0;
-  transform: translateX(-50%);
-  transform-origin: 50% 100%;
-  border-radius: 50% 50% 42% 42%;
-  mix-blend-mode: screen;
-  will-change: transform, opacity, filter;
-}
-.flame.outer {
-  width: 22px;
-  height: 40px;
-  background: radial-gradient(ellipse at 50% 72%, rgba(255,150,45,.95) 0%, rgba(255,70,10,.55) 48%, transparent 78%);
-  filter: blur(1.2px);
-  box-shadow: 0 0 18px 6px rgba(255,110,30,.38);
-  animation: flameDance 0.78s ease-in-out infinite;
-}
-.flame.mid {
-  width: 13px;
-  height: 28px;
-  bottom: 4px;
-  background: radial-gradient(ellipse at 50% 68%, #fff0b0 0%, #ffb840 42%, #ff6a18 78%, transparent 100%);
-  box-shadow: 0 0 10px 3px rgba(255,170,60,.55);
-  animation: flameDance 0.62s ease-in-out infinite reverse;
-  animation-delay: -.15s;
-}
-.flame.core {
-  width: 6px;
-  height: 15px;
-  bottom: 5px;
-  background: radial-gradient(ellipse at 50% 60%, #fffdf2 0%, #ffe9a8 55%, transparent 100%);
-  filter: blur(.3px);
-  animation: flameCore 0.48s ease-in-out infinite;
-}
-.flame.tip {
-  width: 4px;
-  height: 10px;
-  bottom: 24px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(255,255,250,.95), rgba(255,210,120,.35) 60%, transparent 100%);
-  filter: blur(.5px);
-  animation: flameTip 0.55s ease-in-out infinite;
-  opacity: .9;
-}
-.candle-ember {
-  position: absolute;
-  left: 50%;
-  bottom: 36px;
-  width: 2px;
-  height: 2px;
-  border-radius: 50%;
-  background: #ffe0a8;
-  box-shadow: 0 0 6px #ff9a40;
-  opacity: 0;
-  animation: emberRise 2.6s ease-out infinite;
-  z-index: 3;
-}
-.candle-ember.e1 { animation-delay: 0s; margin-left: -6px; }
-.candle-ember.e2 { animation-delay: .7s; margin-left: 4px; animation-duration: 3.1s; }
-.candle-ember.e3 { animation-delay: 1.4s; margin-left: -2px; animation-duration: 2.4s; }
-.candle-ember.e4 { animation-delay: 2s; margin-left: 7px; animation-duration: 2.9s; }
-.candle-ember.e5 { animation-delay: 2.5s; margin-left: -8px; animation-duration: 3.4s; }
-
-/* 锚点 = 香炉盖出烟口；烟加大 */
 .prop-censer {
   position: absolute;
-  right: 13.5%;
-  bottom: 39%;
-  width: clamp(90px, 22vw, 130px);
-  height: clamp(220px, 48vw, 280px);
+  right: 12%;
+  bottom: 34%;
+  width: 100px;
+  height: 240px;
   transform: translateX(50%);
 }
 .censer-glow {
   position: absolute;
   left: 50%;
   bottom: -6px;
-  width: 100px;
-  height: 64px;
+  width: 90px;
+  height: 56px;
   transform: translateX(-50%);
   background: radial-gradient(ellipse, rgba(255,140,50,.2), transparent 72%);
   filter: blur(9px);
@@ -238,8 +144,8 @@ body::after {
   position: absolute;
   left: 50%;
   bottom: 4px;
-  width: 16px;
-  height: 7px;
+  width: 14px;
+  height: 6px;
   transform: translateX(-50%);
   border-radius: 50%;
   background: radial-gradient(circle, rgba(255,200,120,.7), rgba(255,90,20,.3) 55%, transparent 82%);
@@ -253,8 +159,8 @@ body::after {
   position: absolute;
   left: 50%;
   bottom: 10px;
-  width: 120px;
-  height: 260px;
+  width: 110px;
+  height: 230px;
   transform: translateX(-50%);
   z-index: 2;
   mask-image: linear-gradient(180deg, transparent 0%, #000 10%, #000 82%, transparent 100%);
@@ -265,7 +171,7 @@ body::after {
   left: 50%;
   bottom: 0;
   width: 28px;
-  height: 170px;
+  height: 160px;
   transform: translateX(-50%);
   border-radius: 60% 60% 40% 40%;
   background:
@@ -356,31 +262,6 @@ body::after {
   mix-blend-mode: soft-light;
 }
 
-@keyframes candleHalo {
-  0%, 100% { opacity: .72; transform: translateX(-50%) scale(1); }
-  35% { opacity: 1; transform: translateX(-50%) scale(1.1); }
-  65% { opacity: .8; transform: translateX(-50%) scale(.94); }
-}
-@keyframes flameDance {
-  0%, 100% { transform: translateX(-50%) scaleY(1) scaleX(1) rotate(-2deg) skewX(0deg); }
-  20% { transform: translateX(-46%) scaleY(1.12) scaleX(.88) rotate(3deg) skewX(2deg); }
-  45% { transform: translateX(-54%) scaleY(.9) scaleX(1.1) rotate(-4deg) skewX(-3deg); }
-  70% { transform: translateX(-49%) scaleY(1.08) scaleX(.94) rotate(2deg) skewX(1deg); }
-}
-@keyframes flameCore {
-  0%, 100% { transform: translateX(-50%) scaleY(1) scaleX(1); opacity: .95; }
-  50% { transform: translateX(-48%) scaleY(1.14) scaleX(.86); opacity: 1; }
-}
-@keyframes flameTip {
-  0%, 100% { transform: translateX(-50%) translateY(0) scale(1); opacity: .75; }
-  40% { transform: translateX(-40%) translateY(-3px) scale(1.15); opacity: 1; }
-  75% { transform: translateX(-60%) translateY(-1px) scale(.9); opacity: .65; }
-}
-@keyframes emberRise {
-  0% { opacity: 0; transform: translateY(0) scale(.55); }
-  12% { opacity: 1; }
-  100% { opacity: 0; transform: translateY(-52px) translateX(10px) scale(.15); }
-}
 @keyframes censerPulse {
   0%, 100% { opacity: .5; transform: translateX(-50%) scale(1); }
   50% { opacity: .95; transform: translateX(-50%) scale(1.12); }
@@ -426,8 +307,7 @@ body::after {
 }
 
 @media (max-width: 480px) {
-  .prop-candle { left: 8%; bottom: 48%; }
-  .prop-censer { right: 8%; bottom: 36%; width: 96px; height: 220px; }
+  .prop-censer { right: 10%; bottom: 32%; width: 88px; height: 210px; }
 }
 
 .audio-toggle {
@@ -455,7 +335,7 @@ body::after {
 .world {
   position: relative;
   z-index: 2;
-  width: min(440px, calc(100% - 28px));
+  width: min(var(--stage-w), calc(100% - var(--stage-pad) * 2));
   margin: 0 auto;
 }
 
@@ -540,12 +420,12 @@ body::after {
 /* 签筒旁：看山卜卦（右侧陪侍） */
 .kanshan-seer {
   position: absolute;
-  left: calc(50% + 96px);
+  left: calc(50% + 72px);
   right: auto;
-  bottom: calc(50% - 162px);
+  bottom: calc(50% - 150px);
   top: auto;
-  width: clamp(196px, 34vh, 248px);
-  height: clamp(214px, 37vh, 272px);
+  width: clamp(150px, 32vh, 196px);
+  height: clamp(164px, 35vh, 214px);
   z-index: 2;
   pointer-events: none;
   transform-origin: 42% 90%;
@@ -653,22 +533,39 @@ body::after {
   100% { transform: translate(-50%, -50%) rotate(360deg) scale(1); }
 }
 
+/* PE：全宽竖屏；PC：居中 430 舞台 */
+@media (max-width: 480px) {
+  :root {
+    --stage-w: 100%;
+    --stage-pad: 14px;
+  }
+  .world-bg { width: 100%; left: 0; transform: none; }
+  .world { width: calc(100% - var(--stage-pad) * 2); }
+  .audio-toggle { right: 12px; top: 12px; }
+}
+@media (min-width: 481px) and (max-width: 900px) {
+  :root { --stage-w: 400px; --stage-pad: 16px; }
+}
+@media (min-width: 901px) {
+  :root { --stage-w: 430px; --stage-pad: 20px; }
+}
+
 @media (max-width: 720px) {
   .kanshan-seer {
-    left: calc(50% + 68px);
+    left: calc(50% + 58px);
     right: auto;
-    width: clamp(148px, 28vh, 186px);
-    height: clamp(162px, 30.5vh, 204px);
-    bottom: calc(50% - 128px);
+    width: clamp(132px, 28vh, 168px);
+    height: clamp(144px, 30.5vh, 184px);
+    bottom: calc(50% - 120px);
   }
 }
 @media (max-width: 420px) {
   .kanshan-seer {
-    left: calc(50% + 52px);
+    left: calc(50% + 48px);
     right: auto;
-    width: clamp(122px, 26vh, 152px);
-    height: clamp(134px, 28.5vh, 166px);
-    bottom: calc(50% - 112px);
+    width: clamp(112px, 26vh, 140px);
+    height: clamp(122px, 28.5vh, 154px);
+    bottom: calc(50% - 108px);
   }
   .kanshan-seer-caption { font-size: .52rem; letter-spacing: .1em; text-indent: .1em; }
 }
