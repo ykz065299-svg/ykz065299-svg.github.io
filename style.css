@@ -1,4 +1,4 @@
-/* v22 — 去烛火；恢复 PC 全宽；修 PE 封面取景 */
+/* v100 — 看山更大更右；整体比例抛光；隐藏 CLI 脚注 */
 :root {
   --gold: #e7c16a;
   --gold-soft: #f3dfaa;
@@ -117,10 +117,10 @@ body::after {
 }
 .prop-censer {
   position: absolute;
-  right: 12%;
-  bottom: 34%;
-  width: 100px;
-  height: 240px;
+  right: 14%;
+  bottom: 33%;
+  width: 108px;
+  height: 250px;
   transform: translateX(50%);
 }
 .censer-glow {
@@ -371,7 +371,7 @@ body::after {
   position: relative;
   justify-content: flex-start;
   align-items: center;
-  padding: 18px 0 28px;
+  padding: 16px 0 22px;
   text-align: center;
   /* 整页作为签的定位坐标系 */
   min-height: 100vh;
@@ -391,11 +391,12 @@ body::after {
 }
 
 .phase {
-  margin: 8px 0 0;
-  min-height: 1.4em;
+  margin: 10px 0 0;
+  min-height: 1.35em;
   color: var(--gold-soft);
-  letter-spacing: .32em;
-  text-indent: .32em;
+  letter-spacing: .36em;
+  text-indent: .36em;
+  font-size: .95rem;
   text-shadow: 0 4px 18px rgba(0,0,0,.9), 0 0 24px rgba(231,193,106,.18);
   transition: opacity .3s ease;
   position: relative;
@@ -411,19 +412,19 @@ body::after {
   z-index: 2;
 }
 
-/* 签筒旁：看山卜卦（右侧陪侍） */
+/* 签筒旁：看山卜卦（更大、更靠右） */
 .kanshan-seer {
   position: absolute;
-  left: calc(50% + 72px);
+  left: calc(50% + 108px);
   right: auto;
-  bottom: calc(50% - 150px);
+  bottom: calc(50% - 178px);
   top: auto;
-  width: clamp(150px, 32vh, 196px);
-  height: clamp(164px, 35vh, 214px);
+  width: clamp(210px, 40vh, 286px);
+  height: clamp(230px, 44vh, 314px);
   z-index: 2;
   pointer-events: none;
-  transform-origin: 42% 90%;
-  filter: drop-shadow(0 12px 18px rgba(0,0,0,.45));
+  transform-origin: 40% 92%;
+  filter: drop-shadow(0 14px 22px rgba(0,0,0,.5));
   animation: kanshanIdle 4.8s ease-in-out infinite;
   will-change: transform, filter;
 }
@@ -483,12 +484,12 @@ body::after {
 }
 .kanshan-seer-caption {
   display: block;
-  margin-top: 2px;
+  margin-top: 4px;
   text-align: center;
-  color: rgba(243, 223, 170, .72);
-  font-size: .6rem;
-  letter-spacing: .16em;
-  text-indent: .16em;
+  color: rgba(243, 223, 170, .62);
+  font-size: .58rem;
+  letter-spacing: .2em;
+  text-indent: .2em;
   text-shadow: 0 2px 10px rgba(0,0,0,.9);
 }
 .kanshan-seer.blessing {
@@ -529,29 +530,29 @@ body::after {
 
 @media (max-width: 720px) {
   .kanshan-seer {
-    left: calc(50% + 58px);
+    left: calc(50% + 78px);
     right: auto;
-    width: clamp(132px, 28vh, 168px);
-    height: clamp(144px, 30.5vh, 184px);
-    bottom: calc(50% - 120px);
+    width: clamp(168px, 34vh, 220px);
+    height: clamp(184px, 37vh, 240px);
+    bottom: calc(50% - 138px);
   }
 }
 @media (max-width: 420px) {
   .kanshan-seer {
-    left: calc(50% + 48px);
+    left: calc(50% + 62px);
     right: auto;
-    width: clamp(112px, 26vh, 140px);
-    height: clamp(122px, 28.5vh, 154px);
-    bottom: calc(50% - 108px);
+    width: clamp(148px, 32vh, 186px);
+    height: clamp(162px, 35vh, 204px);
+    bottom: calc(50% - 122px);
   }
-  .kanshan-seer-caption { font-size: .52rem; letter-spacing: .1em; text-indent: .1em; }
+  .kanshan-seer-caption { font-size: .55rem; letter-spacing: .12em; text-indent: .12em; }
 }
 
 .ritual-footer {
   position: relative;
   z-index: 4;
   width: 100%;
-  padding-top: 4px;
+  padding: 8px 0 10px;
   margin-top: auto;
 }
 
@@ -559,10 +560,10 @@ body::after {
 .tube-stage {
   position: absolute;
   left: 50%;
-  top: 52%;
+  top: 50%;
   transform: translate3d(-50%, -50%, 0);
-  width: 260px;
-  height: 400px;
+  width: 268px;
+  height: 420px;
   z-index: 3;
   display: grid;
   place-items: center;
@@ -645,9 +646,9 @@ body::after {
 
 .tube {
   position: relative;
-  width: 220px;
-  height: 340px;
-  margin-bottom: 44px;
+  width: 228px;
+  height: 352px;
+  margin-bottom: 48px;
   z-index: 2;
   transform-origin: 50% 92%;
   transform: translateZ(0);
@@ -698,19 +699,19 @@ body::after {
 
 .tube-label {
   position: absolute;
-  bottom: 8px;
+  bottom: 4px;
   left: 50%;
   transform: translateX(-50%);
   margin: 0;
   white-space: nowrap;
   color: var(--gold);
-  letter-spacing: .28em;
-  text-indent: .28em;
-  font-size: clamp(1.05rem, 3.4vw, 1.28rem);
+  letter-spacing: .3em;
+  text-indent: .3em;
+  font-size: clamp(1rem, 3.2vw, 1.2rem);
   font-family: "Noto Serif SC", "ZCOOL XiaoWei", serif;
   font-weight: 700;
   text-shadow: 0 2px 16px rgba(0,0,0,.95), 0 0 18px rgba(231,193,106,.28);
-  opacity: .96;
+  opacity: .9;
 }
 
 .emerging {
@@ -1071,10 +1072,10 @@ body::after {
     linear-gradient(180deg, #3f2e14, #1a1208);
   color: var(--gold-soft);
   font-family: inherit;
-  font-size: 1.08rem;
-  letter-spacing: .42em;
-  text-indent: .42em;
-  padding: 13px 44px;
+  font-size: 1.05rem;
+  letter-spacing: .46em;
+  text-indent: .46em;
+  padding: 14px 48px;
   border-radius: 999px;
   cursor: pointer;
   overflow: hidden;
@@ -1105,18 +1106,14 @@ body::after {
 }
 
 .hint {
-  margin: 12px 0 0;
-  color: var(--muted);
-  font-size: .82rem;
-  letter-spacing: .06em;
+  margin: 14px 0 0;
+  color: rgba(196,189,174,.72);
+  font-size: .78rem;
+  letter-spacing: .12em;
+  text-indent: .12em;
   text-shadow: 0 2px 10px rgba(0,0,0,.8);
 }
-.source {
-  margin: 10px 0 0;
-  color: rgba(183,177,163,.55);
-  font-size: .7rem;
-  letter-spacing: .04em;
-}
+.source { display: none !important; }
 
 @media (max-width: 720px) {
   .page1-bg {
@@ -1127,9 +1124,9 @@ body::after {
     margin-bottom: max(8px, env(safe-area-inset-bottom));
   }
   .page2-bg { background-position: 50% 70%; }
-  .tube { width: 190px; height: 300px; margin-bottom: 40px; }
-  .tube-stage { width: 220px; height: 360px; top: 52%; }
-  .fate-ring { width: 200px; height: 200px; }
+  .tube { width: 196px; height: 308px; margin-bottom: 42px; }
+  .tube-stage { width: 232px; height: 372px; top: 50%; }
+  .fate-ring { width: 208px; height: 208px; }
   .fate-ring span {
     transform:
       rotate(calc(var(--i) * 30deg))
