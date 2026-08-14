@@ -1,6 +1,6 @@
 /* v103 — HTMLAudio 流式播放；不预解码；不阻塞首屏 */
 (() => {
-  const bust = "?v=104";
+  const bust = "?v=105";
   const SHAKE_SEC = 5.4;
 
   const AudioEngine = {

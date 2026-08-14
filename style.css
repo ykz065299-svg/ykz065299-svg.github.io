@@ -1,4 +1,4 @@
-/* v104 — v103观感+加速： 首屏加速：系统字体；二页背景懒加载；去掉噪点滤镜 */
+/* v105 — v103观感+加速： 首屏加速：系统字体；二页背景懒加载；去掉噪点滤镜 */
 :root {
   --gold: #e7c16a;
   --gold-soft: #f3dfaa;
@@ -49,7 +49,7 @@ body:not(.ritual-visible) .page2-bg {
 }
 .page1-bg {
   top: 0;
-  background-image: url("/cover.jpg?v=104");
+  background-image: url("/cover.jpg?v=105");
   background-position: 36% 26%;
 }
 .page-seam {
@@ -76,7 +76,7 @@ body:not(.ritual-visible) .page2-bg {
   background-position: 50% 60%;
 }
 body.ritual-assets-ready .page2-bg {
-  background-image: url("/page2-bg.jpg?v=104");
+  background-image: url("/page2-bg.jpg?v=105");
   visibility: visible;
 }
 .page2-mood {
@@ -961,7 +961,7 @@ body.ritual-assets-ready .page2-bg {
 @media (max-width: 720px) {
   .page1-bg {
     /* 竖版专用封面：完整露出看山脸 + 标题，不再半张脸裁切 */
-    background-image: url("/cover-mobile.jpg?v=104");
+    background-image: url("/cover-mobile.jpg?v=105");
     background-position: center center;
     background-size: cover;
   }

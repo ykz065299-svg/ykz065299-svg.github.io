@@ -1,6 +1,6 @@
 /* v103 — HTMLAudio 流式播放；不预解码；不阻塞首屏 */
 (() => {
-  const bust = "?v=104";
+  const bust = "?v=105";
   const SHAKE_SEC = 5.4;
 
   const AudioEngine = {
@@ -83,7 +83,7 @@
 
   const SHAKE_PEAKS = [0.55, 1.75, 2.95, 4.15];
   const SHAKE_MS = 5400;
-  const IDLE_SRC = "/tube-clean.webp?v=104";
+  const IDLE_SRC = "/tube-clean.webp?v=105";
 
   let shakeRaf = 0;
 
@@ -585,6 +585,6 @@ setAudioUi();
 
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", function () {
-    navigator.serviceWorker.register("/sw.js?v=104").catch(function () {});
+    navigator.serviceWorker.register("/sw.js?v=105").catch(function () {});
   });
 }

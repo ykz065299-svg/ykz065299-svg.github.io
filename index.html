@@ -7,7 +7,7 @@
     <title>看山今日一签</title>
     <!-- CSS 内联：少一次 github.io 慢请求 -->
     <style>
-/* v104 — v103观感+加速： 首屏加速：系统字体；二页背景懒加载；去掉噪点滤镜 */
+/* v105 — v103观感+加速： 首屏加速：系统字体；二页背景懒加载；去掉噪点滤镜 */
 :root {
   --gold: #e7c16a;
   --gold-soft: #f3dfaa;
@@ -58,7 +58,7 @@ body:not(.ritual-visible) .page2-bg {
 }
 .page1-bg {
   top: 0;
-  background-image: url("/cover.jpg?v=104");
+  background-image: url("/cover.jpg?v=105");
   background-position: 36% 26%;
 }
 .page-seam {
@@ -85,7 +85,7 @@ body:not(.ritual-visible) .page2-bg {
   background-position: 50% 60%;
 }
 body.ritual-assets-ready .page2-bg {
-  background-image: url("/page2-bg.jpg?v=104");
+  background-image: url("/page2-bg.jpg?v=105");
   visibility: visible;
 }
 .page2-mood {
@@ -970,7 +970,7 @@ body.ritual-assets-ready .page2-bg {
 @media (max-width: 720px) {
   .page1-bg {
     /* 竖版专用封面：完整露出看山脸 + 标题，不再半张脸裁切 */
-    background-image: url("/cover-mobile.jpg?v=104");
+    background-image: url("/cover-mobile.jpg?v=105");
     background-position: center center;
     background-size: cover;
   }
@@ -996,7 +996,7 @@ body.ritual-assets-ready .page2-bg {
         var link = document.createElement("link");
         link.rel = "preload";
         link.as = "image";
-        link.href = mobile ? "/cover-mobile.jpg?v=104" : "/cover.jpg?v=104";
+        link.href = mobile ? "/cover-mobile.jpg?v=105" : "/cover.jpg?v=105";
         document.head.appendChild(link);
       })();
     </script>
@@ -1023,7 +1023,7 @@ body.ritual-assets-ready .page2-bg {
           <aside class="kanshan-seer" id="kanshanSeer" aria-hidden="true">
             <img
               class="kanshan-seer-art"
-              data-src="/art/kanshan-daoshi-bugua-cut.webp?v=104"
+              data-src="/art/kanshan-daoshi-bugua-cut.webp?v=105"
               alt=""
               width="420"
               height="459"
@@ -1038,7 +1038,7 @@ body.ritual-assets-ready .page2-bg {
               <div class="tube-glow" aria-hidden="true"></div>
               <img
                 id="tubeArt"
-                data-src="/tube-clean.webp?v=104"
+                data-src="/tube-clean.webp?v=105"
                 alt=""
                 class="tube-art"
                 width="320"
@@ -1091,6 +1091,6 @@ body.ritual-assets-ready .page2-bg {
       </section>
     </main>
 
-    <script src="/boot.js?v=104" defer></script>
+    <script src="/boot.js?v=105" defer></script>
   </body>
 </html>
