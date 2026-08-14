@@ -964,38 +964,16 @@ body.ritual-assets-ready .page2-bg {
     background-image: url("/cover-mobile.jpg?v=103");
     background-position: center center;
     background-size: cover;
-    filter: saturate(1.04) contrast(1.03) brightness(1.0);
   }
   .page-cover .scroll-cue {
     margin-bottom: max(8px, env(safe-area-inset-bottom));
   }
   .page2-bg { background-position: 50% 70%; }
-  /* 手机减负：少模糊少动画 */
-  .page2-dust,
-  .prop-talisman,
-  .moon-shimmer,
-  .table-warmth,
-  .kanshan-aura.ring {
-    display: none !important;
-  }
-  .fate-ring {
-    animation: none;
-    opacity: .7;
-  }
-  .fate-ring span { animation: none; opacity: .65; }
-  .tube { width: 196px; height: 308px; margin-bottom: 42px; will-change: auto; }
+  .tube { width: 196px; height: 308px; margin-bottom: 42px; }
   .tube-stage { width: 232px; height: 372px; top: 50%; }
-  .fate-ring { width: 208px; height: 208px; }
-  .kanshan-seer { will-change: auto; filter: drop-shadow(0 10px 14px rgba(0,0,0,.45)); }
-  body::after { opacity: .02; }
+  .kanshan-seer { filter: drop-shadow(0 10px 14px rgba(0,0,0,.45)); }
   .audio-toggle,
   .scroll-cue { backdrop-filter: none; }
-  .fate-ring span {
-    transform:
-      rotate(calc(var(--i) * 30deg))
-      translateY(-92px)
-      rotate(calc(var(--i) * -30deg));
-  }
   .slip-scroll {
     width: min(256px, 88vw);
   }
