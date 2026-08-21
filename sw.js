@@ -1,7 +1,7 @@
-/* v106 — 资源缓存加速二次打开；HTML 网络优先防卡旧版 */
-const CACHE = "kanshan-v106";
+/* v107 — 资源缓存加速二次打开；HTML 网络优先防卡旧版 */
+const CACHE = "kanshan-v107";
 const ASSETS = [
-  "./boot.js?v=106",
+  "./boot.js?v=107",
   "./cover-mobile.jpg?v=106",
   "./cover.jpg?v=106",
 ];

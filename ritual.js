@@ -1,4 +1,4 @@
-/* v103 — 看山求签：仅大小浮动，不跟签筒摇晃 */
+/* v107 — 看山求签：五幕故事节奏；看山仅大小浮动，不跟签筒摇晃 */
 (() => {
   const tube = document.getElementById("tube");
   const tubeArt = document.getElementById("tubeArt");
@@ -11,7 +11,6 @@
 
   const SHAKE_PEAKS = [0.55, 1.75, 2.95, 4.15];
   const SHAKE_MS = 5400;
-  const IDLE_SRC = "/tube-clean.webp?v=106";
 
   let shakeRaf = 0;
 
@@ -54,22 +53,32 @@
     return Math.min(1, amp);
   }
 
-  function animateShake(durationMs = SHAKE_MS) {
+  function animateShake(durationMs = SHAKE_MS, onBeat) {
     return new Promise((resolve) => {
       tube.classList.add("shaking");
+      pageRitual?.classList.add("is-casting");
       setSeer("casting");
       const start = performance.now();
       const peaks = SHAKE_PEAKS;
+      const fired = new Set();
 
       const tick = (now) => {
         const t = (now - start) / 1000;
         if (t >= durationMs / 1000) {
           stopShake();
           tube.classList.remove("shaking");
+          pageRitual?.classList.remove("is-casting");
           tube.style.transform = "rotate(0deg) translate3d(0,0,0)";
           setSeer(null);
           resolve();
           return;
+        }
+
+        for (let i = 0; i < peaks.length; i++) {
+          if (!fired.has(i) && t >= peaks[i] - 0.04) {
+            fired.add(i);
+            onBeat?.(i);
+          }
         }
 
         const amp = peakAmp(t, peaks);
@@ -95,6 +104,7 @@
   function resetRitualVisual() {
     stopShake();
     setSeer(null);
+    pageRitual?.classList.remove("is-casting", "is-drawing");
     tubeStage.classList.remove("leaving");
     emerging.hidden = true;
     emerging.classList.remove("show");
@@ -107,19 +117,28 @@
     pageRitual?.classList.remove("has-slip");
   }
 
-  async function playShakeAndDraw(onPhase) {
+  async function playShakeAndDraw(onPhase, onBeat) {
     resetRitualVisual();
-    onPhase?.("求签");
-    await wait(280);
+    pageRitual?.classList.add("is-drawing");
 
+    // 第一幕：问事入筒
+    onPhase?.("求签");
+    await wait(780);
+
+    // 第二幕：摇筒夺缘（旁白随峰值推进）
     onPhase?.("摇签");
+    onBeat?.(0);
     tube.style.willChange = "transform";
     if (kanshanSeer) kanshanSeer.style.willChange = "transform";
     const shakeAudio = window.KanshanAudio?.playShake?.() || Promise.resolve();
-    const shakeMotion = animateShake(SHAKE_MS);
+    const shakeMotion = animateShake(SHAKE_MS, onBeat);
     await Promise.all([shakeAudio, shakeMotion]);
     tube.style.willChange = "auto";
     if (kanshanSeer) kanshanSeer.style.willChange = "auto";
+
+    // 第三幕：落定一瞬，再出签
+    onPhase?.("落定", "筒声渐歇，缘分将定…");
+    await wait(420);
 
     onPhase?.("取签");
     setSeer("blessing");
@@ -127,14 +146,19 @@
     void emerging.offsetWidth;
     emerging.classList.add("show");
     window.KanshanAudio?.playReveal?.();
-    await wait(1050);
+    await wait(1180);
+    onPhase?.("取签", "一签认主，看山将为你展卷");
+    await wait(520);
     setSeer(null);
+    pageRitual?.classList.remove("is-drawing");
   }
 
   async function revealSlip(onPhase, opts = {}) {
+    // 第四幕：开卷见题
     onPhase?.("开签");
+    await wait(260);
     tubeStage.classList.add("leaving");
-    await wait(280);
+    await wait(300);
     emerging.classList.remove("show");
     emerging.hidden = true;
 
@@ -150,13 +174,13 @@
     fortuneCard.classList.add("visible");
 
     const h = opts.height || 420;
-    const expandMs = Math.round(920 + Math.min(380, (h - 280) * 0.55));
+    const expandMs = Math.round(980 + Math.min(420, (h - 280) * 0.55));
     await wait(expandMs);
 
     fortuneCard.classList.add("revealed");
-    await wait(700);
+    await wait(760);
     fortuneCard.classList.add("glowing");
-    await wait(420);
+    await wait(480);
     fortuneCard.style.willChange = "auto";
   }
 
@@ -167,8 +191,8 @@
     SHAKE_PEAKS,
     SHAKE_MS,
     burst() {},
-    async playRitual(onPhase) {
-      await playShakeAndDraw(onPhase);
+    async playRitual(onPhase, onBeat) {
+      await playShakeAndDraw(onPhase, onBeat);
       await revealSlip(onPhase);
     },
   };

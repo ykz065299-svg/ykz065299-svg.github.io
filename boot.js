@@ -157,8 +157,7 @@
 
   window.KanshanAudio = AudioEngine;
 })();
-
-/* v103 — 看山求签：仅大小浮动，不跟签筒摇晃 */
+/* v107 — 看山求签：五幕故事节奏；看山仅大小浮动，不跟签筒摇晃 */
 (() => {
   const tube = document.getElementById("tube");
   const tubeArt = document.getElementById("tubeArt");
@@ -171,7 +170,6 @@
 
   const SHAKE_PEAKS = [0.55, 1.75, 2.95, 4.15];
   const SHAKE_MS = 5400;
-  const IDLE_SRC = "/tube-clean.webp?v=106";
 
   let shakeRaf = 0;
 
@@ -214,22 +212,32 @@
     return Math.min(1, amp);
   }
 
-  function animateShake(durationMs = SHAKE_MS) {
+  function animateShake(durationMs = SHAKE_MS, onBeat) {
     return new Promise((resolve) => {
       tube.classList.add("shaking");
+      pageRitual?.classList.add("is-casting");
       setSeer("casting");
       const start = performance.now();
       const peaks = SHAKE_PEAKS;
+      const fired = new Set();
 
       const tick = (now) => {
         const t = (now - start) / 1000;
         if (t >= durationMs / 1000) {
           stopShake();
           tube.classList.remove("shaking");
+          pageRitual?.classList.remove("is-casting");
           tube.style.transform = "rotate(0deg) translate3d(0,0,0)";
           setSeer(null);
           resolve();
           return;
+        }
+
+        for (let i = 0; i < peaks.length; i++) {
+          if (!fired.has(i) && t >= peaks[i] - 0.04) {
+            fired.add(i);
+            onBeat?.(i);
+          }
         }
 
         const amp = peakAmp(t, peaks);
@@ -255,6 +263,7 @@
   function resetRitualVisual() {
     stopShake();
     setSeer(null);
+    pageRitual?.classList.remove("is-casting", "is-drawing");
     tubeStage.classList.remove("leaving");
     emerging.hidden = true;
     emerging.classList.remove("show");
@@ -267,19 +276,28 @@
     pageRitual?.classList.remove("has-slip");
   }
 
-  async function playShakeAndDraw(onPhase) {
+  async function playShakeAndDraw(onPhase, onBeat) {
     resetRitualVisual();
-    onPhase?.("求签");
-    await wait(280);
+    pageRitual?.classList.add("is-drawing");
 
+    // 第一幕：问事入筒
+    onPhase?.("求签");
+    await wait(780);
+
+    // 第二幕：摇筒夺缘（旁白随峰值推进）
     onPhase?.("摇签");
+    onBeat?.(0);
     tube.style.willChange = "transform";
     if (kanshanSeer) kanshanSeer.style.willChange = "transform";
     const shakeAudio = window.KanshanAudio?.playShake?.() || Promise.resolve();
-    const shakeMotion = animateShake(SHAKE_MS);
+    const shakeMotion = animateShake(SHAKE_MS, onBeat);
     await Promise.all([shakeAudio, shakeMotion]);
     tube.style.willChange = "auto";
     if (kanshanSeer) kanshanSeer.style.willChange = "auto";
+
+    // 第三幕：落定一瞬，再出签
+    onPhase?.("落定", "筒声渐歇，缘分将定…");
+    await wait(420);
 
     onPhase?.("取签");
     setSeer("blessing");
@@ -287,14 +305,19 @@
     void emerging.offsetWidth;
     emerging.classList.add("show");
     window.KanshanAudio?.playReveal?.();
-    await wait(1050);
+    await wait(1180);
+    onPhase?.("取签", "一签认主，看山将为你展卷");
+    await wait(520);
     setSeer(null);
+    pageRitual?.classList.remove("is-drawing");
   }
 
   async function revealSlip(onPhase, opts = {}) {
+    // 第四幕：开卷见题
     onPhase?.("开签");
+    await wait(260);
     tubeStage.classList.add("leaving");
-    await wait(280);
+    await wait(300);
     emerging.classList.remove("show");
     emerging.hidden = true;
 
@@ -310,13 +333,13 @@
     fortuneCard.classList.add("visible");
 
     const h = opts.height || 420;
-    const expandMs = Math.round(920 + Math.min(380, (h - 280) * 0.55));
+    const expandMs = Math.round(980 + Math.min(420, (h - 280) * 0.55));
     await wait(expandMs);
 
     fortuneCard.classList.add("revealed");
-    await wait(700);
+    await wait(760);
     fortuneCard.classList.add("glowing");
-    await wait(420);
+    await wait(480);
     fortuneCard.style.willChange = "auto";
   }
 
@@ -327,16 +350,15 @@
     SHAKE_PEAKS,
     SHAKE_MS,
     burst() {},
-    async playRitual(onPhase) {
-      await playShakeAndDraw(onPhase);
+    async playRitual(onPhase, onBeat) {
+      await playShakeAndDraw(onPhase, onBeat);
       await revealSlip(onPhase);
     },
   };
 
   resetRitualVisual();
 })();
-
-/* v103 — 二页资源懒加载；求签不阻塞等音频 */
+/* v107 — 二页懒加载；求签五幕旁白；不阻塞等音频 */
 const drawBtn = document.getElementById("drawBtn");
 const againBtn = document.getElementById("againBtn");
 const btnLabel = document.getElementById("btnLabel");
@@ -359,12 +381,32 @@ let busy = false;
 let audioOn = false;
 let ritualAssetsReady = false;
 
+/** 五幕：问事 → 摇筒 → 落定 → 取签 → 开卷 */
 const PHASE_HINT = {
-  求签: "心诚则灵…",
+  静候开筒: "心念一事，再请看山开筒",
+  求签: "看山侧耳——今日所求，可入筒中",
   摇签: "百签同栖，筒中有数",
-  取签: "一签脱出",
-  开签: "一签已定，可再求",
-  待命: "静候山门回音…",
+  落定: "筒声渐歇，缘分将定…",
+  取签: "一枝脱出，认主而立",
+  开签: "天机展开，便是今日山门风云",
+  待命: "看山展卷，天机将现…",
+};
+
+/** 摇签峰值旁白：跟木签相碰的节奏讲故事 */
+const SHAKE_LINES = [
+  "百签同栖，筒中有数",
+  "木签相碰，各争机缘",
+  "山风入筒，天命将定",
+  "一签将出，且莫分心",
+];
+
+const BTN_PHASE = {
+  求签: "求签",
+  摇签: "摇签",
+  落定: "摇签",
+  取签: "取签",
+  开签: "求签",
+  待命: "开签",
 };
 
 function setAudioUi() {
@@ -384,7 +426,7 @@ audioToggle.addEventListener("click", async () => {
   if (!audioOn) {
     await window.KanshanAudio.enable();
     audioOn = true;
-    hint.textContent = "氛围音已开。请听清每一次摇筒。";
+    setHint("氛围音已开。请听清每一次摇筒。");
   } else {
     await window.KanshanAudio.disable();
     audioOn = false;
@@ -421,13 +463,25 @@ function setBusy(on) {
   if (againBtn) againBtn.disabled = on;
 }
 
-function setPhase(name) {
+function setHint(text) {
+  if (!hint) return;
+  hint.style.opacity = "0";
+  requestAnimationFrame(() => {
+    hint.textContent = text || "";
+    hint.style.opacity = "1";
+  });
+}
+
+function setPhase(name, hintOverride) {
+  const line = hintOverride != null ? hintOverride : PHASE_HINT[name] || "";
   phaseText.style.opacity = "0";
+  if (hint) hint.style.opacity = "0";
   requestAnimationFrame(() => {
     phaseText.textContent = name;
-    btnLabel.textContent = name === "开签" ? "求签" : name;
-    hint.textContent = PHASE_HINT[name] || "";
+    btnLabel.textContent = BTN_PHASE[name] || (name === "开签" ? "求签" : name);
+    if (hint) hint.textContent = line;
     phaseText.style.opacity = "1";
+    if (hint) hint.style.opacity = "1";
   });
 }
 
@@ -566,11 +620,14 @@ async function localDrawFallback() {
   ];
   const g = grades[Math.floor(Math.random() * grades.length)];
   const oracles = [
+    "看山掷筒：筒中落下的，是此刻山顶最响的那一声问。",
     "签意已定：此题正搅动山顶风云，宜深读，忌人云亦云。",
+    "此签不讲命运，只讲今日——热榜之上，风正从这里过。",
     "山风起处，热议已成。今日宜观其势，再判其理。",
-    "一签既出，机缘自来。点开细看，或许正是你要的答案。",
     "看山有言：热闹处未必见真章，却最见人心。",
     "山门已开：莫急着站队，先把原题读完。",
+    "筒中百签，独此一枝认你。点开，便是今日山门题。",
+    "一签既出，机缘自来。顺着链接上山，自有风景。",
   ];
   const digits = "零一二三四五六七八九";
   const toCn = (n) => {
@@ -639,7 +696,10 @@ async function draw() {
   const fetchPromise = fetchDraw().catch((err) => ({ __err: err }));
 
   try {
-    await window.KanshanScene.playShakeAndDraw((name) => setPhase(name));
+    await window.KanshanScene.playShakeAndDraw(
+      (name, line) => setPhase(name, line),
+      (i) => setHint(SHAKE_LINES[i] || SHAKE_LINES[0])
+    );
 
     setPhase("待命");
     const data = await fetchPromise;
@@ -648,18 +708,18 @@ async function draw() {
     fillSlip(data);
     // 展开前按内容定长
     const slipH = prepareSlipSize();
-    await window.KanshanScene.revealSlip((name) => setPhase(name), { height: slipH });
+    await window.KanshanScene.revealSlip((name, line) => setPhase(name, line), { height: slipH });
     phaseText.textContent = `${data.slip?.label || ""} · ${data.slip?.grade || ""}`;
-    hint.textContent = PHASE_HINT["开签"];
+    setHint("此签即今日山顶热议——点开便是原题");
   } catch (err) {
     window.KanshanScene?.resetRitualVisual?.();
     clearSlip();
     phaseText.textContent = "静候开筒";
     btnLabel.textContent = "求签";
     const msg = String(err?.message || err || "");
-    hint.textContent = /rate limit/i.test(msg)
-      ? "山门拥挤，请稍候再求"
-      : `求签未果：${msg}`;
+    setHint(
+      /rate limit/i.test(msg) ? "山门拥挤，请稍候再求" : `求签未果：${msg}`
+    );
   } finally {
     setBusy(false);
     btnLabel.textContent = "求签";
@@ -669,10 +729,3 @@ async function draw() {
 drawBtn.addEventListener("click", draw);
 againBtn?.addEventListener("click", draw);
 setAudioUi();
-
-
-if ("serviceWorker" in navigator) {
-  window.addEventListener("load", function () {
-    navigator.serviceWorker.register("/sw.js?v=106").catch(function () {});
-  });
-}
