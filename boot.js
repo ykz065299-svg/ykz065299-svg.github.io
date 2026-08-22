@@ -1,7 +1,7 @@
-/* v106 — 恢复原版摇签/出签音色（44100 wav + 均衡）；氛围音仍轻量流式 */
+/* v143 — 0821 摇签/出签音色；完整一轮 shake.wav，可略放慢并对齐动画 */
 (() => {
   const bust = "?v=106";
-  const SHAKE_SEC = 5.4;
+  const NATIVE_SHAKE_SEC = 5.4;
 
   const AudioEngine = {
     ctx: null,
@@ -45,17 +45,12 @@
       await this.ensure();
       this.enabled = true;
       this.startAmbient();
-      // 后台预热摇签音，不挡交互
       this.loadBuffer("shake", "/audio/shake.wav").catch(() => {});
       this.loadBuffer("reveal", "/audio/reveal.wav").catch(() => {});
     },
 
     async disable() {
       this.enabled = false;
-      this.stopAmbient();
-    },
-
-    stopAmbient() {
       if (this.ambient) {
         this.ambient.pause();
         this.ambient.src = "";
@@ -64,8 +59,7 @@
     },
 
     startAmbient() {
-      this.stopAmbient();
-      if (!this.enabled) return;
+      if (this.ambient) return;
       const a = new Audio("/audio/ambient-lite.wav" + bust);
       a.loop = true;
       a.volume = 0.22;
@@ -74,7 +68,7 @@
       this.ambient = a;
     },
 
-    duckMusic(seconds = SHAKE_SEC) {
+    duckMusic(seconds = NATIVE_SHAKE_SEC) {
       if (!this.ambient) return;
       const prev = this.ambient.volume;
       this.ambient.volume = 0.06;
@@ -91,19 +85,48 @@
       return a;
     },
 
-    async playShake() {
-      // 求签手势：即使氛围音未开也播摇签
+    _waitHtml(url, volume, rate, seconds) {
+      return new Promise((resolve) => {
+        const a = this.playHtml(url, volume);
+        try {
+          if (a) a.playbackRate = rate;
+        } catch (_) {}
+        if (!a) return resolve();
+        let settled = false;
+        const done = () => {
+          if (settled) return;
+          settled = true;
+          try {
+            a.pause();
+          } catch (_) {}
+          resolve();
+        };
+        a.addEventListener("ended", done, { once: true });
+        setTimeout(done, (seconds + 0.15) * 1000);
+      });
+    },
+
+    /** 完整一轮摇签声（0821）；rate<1 时整段放慢，播完 resolve */
+    async playShake(opts = {}) {
+      const rate = typeof opts.rate === "number" && opts.rate > 0 ? opts.rate : 1;
+      const duckSec =
+        typeof opts.seconds === "number"
+          ? opts.seconds
+          : NATIVE_SHAKE_SEC / Math.max(rate, 0.01);
+
       try {
         await this.ensure();
       } catch (_) {
-        this.playHtml("/audio/shake.wav", 0.85);
-        return;
+        return this._waitHtml("/audio/shake.wav", 0.85, rate, duckSec);
       }
-      if (this.enabled) this.duckMusic(SHAKE_SEC);
+
+      if (this.enabled) this.duckMusic(duckSec);
+
       try {
         const buf = await this.loadBuffer("shake", "/audio/shake.wav");
         const src = this.ctx.createBufferSource();
         src.buffer = buf;
+        src.playbackRate.value = rate;
         const hp = this.ctx.createBiquadFilter();
         hp.type = "highpass";
         hp.frequency.value = 80;
@@ -128,9 +151,21 @@
         shelf.connect(lp);
         lp.connect(g);
         g.connect(this.sfxGain);
-        src.start();
+
+        const dur = buf.duration / Math.max(rate, 0.01);
+        await new Promise((resolve) => {
+          let settled = false;
+          const done = () => {
+            if (settled) return;
+            settled = true;
+            resolve();
+          };
+          src.onended = done;
+          src.start(); // 完整一轮，不截取
+          setTimeout(done, (dur + 0.12) * 1000);
+        });
       } catch (_) {
-        this.playHtml("/audio/shake.wav", 0.85);
+        return this._waitHtml("/audio/shake.wav", 0.85, rate, duckSec);
       }
     },
 
@@ -148,16 +183,28 @@
         src.connect(lp);
         lp.connect(g);
         g.connect(this.sfxGain);
-        src.start();
+        const dur = buf.duration;
+        await new Promise((resolve) => {
+          let settled = false;
+          const done = () => {
+            if (settled) return;
+            settled = true;
+            resolve();
+          };
+          src.onended = done;
+          src.start();
+          setTimeout(done, (dur + 0.12) * 1000);
+        });
       } catch (_) {
-        this.playHtml("/audio/reveal.wav", 0.8);
+        return this._waitHtml("/audio/reveal.wav", 0.8, 1, 4.8);
       }
     },
   };
 
   window.KanshanAudio = AudioEngine;
 })();
-/* v107 — 看山求签：五幕故事节奏；看山仅大小浮动，不跟签筒摇晃 */
+
+/* v170 — 看山流畅定稿：RAF 呼吸+峰推；静态光；退场 freeze */
 (() => {
   const tube = document.getElementById("tube");
   const tubeArt = document.getElementById("tubeArt");
@@ -166,20 +213,32 @@
   const fortuneCard = document.getElementById("fortuneCard");
   const pageRitual = document.getElementById("pageRitual");
   const kanshanSeer = document.getElementById("kanshanSeer");
+  const actFlash = document.getElementById("actFlash");
   const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 
-  const SHAKE_PEAKS = [0.55, 1.75, 2.95, 4.15];
-  const SHAKE_MS = 5400;
+  const ACT_WORDS = ["叩问", "尘定", "认主", "显机"];
+  const NATIVE_MS = 5400;
+  // 再慢一档：声画同比拉长，峰点仍对齐
+  const SHAKE_MS = 9200;
+  const PLAY_RATE = NATIVE_MS / SHAKE_MS;
+  const SHAKE_PEAKS = [0.55, 1.75, 2.95, 4.15].map((t) => t / PLAY_RATE);
+
+  // 手机略减起伏，避免小屏晃眼
+  const MOBILE =
+    typeof window.matchMedia === "function" &&
+    window.matchMedia("(max-width: 720px)").matches;
+  const BREATH_AMP_Y = MOBILE ? 1.6 : 2.2;
+  const BREATH_AMP_S = MOBILE ? 0.018 : 0.025;
+  const PEAK_AMP_Y = MOBILE ? 2.6 : 3.6;
+  const PEAK_AMP_S = MOBILE ? 0.032 : 0.045;
+  const BREATH_HZ = 0.55; // ~1.8s 一呼一吸
 
   let shakeRaf = 0;
-
-  if (tubeArt) {
-    // src 由下滑到二页时 data-src 注入
-  }
+  let settleRaf = 0;
 
   function setSeer(mode) {
     if (!kanshanSeer) return;
-    kanshanSeer.classList.remove("casting", "blessing");
+    kanshanSeer.classList.remove("casting", "blessing", "beating");
     if (mode) kanshanSeer.classList.add(mode);
   }
 
@@ -187,11 +246,14 @@
     if (!kanshanSeer) return;
     kanshanSeer.style.transform = "";
     kanshanSeer.style.filter = "";
+    kanshanSeer.style.opacity = "";
   }
 
   function stopShake() {
     cancelAnimationFrame(shakeRaf);
+    cancelAnimationFrame(settleRaf);
     shakeRaf = 0;
+    settleRaf = 0;
     if (tube) {
       tube.style.transform = "";
       tube.style.filter = "";
@@ -203,67 +265,166 @@
     let amp = 0;
     for (const p of peaks) {
       const d = Math.abs(t - p);
-      if (d < 0.4) {
-        amp = Math.max(amp, Math.cos((d / 0.4) * (Math.PI / 2)));
+      if (d < 0.45) {
+        amp = Math.max(amp, Math.cos((d / 0.45) * (Math.PI / 2)));
       }
     }
-    // 低底噪，保持呼吸感但不抢峰值
-    amp = Math.max(amp, 0.06 * Math.abs(Math.sin(t * 7.5)));
+    amp = Math.max(amp, 0.06 * Math.abs(Math.sin(t * 6.8)));
     return Math.min(1, amp);
+  }
+
+  function applySeerFloat(t, amp) {
+    if (!kanshanSeer) return;
+    const breath = 0.5 + 0.5 * Math.sin(t * Math.PI * 2 * BREATH_HZ);
+    const scale = 1 + breath * BREATH_AMP_S + amp * PEAK_AMP_S;
+    const ty = -(breath * BREATH_AMP_Y + amp * PEAK_AMP_Y);
+    kanshanSeer.style.transform =
+      `translate3d(0, ${ty.toFixed(2)}px, 0) scale(${scale.toFixed(4)})`;
+  }
+
+  /** 摇毕：从当前姿态缓回静止，避免瞬间跳回 */
+  function settleSeer(fromTransform, ms = 180) {
+    if (!kanshanSeer) return Promise.resolve();
+    cancelAnimationFrame(settleRaf);
+    const start = performance.now();
+    // 解析粗略：若已是 matrix，直接用当前 computed
+    const el = kanshanSeer;
+    const cs = getComputedStyle(el).transform;
+    el.style.transform = cs && cs !== "none" ? cs : fromTransform || "translate3d(0,0,0) scale(1)";
+    void el.offsetWidth;
+    return new Promise((resolve) => {
+      const tick = (now) => {
+        const p = Math.min(1, (now - start) / ms);
+        const e = 1 - Math.pow(1 - p, 3);
+        const s = 1 + (1 - e) * 0.02;
+        const y = (1 - e) * -1.2;
+        el.style.transform = `translate3d(0, ${y.toFixed(2)}px, 0) scale(${s.toFixed(4)})`;
+        if (p < 1) {
+          settleRaf = requestAnimationFrame(tick);
+        } else {
+          el.style.transform = "";
+          settleRaf = 0;
+          resolve();
+        }
+      };
+      settleRaf = requestAnimationFrame(tick);
+    });
+  }
+
+  function freezeSeerTransform() {
+    if (!kanshanSeer) return;
+    const cs = getComputedStyle(kanshanSeer).transform;
+    kanshanSeer.classList.remove("casting", "blessing", "beating");
+    kanshanSeer.style.animation = "none";
+    kanshanSeer.style.transform = cs && cs !== "none" ? cs : "translate3d(0,0,0) scale(1)";
+    void kanshanSeer.offsetWidth;
+  }
+
+  function flashActNow(word) {
+    if (!actFlash || !word) return;
+    clearTimeout(flashActNow._delay);
+    clearTimeout(flashActNow._t);
+    flashActNow._delay = setTimeout(() => {
+      actFlash.textContent = word;
+      actFlash.classList.remove("show", "punch");
+      void actFlash.offsetWidth;
+      pageRitual?.classList.add("act-flashing");
+      actFlash.classList.add("show");
+      flashActNow._t = setTimeout(() => {
+        actFlash.classList.remove("show", "punch");
+        pageRitual?.classList.remove("act-flashing");
+      }, 1350);
+    }, 200);
   }
 
   function animateShake(durationMs = SHAKE_MS, onBeat) {
     return new Promise((resolve) => {
+      let finished = false;
+      const finish = () => {
+        if (finished) return;
+        finished = true;
+        cancelAnimationFrame(shakeRaf);
+        shakeRaf = 0;
+        if (tube) {
+          tube.style.transform = "";
+          tube.style.filter = "";
+        }
+        tube.classList.remove("shaking");
+        pageRitual?.classList.remove("is-casting");
+        if (tube) tube.style.transform = "rotate(0deg) translate3d(0,0,0)";
+        // 看山先 settle，再清 casting（保留光晕到收势结束）
+        const seerWas = kanshanSeer?.style.transform || "";
+        settleSeer(seerWas, 220).then(() => {
+          setSeer(null);
+          resolve();
+        });
+      };
+
       tube.classList.add("shaking");
       pageRitual?.classList.add("is-casting");
       setSeer("casting");
       const start = performance.now();
       const peaks = SHAKE_PEAKS;
       const fired = new Set();
+      const f1 = 16 * PLAY_RATE;
+      const f2 = 6.2 * PLAY_RATE;
+      const f3 = 12.5 * PLAY_RATE;
+      const f4 = 10 * PLAY_RATE;
 
       const tick = (now) => {
+        if (finished) return;
         const t = (now - start) / 1000;
         if (t >= durationMs / 1000) {
-          stopShake();
-          tube.classList.remove("shaking");
-          pageRitual?.classList.remove("is-casting");
-          tube.style.transform = "rotate(0deg) translate3d(0,0,0)";
-          setSeer(null);
-          resolve();
+          finish();
           return;
         }
 
         for (let i = 0; i < peaks.length; i++) {
-          if (!fired.has(i) && t >= peaks[i] - 0.04) {
+          if (!fired.has(i) && t >= peaks[i] - 0.05) {
             fired.add(i);
             onBeat?.(i);
           }
         }
 
         const amp = peakAmp(t, peaks);
-
-        // 签筒主律动
-        const rot = Math.sin(t * 16) * amp * 11.5 + Math.sin(t * 6.2) * amp * 2.6;
-        const tx = Math.sin(t * 12.5) * amp * 8;
-        const ty = Math.abs(Math.cos(t * 10)) * amp * 5.5;
+        const rot = Math.sin(t * f1) * amp * 11.5 + Math.sin(t * f2) * amp * 2.6;
+        const tx = Math.sin(t * f3) * amp * 8;
+        const ty = Math.abs(Math.cos(t * f4)) * amp * 5.5;
         const squish = 1 - amp * 0.03;
 
         tube.style.transform =
           `translate3d(${tx.toFixed(2)}px, ${ty.toFixed(2)}px, 0) ` +
           `rotate(${rot.toFixed(2)}deg) scale(${squish.toFixed(3)}, ${(1 + amp * 0.018).toFixed(3)})`;
 
-        // 看山：不跟摇晃，仅靠 CSS casting 做大小浮动
+        applySeerFloat(t, amp);
+
         shakeRaf = requestAnimationFrame(tick);
       };
 
       shakeRaf = requestAnimationFrame(tick);
+      setTimeout(finish, durationMs + 120);
     });
   }
 
   function resetRitualVisual() {
     stopShake();
     setSeer(null);
-    pageRitual?.classList.remove("is-casting", "is-drawing");
+    kanshanSeer?.classList.remove("exiting");
+    if (kanshanSeer) {
+      kanshanSeer.style.transform = "";
+      kanshanSeer.style.filter = "";
+      kanshanSeer.style.opacity = "";
+      kanshanSeer.style.animation = "";
+      kanshanSeer.style.willChange = "auto";
+      kanshanSeer.style.transition = "";
+    }
+    pageRitual?.classList.remove("is-casting", "is-drawing", "act-flashing");
+    if (actFlash) {
+      actFlash.classList.remove("show", "punch");
+      actFlash.textContent = "";
+    }
+    clearTimeout(flashActNow._t);
+    clearTimeout(flashActNow._delay);
     tubeStage.classList.remove("leaving");
     emerging.hidden = true;
     emerging.classList.remove("show");
@@ -276,50 +437,63 @@
     pageRitual?.classList.remove("has-slip");
   }
 
-  async function playShakeAndDraw(onPhase, onBeat) {
+  async function playShakeAndDraw(onPhase) {
     resetRitualVisual();
     pageRitual?.classList.add("is-drawing");
 
-    // 第一幕：问事入筒
-    onPhase?.("求签");
-    await wait(780);
-
-    // 第二幕：摇筒夺缘（旁白随峰值推进）
     onPhase?.("摇签");
-    onBeat?.(0);
     tube.style.willChange = "transform";
     if (kanshanSeer) kanshanSeer.style.willChange = "transform";
-    const shakeAudio = window.KanshanAudio?.playShake?.() || Promise.resolve();
-    const shakeMotion = animateShake(SHAKE_MS, onBeat);
+
+    const shakeAudio =
+      window.KanshanAudio?.playShake?.({
+        rate: PLAY_RATE,
+        seconds: SHAKE_MS / 1000,
+      }) || Promise.resolve();
+    const shakeMotion = animateShake(SHAKE_MS, (i) => {
+      const word = ACT_WORDS[i];
+      if (!word) return;
+      onPhase?.(word);
+      flashActNow(word);
+    });
+
     await Promise.all([shakeAudio, shakeMotion]);
     tube.style.willChange = "auto";
     if (kanshanSeer) kanshanSeer.style.willChange = "auto";
-
-    // 第三幕：落定一瞬，再出签
-    onPhase?.("落定", "筒声渐歇，缘分将定…");
-    await wait(420);
-
-    onPhase?.("取签");
-    setSeer("blessing");
-    emerging.hidden = false;
-    void emerging.offsetWidth;
-    emerging.classList.add("show");
-    window.KanshanAudio?.playReveal?.();
-    await wait(1180);
-    onPhase?.("取签", "一签认主，看山将为你展卷");
-    await wait(520);
-    setSeer(null);
     pageRitual?.classList.remove("is-drawing");
   }
 
   async function revealSlip(onPhase, opts = {}) {
-    // 第四幕：开卷见题
-    onPhase?.("开签");
-    await wait(260);
+    onPhase?.("显机");
+    if (kanshanSeer) {
+      kanshanSeer.classList.remove("exiting");
+      kanshanSeer.style.opacity = "";
+      kanshanSeer.style.transition = "";
+      kanshanSeer.style.willChange = "transform, opacity";
+    }
+    setSeer("blessing");
+    emerging.hidden = false;
+    void emerging.offsetWidth;
+    emerging.classList.add("show");
+    const bellP = window.KanshanAudio?.playReveal?.() || Promise.resolve();
+
+    await wait(980);
+    freezeSeerTransform();
+    if (kanshanSeer) {
+      kanshanSeer.style.transition =
+        "opacity .88s cubic-bezier(.33,.08,.25,1), transform .88s cubic-bezier(.33,.08,.25,1)";
+      void kanshanSeer.offsetWidth;
+      kanshanSeer.classList.add("exiting");
+      kanshanSeer.style.opacity = "0";
+      kanshanSeer.style.transform = "translate3d(10px, 6px, 0) scale(1)";
+    }
+    await wait(720);
+
     tubeStage.classList.add("leaving");
-    await wait(300);
+    await wait(320);
     emerging.classList.remove("show");
     emerging.hidden = true;
+    setSeer(null);
 
     if (opts.height) {
       fortuneCard.style.setProperty("--slip-h", `${opts.height}px`);
@@ -332,38 +506,50 @@
     await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
     fortuneCard.classList.add("visible");
 
+    if (kanshanSeer) {
+      kanshanSeer.style.willChange = "auto";
+      kanshanSeer.style.transition = "";
+    }
+
     const h = opts.height || 420;
-    const expandMs = Math.round(980 + Math.min(420, (h - 280) * 0.55));
+    const expandMs = Math.round(920 + Math.min(380, (h - 280) * 0.55));
     await wait(expandMs);
 
     fortuneCard.classList.add("revealed");
-    await wait(760);
+    await wait(700);
     fortuneCard.classList.add("glowing");
-    await wait(480);
+    await wait(420);
     fortuneCard.style.willChange = "auto";
+    await Promise.resolve(bellP).catch(() => {});
   }
 
   window.KanshanScene = {
     playShakeAndDraw,
     revealSlip,
     resetRitualVisual,
+    ACT_WORDS,
     SHAKE_PEAKS,
     SHAKE_MS,
     burst() {},
-    async playRitual(onPhase, onBeat) {
-      await playShakeAndDraw(onPhase, onBeat);
+    async playRitual(onPhase) {
+      await playShakeAndDraw(onPhase);
       await revealSlip(onPhase);
     },
   };
 
   resetRitualVisual();
 })();
-/* v107 — 二页懒加载；求签五幕旁白；不阻塞等音频 */
+
+/* v180 — 路演 P0：分享签文 + 热榜解析 + SW 注册 */
 const drawBtn = document.getElementById("drawBtn");
 const againBtn = document.getElementById("againBtn");
+const shareBtn = document.getElementById("shareBtn");
 const btnLabel = document.getElementById("btnLabel");
 const hint = document.getElementById("hint");
 const phaseText = document.getElementById("phaseText");
+const storyLine = document.getElementById("storyLine");
+const tubeLabel = document.getElementById("tubeLabel");
+const seerCaption = document.getElementById("seerCaption");
 const slipGrade = document.getElementById("slipGrade");
 const slipNo = document.getElementById("slipNo");
 const slipMotto = document.getElementById("slipMotto");
@@ -380,37 +566,79 @@ const fortuneCard = document.getElementById("fortuneCard");
 let busy = false;
 let audioOn = false;
 let ritualAssetsReady = false;
+let lastDrawData = null;
 
-/** 五幕：问事 → 摇筒 → 落定 → 取签 → 开卷 */
-const PHASE_HINT = {
-  静候开筒: "心念一事，再请看山开筒",
-  求签: "看山侧耳——今日所求，可入筒中",
-  摇签: "百签同栖，筒中有数",
-  落定: "筒声渐歇，缘分将定…",
-  取签: "一枝脱出，认主而立",
-  开签: "天机展开，便是今日山门风云",
-  待命: "看山展卷，天机将现…",
+const SITE_URL = "https://ykz065299-svg.github.io/";
+
+const ACT_NAMES = new Set(["叩问", "尘定", "认主", "显机"]);
+
+/** polish-20 定稿文案 */
+const ACT_META = {
+  idle: {
+    phase: "静候开筒",
+    line: "心念一事，再请看山开筒",
+    btn: "求签",
+    hint: "心诚则灵",
+  },
+  摇签: { phase: "摇签", line: "", btn: "求签", hint: "" },
+  叩问: { phase: "叩问", line: "", btn: "求签", hint: "" },
+  尘定: { phase: "尘定", line: "", btn: "求签", hint: "" },
+  认主: { phase: "认主", line: "", btn: "求签", hint: "" },
+  显机: { phase: "显机", line: "", btn: "求签", hint: "" },
+  待命: { phase: "显机", line: "墨迹将现…", btn: "求签", hint: "" },
 };
 
-/** 摇签峰值旁白：跟木签相碰的节奏讲故事 */
-const SHAKE_LINES = [
-  "百签同栖，筒中有数",
-  "木签相碰，各争机缘",
-  "山风入筒，天命将定",
-  "一签将出，且莫分心",
-];
+function buildShareText(data) {
+  const s = data.slip || {};
+  const item = data.item || {};
+  return [
+    "看山今日一签",
+    `${s.label || ""} · ${s.grade || ""}`,
+    data.oracle || "",
+    "",
+    `今日山门题：${item.title || ""}`,
+    `热榜第 ${data.rank ?? "?"} 位`,
+    item.url || SITE_URL,
+    "",
+    SITE_URL,
+  ]
+    .join("\n")
+    .trim();
+}
 
-const BTN_PHASE = {
-  求签: "求签",
-  摇签: "摇签",
-  落定: "摇签",
-  取签: "取签",
-  开签: "求签",
-  待命: "开签",
-};
+async function shareSlip() {
+  if (!lastDrawData) return;
+  const text = buildShareText(lastDrawData);
+  const url = lastDrawData.item?.url || SITE_URL;
+  if (navigator.share) {
+    try {
+      await navigator.share({ title: "看山今日一签", text, url });
+      setHint("已唤起分享");
+      return;
+    } catch (err) {
+      if (err?.name === "AbortError") return;
+    }
+  }
+  try {
+    await navigator.clipboard.writeText(text);
+    setHint("签文已复制");
+  } catch (_) {
+    setHint("复制失败，请手动选中文本");
+  }
+}
 
 function setAudioUi() {
   audioToggle.textContent = audioOn ? "氛围音 · 开" : "氛围音 · 关";
+}
+
+function ensureAudio() {
+  if (audioOn || !window.KanshanAudio) return Promise.resolve();
+  return window.KanshanAudio.enable()
+    .then(() => {
+      audioOn = true;
+      setAudioUi();
+    })
+    .catch(() => {});
 }
 
 function ensureRitualAssets() {
@@ -426,7 +654,7 @@ audioToggle.addEventListener("click", async () => {
   if (!audioOn) {
     await window.KanshanAudio.enable();
     audioOn = true;
-    setHint("氛围音已开。请听清每一次摇筒。");
+    setHint("氛围音已开");
   } else {
     await window.KanshanAudio.disable();
     audioOn = false;
@@ -436,14 +664,13 @@ audioToggle.addEventListener("click", async () => {
 
 scrollCue?.addEventListener("click", () => {
   ensureRitualAssets();
+  ensureAudio();
   pageRitual?.scrollIntoView({ behavior: "smooth", block: "start" });
 });
 
-// 接近第二页再加载背景；第一页时关掉二页可见性
 if (pageRitual && "IntersectionObserver" in window) {
   const io = new IntersectionObserver(
     ([entry]) => {
-      const near = entry.isIntersecting || entry.intersectionRatio > 0;
       if (entry.boundingClientRect.top < window.innerHeight * 1.35) ensureRitualAssets();
       document.body.classList.toggle("ritual-visible", entry.isIntersecting && entry.intersectionRatio > 0.15);
     },
@@ -455,34 +682,96 @@ if (pageRitual && "IntersectionObserver" in window) {
   document.body.classList.add("ritual-visible");
 }
 
-// 首屏不预热二页，避免和封面抢带宽
-
 function setBusy(on) {
   busy = on;
   drawBtn.disabled = on;
   if (againBtn) againBtn.disabled = on;
 }
 
-function setHint(text) {
-  if (!hint) return;
-  hint.style.opacity = "0";
+function fadeText(el, text) {
+  if (!el) return;
+  el.style.opacity = "0";
   requestAnimationFrame(() => {
-    hint.textContent = text || "";
-    hint.style.opacity = "1";
+    el.textContent = text || "";
+    el.style.opacity = "1";
   });
 }
 
-function setPhase(name, hintOverride) {
-  const line = hintOverride != null ? hintOverride : PHASE_HINT[name] || "";
-  phaseText.style.opacity = "0";
-  if (hint) hint.style.opacity = "0";
-  requestAnimationFrame(() => {
-    phaseText.textContent = name;
-    btnLabel.textContent = BTN_PHASE[name] || (name === "开签" ? "求签" : name);
-    if (hint) hint.textContent = line;
-    phaseText.style.opacity = "1";
+function setHint(text) {
+  fadeText(hint, text);
+}
+
+function setPhase(name) {
+  const meta = ACT_META[name] || ACT_META.idle;
+  const seerMap = {
+    idle: "看山候你",
+    叩问: "看山侧耳",
+    摇签: "看山摇筒",
+    尘定: "看山凝神",
+    认主: "看山点头",
+    显机: "看山展卷",
+    待命: "看山展卷",
+  };
+
+  if (ACT_NAMES.has(name)) {
+    if (phaseText) {
+      phaseText.textContent = "";
+      phaseText.style.opacity = "0";
+    }
+    if (storyLine) storyLine.style.opacity = "0";
+    if (hint) {
+      hint.textContent = "";
+      hint.style.opacity = "0";
+    }
+    if (btnLabel) btnLabel.textContent = "求签";
+    if (tubeLabel) tubeLabel.textContent = "百签同栖 · 一签认主";
+    if (seerCaption) seerCaption.textContent = seerMap[name] || "看山候你";
+    return;
+  }
+
+  fadeText(phaseText, meta.phase);
+  if (storyLine) {
+    if (meta.line) fadeText(storyLine, meta.line);
+    else storyLine.style.opacity = "0";
+  }
+  if (btnLabel) btnLabel.textContent = meta.btn;
+  if (meta.hint) {
     if (hint) hint.style.opacity = "1";
-  });
+    setHint(meta.hint);
+  } else if (hint) {
+    hint.textContent = "";
+    hint.style.opacity = "0";
+  }
+  if ((name === "idle" || name === "摇签") && tubeLabel) {
+    tubeLabel.textContent = "百签同栖 · 一签认主";
+  }
+  if (seerCaption) seerCaption.textContent = seerMap[name] || "看山候你";
+}
+
+function settleDoneCopy(data) {
+  lastDrawData = data;
+  if (shareBtn) shareBtn.hidden = false;
+  fadeText(phaseText, `${data.slip?.label || ""} · ${data.slip?.grade || ""}`);
+  if (storyLine) {
+    storyLine.style.opacity = "1";
+    fadeText(storyLine, "此签即今日山顶热议");
+  }
+  if (hint) {
+    hint.style.opacity = "1";
+    fadeText(hint, "一签已定 · 可再求");
+  }
+  if (btnLabel) btnLabel.textContent = "求签";
+  if (seerCaption) seerCaption.textContent = "看山已决";
+  if (tubeLabel) tubeLabel.textContent = "一签认主";
+}
+
+function resetIdleCopy() {
+  setPhase("idle");
+  if (storyLine) {
+    storyLine.style.opacity = "1";
+    storyLine.textContent = ACT_META.idle.line;
+  }
+  if (hint) hint.style.opacity = "1";
 }
 
 function cleanMediaPlaceholder(raw) {
@@ -501,6 +790,8 @@ function cleanMediaPlaceholder(raw) {
 }
 
 function clearSlip() {
+  lastDrawData = null;
+  if (shareBtn) shareBtn.hidden = true;
   slipGrade.textContent = "";
   slipGrade.className = "slip-grade";
   slipNo.textContent = "";
@@ -538,39 +829,27 @@ function fillSlip(data) {
   topicLink.href = item.url || "#";
 }
 
-/**
- * 迭代核心：按正文自然高度预计算签长，再交给 scale 展开。
- * 短签短展、长签封顶可滚，避免一律拉满造成空洞或拥挤。
- */
 function prepareSlipSize() {
   if (!fortuneCard) return 420;
 
   const body = fortuneCard.querySelector(".scroll-body");
   const inner = fortuneCard.querySelector(".scroll-inner");
-  const rollH = 24; // 上下轴合计
+  const rollH = 24;
 
-  // 测量态：居中、真实宽度、内容全显、高度自适应
   fortuneCard.hidden = false;
   fortuneCard.classList.remove("visible", "glowing", "revealed", "fit");
   fortuneCard.classList.add("measuring");
   fortuneCard.style.height = "auto";
   if (body) body.style.overflow = "visible";
 
-  // 强制回流拿真实高度
   void fortuneCard.offsetHeight;
   const contentH = inner ? inner.scrollHeight : 360;
   const natural = contentH + rollH + 4;
 
-  // v2 幅度带：短 / 中 / 长
   const vh = window.innerHeight || 700;
   const minH = Math.round(Math.max(260, vh * 0.34));
   const maxH = Math.round(Math.min(620, vh * 0.74));
-  let target = natural;
-
-  // v2：给一点呼吸边，但不故意撑满
-  target = Math.round(target + 6);
-
-  // v4：内容能放下则贴合；超出则封顶并允许滚动
+  let target = Math.round(natural + 6);
   const fits = target <= maxH;
   target = Math.max(minH, Math.min(maxH, target));
 
@@ -586,7 +865,6 @@ function prepareSlipSize() {
 }
 
 async function localDrawFallback() {
-  // Pages 无后端：优先最近热榜缓存，再退回 seed
   let items = [];
   let source = "static-seed";
   for (const [path, tag] of [
@@ -597,7 +875,11 @@ async function localDrawFallback() {
       const r = await fetch(path, { cache: "no-store" });
       if (!r.ok) continue;
       const payload = await r.json();
-      const list = payload.Items || payload.items || [];
+      const list =
+        payload.Items ||
+        payload.items ||
+        payload.Data?.Items ||
+        [];
       if (list.length) {
         items = list;
         source = tag;
@@ -620,14 +902,12 @@ async function localDrawFallback() {
   ];
   const g = grades[Math.floor(Math.random() * grades.length)];
   const oracles = [
-    "看山掷筒：筒中落下的，是此刻山顶最响的那一声问。",
-    "签意已定：此题正搅动山顶风云，宜深读，忌人云亦云。",
-    "此签不讲命运，只讲今日——热榜之上，风正从这里过。",
-    "山风起处，热议已成。今日宜观其势，再判其理。",
+    "筒中落下的，是此刻山顶最响的一声问——热榜即今日山门题。",
+    "此签不讲命运，只讲今日：热榜之上，风正从这里过。",
+    "签意已定：此题搅动山顶风云，宜深读，忌人云亦云。",
     "看山有言：热闹处未必见真章，却最见人心。",
     "山门已开：莫急着站队，先把原题读完。",
-    "筒中百签，独此一枝认你。点开，便是今日山门题。",
-    "一签既出，机缘自来。顺着链接上山，自有风景。",
+    "一签认主。点开链接上山，便是你与今日的相遇。",
   ];
   const digits = "零一二三四五六七八九";
   const toCn = (n) => {
@@ -669,10 +949,21 @@ async function fetchDraw() {
       data = null;
     }
     if (r.ok && data?.ok) return data;
-  } catch (_) {
-    /* GitHub Pages 无 Python 后端 */
-  }
+  } catch (_) {}
   return localDrawFallback();
+}
+
+const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+
+async function retractSlipIfNeeded() {
+  if (!pageRitual?.classList.contains("has-slip")) return;
+  pageRitual.classList.add("slip-retracting");
+  await wait(420);
+  pageRitual.classList.remove("slip-retracting", "has-slip");
+  if (fortuneCard) {
+    fortuneCard.classList.remove("visible", "glowing", "revealed");
+    fortuneCard.hidden = true;
+  }
 }
 
 async function draw() {
@@ -680,52 +971,44 @@ async function draw() {
   setBusy(true);
   clearSlip();
   ensureRitualAssets();
+  await retractSlipIfNeeded();
   window.KanshanScene?.resetRitualVisual?.();
+  resetIdleCopy();
   pageRitual?.scrollIntoView({ behavior: "smooth", block: "start" });
-
-  // 不阻塞摇签：音频后台开，避免等 音频解码卡死
-  if (!audioOn && window.KanshanAudio) {
-    window.KanshanAudio.enable()
-      .then(() => {
-        audioOn = true;
-        setAudioUi();
-      })
-      .catch(() => {});
-  }
+  ensureAudio();
 
   const fetchPromise = fetchDraw().catch((err) => ({ __err: err }));
 
   try {
-    await window.KanshanScene.playShakeAndDraw(
-      (name, line) => setPhase(name, line),
-      (i) => setHint(SHAKE_LINES[i] || SHAKE_LINES[0])
-    );
-
+    await window.KanshanScene.playShakeAndDraw((name) => setPhase(name));
     setPhase("待命");
     const data = await fetchPromise;
     if (data?.__err) throw data.__err;
-
     fillSlip(data);
-    // 展开前按内容定长
     const slipH = prepareSlipSize();
-    await window.KanshanScene.revealSlip((name, line) => setPhase(name, line), { height: slipH });
-    phaseText.textContent = `${data.slip?.label || ""} · ${data.slip?.grade || ""}`;
-    setHint("此签即今日山顶热议——点开便是原题");
+    await window.KanshanScene.revealSlip((name) => setPhase(name), { height: slipH });
+    settleDoneCopy(data);
   } catch (err) {
     window.KanshanScene?.resetRitualVisual?.();
     clearSlip();
-    phaseText.textContent = "静候开筒";
-    btnLabel.textContent = "求签";
+    resetIdleCopy();
     const msg = String(err?.message || err || "");
-    setHint(
-      /rate limit/i.test(msg) ? "山门拥挤，请稍候再求" : `求签未果：${msg}`
-    );
+    setHint(/rate limit/i.test(msg) ? "山门拥挤，请稍候再求" : `求签未果：${msg}`);
   } finally {
     setBusy(false);
-    btnLabel.textContent = "求签";
+    if (btnLabel) btnLabel.textContent = "求签";
   }
 }
 
 drawBtn.addEventListener("click", draw);
 againBtn?.addEventListener("click", draw);
+shareBtn?.addEventListener("click", shareSlip);
 setAudioUi();
+resetIdleCopy();
+
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("/sw.js?v=180").catch(() => {});
+  });
+}
+

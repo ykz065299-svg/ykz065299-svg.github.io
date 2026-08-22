@@ -1,7 +1,7 @@
-/* v106 — 恢复原版摇签/出签音色（44100 wav + 均衡）；氛围音仍轻量流式 */
+/* v143 — 0821 摇签/出签音色；完整一轮 shake.wav，可略放慢并对齐动画 */
 (() => {
   const bust = "?v=106";
-  const SHAKE_SEC = 5.4;
+  const NATIVE_SHAKE_SEC = 5.4;
 
   const AudioEngine = {
     ctx: null,
@@ -45,17 +45,12 @@
       await this.ensure();
       this.enabled = true;
       this.startAmbient();
-      // 后台预热摇签音，不挡交互
       this.loadBuffer("shake", "/audio/shake.wav").catch(() => {});
       this.loadBuffer("reveal", "/audio/reveal.wav").catch(() => {});
     },
 
     async disable() {
       this.enabled = false;
-      this.stopAmbient();
-    },
-
-    stopAmbient() {
       if (this.ambient) {
         this.ambient.pause();
         this.ambient.src = "";
@@ -64,8 +59,7 @@
     },
 
     startAmbient() {
-      this.stopAmbient();
-      if (!this.enabled) return;
+      if (this.ambient) return;
       const a = new Audio("/audio/ambient-lite.wav" + bust);
       a.loop = true;
       a.volume = 0.22;
@@ -74,7 +68,7 @@
       this.ambient = a;
     },
 
-    duckMusic(seconds = SHAKE_SEC) {
+    duckMusic(seconds = NATIVE_SHAKE_SEC) {
       if (!this.ambient) return;
       const prev = this.ambient.volume;
       this.ambient.volume = 0.06;
@@ -91,19 +85,48 @@
       return a;
     },
 
-    async playShake() {
-      // 求签手势：即使氛围音未开也播摇签
+    _waitHtml(url, volume, rate, seconds) {
+      return new Promise((resolve) => {
+        const a = this.playHtml(url, volume);
+        try {
+          if (a) a.playbackRate = rate;
+        } catch (_) {}
+        if (!a) return resolve();
+        let settled = false;
+        const done = () => {
+          if (settled) return;
+          settled = true;
+          try {
+            a.pause();
+          } catch (_) {}
+          resolve();
+        };
+        a.addEventListener("ended", done, { once: true });
+        setTimeout(done, (seconds + 0.15) * 1000);
+      });
+    },
+
+    /** 完整一轮摇签声（0821）；rate<1 时整段放慢，播完 resolve */
+    async playShake(opts = {}) {
+      const rate = typeof opts.rate === "number" && opts.rate > 0 ? opts.rate : 1;
+      const duckSec =
+        typeof opts.seconds === "number"
+          ? opts.seconds
+          : NATIVE_SHAKE_SEC / Math.max(rate, 0.01);
+
       try {
         await this.ensure();
       } catch (_) {
-        this.playHtml("/audio/shake.wav", 0.85);
-        return;
+        return this._waitHtml("/audio/shake.wav", 0.85, rate, duckSec);
       }
-      if (this.enabled) this.duckMusic(SHAKE_SEC);
+
+      if (this.enabled) this.duckMusic(duckSec);
+
       try {
         const buf = await this.loadBuffer("shake", "/audio/shake.wav");
         const src = this.ctx.createBufferSource();
         src.buffer = buf;
+        src.playbackRate.value = rate;
         const hp = this.ctx.createBiquadFilter();
         hp.type = "highpass";
         hp.frequency.value = 80;
@@ -128,9 +151,21 @@
         shelf.connect(lp);
         lp.connect(g);
         g.connect(this.sfxGain);
-        src.start();
+
+        const dur = buf.duration / Math.max(rate, 0.01);
+        await new Promise((resolve) => {
+          let settled = false;
+          const done = () => {
+            if (settled) return;
+            settled = true;
+            resolve();
+          };
+          src.onended = done;
+          src.start(); // 完整一轮，不截取
+          setTimeout(done, (dur + 0.12) * 1000);
+        });
       } catch (_) {
-        this.playHtml("/audio/shake.wav", 0.85);
+        return this._waitHtml("/audio/shake.wav", 0.85, rate, duckSec);
       }
     },
 
@@ -148,9 +183,20 @@
         src.connect(lp);
         lp.connect(g);
         g.connect(this.sfxGain);
-        src.start();
+        const dur = buf.duration;
+        await new Promise((resolve) => {
+          let settled = false;
+          const done = () => {
+            if (settled) return;
+            settled = true;
+            resolve();
+          };
+          src.onended = done;
+          src.start();
+          setTimeout(done, (dur + 0.12) * 1000);
+        });
       } catch (_) {
-        this.playHtml("/audio/reveal.wav", 0.8);
+        return this._waitHtml("/audio/reveal.wav", 0.8, 1, 4.8);
       }
     },
   };
