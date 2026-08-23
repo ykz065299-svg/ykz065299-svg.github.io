@@ -10,12 +10,14 @@
     <meta property="og:site_name" content="看山今日一签" />
     <meta property="og:title" content="看山今日一签" />
     <meta property="og:description" content="摇签入山，一签直达知乎热榜今日山门题。" />
-    <meta property="og:image" content="https://ykz065299-svg.github.io/cover.jpg?v=106" />
+    <meta property="og:image" content="https://ykz065299-svg.github.io/cover.jpg?v=295" />
     <meta property="og:url" content="https://ykz065299-svg.github.io/" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="看山今日一签" />
     <meta name="twitter:description" content="摇签入山，一签直达知乎热榜今日山门题。" />
-    <meta name="twitter:image" content="https://ykz065299-svg.github.io/cover.jpg?v=106" />
+    <meta name="twitter:image" content="https://ykz065299-svg.github.io/cover.jpg?v=295" />
+    <link rel="preload" as="image" href="cover.jpg?v=295" />
+    <link rel="preload" as="image" href="cover-mobile.jpg?v=295" media="(max-width: 720px)" />
     <title>看山今日一签</title>
     <!-- CSS 内联：少一次 github.io 慢请求 -->
     <style>
@@ -70,7 +72,7 @@ body:not(.ritual-visible) .page2-bg {
 }
 .page1-bg {
   top: 0;
-  background-image: url("/cover.jpg?v=106");
+  background-image: url("cover.jpg?v=295");
   background-position: 36% 26%;
 }
 .page-seam {
@@ -97,7 +99,7 @@ body:not(.ritual-visible) .page2-bg {
   background-position: 50% 60%;
 }
 body.ritual-assets-ready .page2-bg {
-  background-image: url("/page2-bg.jpg?v=106");
+  background-image: url("page2-bg.jpg?v=295");
   visibility: visible;
 }
 .page2-mood {
@@ -1152,7 +1154,7 @@ body.ritual-assets-ready .page2-bg {
 @media (max-width: 720px) {
   .page1-bg {
     /* 竖版专用封面：完整露出看山脸 + 标题，不再半张脸裁切 */
-    background-image: url("/cover-mobile.jpg?v=106");
+    background-image: url("cover-mobile.jpg?v=295");
     background-position: center center;
     background-size: cover;
   }
@@ -1178,7 +1180,7 @@ body.ritual-assets-ready .page2-bg {
         var link = document.createElement("link");
         link.rel = "preload";
         link.as = "image";
-        link.href = mobile ? "/cover-mobile.jpg?v=106" : "/cover.jpg?v=106";
+        link.href = mobile ? "cover-mobile.jpg?v=295" : "cover.jpg?v=295";
         document.head.appendChild(link);
       })();
     </script>
@@ -1209,7 +1211,7 @@ body.ritual-assets-ready .page2-bg {
           <aside class="kanshan-seer" id="kanshanSeer" aria-hidden="true">
             <img
               class="kanshan-seer-art"
-              data-src="/art/kanshan-daoshi-bugua-cut.webp?v=106"
+              src="art/kanshan-daoshi-bugua-cut.webp?v=295" data-src="art/kanshan-daoshi-bugua-cut.webp?v=295"
               alt=""
               width="420"
               height="459"
@@ -1224,7 +1226,7 @@ body.ritual-assets-ready .page2-bg {
               <div class="tube-glow" aria-hidden="true"></div>
               <img
                 id="tubeArt"
-                data-src="/tube-clean.webp?v=106"
+                src="tube-clean.webp?v=295" data-src="tube-clean.webp?v=295"
                 alt=""
                 class="tube-art"
                 width="320"
@@ -1277,6 +1279,6 @@ body.ritual-assets-ready .page2-bg {
       </section>
     </main>
 
-    <script src="/boot.js?v=295" defer></script>
+    <script src="/boot.js?v=296" defer></script>
   </body>
 </html>

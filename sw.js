@@ -1,10 +1,15 @@
-/* v180 — 网络优先：HTML/boot/热榜不读旧缓存；封面离线兜底 */
-const CACHE = "kanshan-v295";
-const SHELL = ["./cover-mobile.jpg?v=106", "./cover.jpg?v=106"];
+/* v296 — 图片网络优先；相对路径；失败不强缓存 */
+const CACHE = "kanshan-v296";
+const SHELL = ["./cover-mobile.jpg?v=295", "./cover.jpg?v=295"];
 
 self.addEventListener("install", (e) => {
   e.waitUntil(
-    caches.open(CACHE).then((c) => c.addAll(SHELL)).then(() => self.skipWaiting())
+    caches
+      .open(CACHE)
+      .then((c) =>
+        Promise.all(SHELL.map((u) => c.add(u).catch(() => {})))
+      )
+      .then(() => self.skipWaiting())
   );
 });
 
@@ -25,7 +30,8 @@ function networkFirst(url) {
     p.includes("hot-cache") ||
     p.includes("hot-seed") ||
     p.endsWith(".html") ||
-    p === "/"
+    p === "/" ||
+    /\.(?:jpg|jpeg|png|webp|gif|svg)$/i.test(p)
   );
 }
 
@@ -39,9 +45,21 @@ self.addEventListener("fetch", (e) => {
 
   if (isNav) {
     e.respondWith(
-      fetch(req).catch(() =>
-        caches.match("./index.html").then((hit) => hit || caches.match("/index.html"))
-      )
+      fetch(req)
+        .then((res) => {
+          if (res.ok && /\.(?:jpg|jpeg|png|webp)$/i.test(url.pathname)) {
+            const copy = res.clone();
+            caches.open(CACHE).then((c) => c.put(req, copy)).catch(() => {});
+          }
+          return res;
+        })
+        .catch(() =>
+          caches.match(req).then(
+            (hit) =>
+              hit ||
+              caches.match("./index.html").then((h) => h || caches.match("/index.html"))
+          )
+        )
     );
     return;
   }

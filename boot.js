@@ -623,7 +623,7 @@ resetIdleCopy();
 
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("/sw.js?v=295").catch(() => {});
+    navigator.serviceWorker.register("/sw.js?v=296").catch(() => {});
   });
 }
 /* v295 — 整轮收势放柔；幕间仍稳 */
