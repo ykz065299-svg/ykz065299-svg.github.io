@@ -1,6 +1,6 @@
-/* v299 — 首屏加速：图片缓存优先；音效 lite；轻量预缓存 */
-const CACHE = "kanshan-v299";
-const SHELL = ["./cover-mobile.jpg?v=299", "./cover.jpg?v=299"];
+/* v300 — 音效网络优先；避免大 wav 被坏缓存卡死无声 */
+const CACHE = "kanshan-v300";
+const SHELL = ["./cover-mobile.jpg?v=300", "./cover.jpg?v=300"];
 
 self.addEventListener("install", (e) => {
   e.waitUntil(
@@ -24,6 +24,10 @@ function isImage(url) {
   return /\.(?:jpg|jpeg|png|webp|gif)$/i.test(url.pathname);
 }
 
+function isAudio(url) {
+  return /\.(?:wav|mp3|ogg|m4a)$/i.test(url.pathname);
+}
+
 function networkFirstDoc(url) {
   const p = url.pathname;
   return (
@@ -41,11 +45,17 @@ self.addEventListener("fetch", (e) => {
   const url = new URL(req.url);
   if (url.origin !== location.origin) return;
 
-  // HTML / boot / 热榜：网络优先，避免旧壳
-  if (req.mode === "navigate" || networkFirstDoc(url)) {
+  // HTML / boot / 热榜 / 音效：网络优先（音效大文件缓存优先易无声）
+  if (req.mode === "navigate" || networkFirstDoc(url) || isAudio(url)) {
     e.respondWith(
       fetch(req)
-        .then((res) => res)
+        .then((res) => {
+          if (res.ok && isAudio(url)) {
+            const copy = res.clone();
+            caches.open(CACHE).then((c) => c.put(req, copy)).catch(() => {});
+          }
+          return res;
+        })
         .catch(() =>
           caches.match(req).then(
             (hit) =>
@@ -57,8 +67,8 @@ self.addEventListener("fetch", (e) => {
     return;
   }
 
-  // 图片/音效：缓存优先，后台更新（国内访问 github.io 更稳）
-  if (isImage(url) || /\.(?:wav|json)$/i.test(url.pathname)) {
+  // 图片：缓存优先，后台更新
+  if (isImage(url) || /\.json$/i.test(url.pathname)) {
     e.respondWith(
       caches.match(req).then((cached) => {
         const net = fetch(req)

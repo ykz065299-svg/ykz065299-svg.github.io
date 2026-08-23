@@ -1,6 +1,6 @@
-/* v299 — 摇筒/出签恢复原版音效；氛围音仍用 lite */
+/* v300 — 原版摇筒/出签；点击手势内解锁；音效 no-cache */
 (() => {
-  const bust = "?v=299";
+  const bust = "?v=300";
   const NATIVE_SHAKE_SEC = 5.4;
   const SHAKE_URL = "audio/shake.wav";
   const REVEAL_URL = "audio/reveal.wav";
@@ -36,9 +36,11 @@
 
     async loadBuffer(name, url) {
       if (this.buffers[name]) return this.buffers[name];
-      const res = await fetch(url + bust, { cache: "force-cache" });
+      // 不用 force-cache：SW/旧缓存容易把大 wav 卡住导致无声
+      const res = await fetch(url + bust, { cache: "no-cache" });
       if (!res.ok) throw new Error("load fail " + url);
       const arr = await res.arrayBuffer();
+      if (!arr.byteLength) throw new Error("empty audio " + url);
       const buf = await this.ctx.decodeAudioData(arr.slice(0));
       this.buffers[name] = buf;
       return buf;
@@ -48,6 +50,7 @@
       await this.ensure();
       this.enabled = true;
       this.startAmbient();
+      // 预热，失败不挡求签（播放时再拉）
       this.loadBuffer("shake", SHAKE_URL).catch(() => {});
       this.loadBuffer("reveal", REVEAL_URL).catch(() => {});
     },
@@ -264,6 +267,14 @@ function ensureAudio() {
     .catch(() => {});
 }
 
+/** 必须在用户点击的同步阶段调用，避免 iOS 手势过期后无声 */
+function unlockAudioSync() {
+  try {
+    window.KanshanAudio?.ensure?.();
+  } catch (_) {}
+  return ensureAudio();
+}
+
 function ensureRitualAssets() {
   document.body.classList.add("ritual-assets-ready");
   document.querySelectorAll("img[data-src]").forEach(function (img) {
@@ -293,7 +304,7 @@ audioToggle.addEventListener("click", async () => {
 
 scrollCue?.addEventListener("click", () => {
   ensureRitualAssets();
-  ensureAudio();
+  unlockAudioSync();
   pageRitual?.scrollIntoView({ behavior: "smooth", block: "start" });
 });
 
@@ -615,13 +626,15 @@ async function retractSlipIfNeeded() {
 async function draw() {
   if (busy) return;
   setBusy(true);
+  // 先解锁音频（仍在点击手势内），再做收签等 await
+  const audioReady = unlockAudioSync();
   clearSlip();
   ensureRitualAssets();
   await retractSlipIfNeeded();
   window.KanshanScene?.resetRitualVisual?.();
   resetIdleCopy();
   pageRitual?.scrollIntoView({ behavior: "smooth", block: "start" });
-  ensureAudio();
+  await audioReady;
 
   const fetchPromise = fetchDraw().catch((err) => ({ __err: err }));
 
@@ -653,7 +666,7 @@ resetIdleCopy();
 
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("sw.js?v=299").catch(() => {});
+    navigator.serviceWorker.register("sw.js?v=300").catch(() => {});
   });
 }
 /* v295 — 整轮收势放柔；幕间仍稳 */

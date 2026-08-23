@@ -1,6 +1,6 @@
-/* v299 — 摇筒/出签恢复原版音效；氛围音仍用 lite */
+/* v300 — 原版摇筒/出签；点击手势内解锁；音效 no-cache */
 (() => {
-  const bust = "?v=299";
+  const bust = "?v=300";
   const NATIVE_SHAKE_SEC = 5.4;
   const SHAKE_URL = "audio/shake.wav";
   const REVEAL_URL = "audio/reveal.wav";
@@ -36,9 +36,11 @@
 
     async loadBuffer(name, url) {
       if (this.buffers[name]) return this.buffers[name];
-      const res = await fetch(url + bust, { cache: "force-cache" });
+      // 不用 force-cache：SW/旧缓存容易把大 wav 卡住导致无声
+      const res = await fetch(url + bust, { cache: "no-cache" });
       if (!res.ok) throw new Error("load fail " + url);
       const arr = await res.arrayBuffer();
+      if (!arr.byteLength) throw new Error("empty audio " + url);
       const buf = await this.ctx.decodeAudioData(arr.slice(0));
       this.buffers[name] = buf;
       return buf;
@@ -48,6 +50,7 @@
       await this.ensure();
       this.enabled = true;
       this.startAmbient();
+      // 预热，失败不挡求签（播放时再拉）
       this.loadBuffer("shake", SHAKE_URL).catch(() => {});
       this.loadBuffer("reveal", REVEAL_URL).catch(() => {});
     },

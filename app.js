@@ -56,6 +56,14 @@ function ensureAudio() {
     .catch(() => {});
 }
 
+/** 必须在用户点击的同步阶段调用，避免 iOS 手势过期后无声 */
+function unlockAudioSync() {
+  try {
+    window.KanshanAudio?.ensure?.();
+  } catch (_) {}
+  return ensureAudio();
+}
+
 function ensureRitualAssets() {
   document.body.classList.add("ritual-assets-ready");
   document.querySelectorAll("img[data-src]").forEach(function (img) {
@@ -85,7 +93,7 @@ audioToggle.addEventListener("click", async () => {
 
 scrollCue?.addEventListener("click", () => {
   ensureRitualAssets();
-  ensureAudio();
+  unlockAudioSync();
   pageRitual?.scrollIntoView({ behavior: "smooth", block: "start" });
 });
 
@@ -407,13 +415,15 @@ async function retractSlipIfNeeded() {
 async function draw() {
   if (busy) return;
   setBusy(true);
+  // 先解锁音频（仍在点击手势内），再做收签等 await
+  const audioReady = unlockAudioSync();
   clearSlip();
   ensureRitualAssets();
   await retractSlipIfNeeded();
   window.KanshanScene?.resetRitualVisual?.();
   resetIdleCopy();
   pageRitual?.scrollIntoView({ behavior: "smooth", block: "start" });
-  ensureAudio();
+  await audioReady;
 
   const fetchPromise = fetchDraw().catch((err) => ({ __err: err }));
 
@@ -445,6 +455,6 @@ resetIdleCopy();
 
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("sw.js?v=299").catch(() => {});
+    navigator.serviceWorker.register("sw.js?v=300").catch(() => {});
   });
 }
