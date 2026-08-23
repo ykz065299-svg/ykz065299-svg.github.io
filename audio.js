@@ -1,9 +1,9 @@
-/* v298 — 线上轻量音效：优先 lite，首屏更少字节 */
+/* v299 — 摇筒/出签恢复原版音效；氛围音仍用 lite */
 (() => {
-  const bust = "?v=298";
+  const bust = "?v=299";
   const NATIVE_SHAKE_SEC = 5.4;
-  const SHAKE_URL = "audio/shake-lite.wav";
-  const REVEAL_URL = "audio/reveal-lite.wav";
+  const SHAKE_URL = "audio/shake.wav";
+  const REVEAL_URL = "audio/reveal.wav";
   const AMBIENT_URL = "audio/ambient-lite.wav";
 
   const AudioEngine = {

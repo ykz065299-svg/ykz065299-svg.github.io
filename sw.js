@@ -1,6 +1,6 @@
-/* v298 — 首屏加速：图片缓存优先；音效 lite；轻量预缓存 */
-const CACHE = "kanshan-v298";
-const SHELL = ["./cover-mobile.jpg?v=298", "./cover.jpg?v=298"];
+/* v299 — 首屏加速：图片缓存优先；音效 lite；轻量预缓存 */
+const CACHE = "kanshan-v299";
+const SHELL = ["./cover-mobile.jpg?v=299", "./cover.jpg?v=299"];
 
 self.addEventListener("install", (e) => {
   e.waitUntil(

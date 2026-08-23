@@ -49,7 +49,7 @@ body:not(.ritual-visible) .page2-bg {
 }
 .page1-bg {
   top: 0;
-  background-image: url("cover.jpg?v=298");
+  background-image: url("cover.jpg?v=299");
   background-position: 36% 26%;
 }
 .page-seam {
@@ -76,7 +76,7 @@ body:not(.ritual-visible) .page2-bg {
   background-position: 50% 60%;
 }
 body.ritual-assets-ready .page2-bg {
-  background-image: url("page2-bg.jpg?v=298");
+  background-image: url("page2-bg.jpg?v=299");
   visibility: visible;
 }
 .page2-mood {
@@ -1119,7 +1119,7 @@ body.ritual-assets-ready .page2-bg {
 @media (max-width: 720px) {
   .page1-bg {
     /* 竖版专用封面：完整露出看山脸 + 标题，不再半张脸裁切 */
-    background-image: url("cover-mobile.jpg?v=298");
+    background-image: url("cover-mobile.jpg?v=299");
     background-position: center center;
     background-size: cover;
   }
