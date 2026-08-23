@@ -1,6 +1,6 @@
-/* v297 — 线上轻量音效：优先 lite，首屏更少字节 */
+/* v298 — 线上轻量音效：优先 lite，首屏更少字节 */
 (() => {
-  const bust = "?v=297";
+  const bust = "?v=298";
   const NATIVE_SHAKE_SEC = 5.4;
   const SHAKE_URL = "audio/shake-lite.wav";
   const REVEAL_URL = "audio/reveal-lite.wav";
@@ -265,12 +265,18 @@ function ensureAudio() {
 }
 
 function ensureRitualAssets() {
-  if (ritualAssetsReady) return;
-  ritualAssetsReady = true;
   document.body.classList.add("ritual-assets-ready");
   document.querySelectorAll("img[data-src]").forEach(function (img) {
-    if (!img.getAttribute("src")) img.setAttribute("src", img.getAttribute("data-src"));
+    const want = img.getAttribute("data-src");
+    if (!want) return;
+    if (img.getAttribute("src") !== want) img.setAttribute("src", want);
+    // 破图后重试：清掉失败态再赋一次
+    if (img.complete && img.naturalWidth === 0) {
+      img.removeAttribute("src");
+      img.setAttribute("src", want);
+    }
   });
+  ritualAssetsReady = true;
 }
 
 audioToggle.addEventListener("click", async () => {
@@ -291,6 +297,15 @@ scrollCue?.addEventListener("click", () => {
   pageRitual?.scrollIntoView({ behavior: "smooth", block: "start" });
 });
 
+// 进二页（或已在二页）就挂背景；签筒/看山 HTML 已带 src，不依赖懒加载
+function ritualNearViewport() {
+  if (!pageRitual) return true;
+  const r = pageRitual.getBoundingClientRect();
+  const vh = window.innerHeight || 800;
+  return r.top < vh + 160 && r.bottom > -40;
+}
+if (ritualNearViewport()) ensureRitualAssets();
+
 if (pageRitual && "IntersectionObserver" in window) {
   const assetsIo = new IntersectionObserver(
     ([entry]) => {
@@ -298,7 +313,7 @@ if (pageRitual && "IntersectionObserver" in window) {
       ensureRitualAssets();
       assetsIo.disconnect();
     },
-    { rootMargin: "120px 0px" }
+    { rootMargin: "160px 0px" }
   );
   assetsIo.observe(pageRitual);
 
@@ -638,7 +653,7 @@ resetIdleCopy();
 
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("sw.js?v=297").catch(() => {});
+    navigator.serviceWorker.register("sw.js?v=298").catch(() => {});
   });
 }
 /* v295 — 整轮收势放柔；幕间仍稳 */

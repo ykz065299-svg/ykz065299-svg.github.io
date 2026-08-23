@@ -1,6 +1,6 @@
-/* v297 — 线上轻量音效：优先 lite，首屏更少字节 */
+/* v298 — 线上轻量音效：优先 lite，首屏更少字节 */
 (() => {
-  const bust = "?v=297";
+  const bust = "?v=298";
   const NATIVE_SHAKE_SEC = 5.4;
   const SHAKE_URL = "audio/shake-lite.wav";
   const REVEAL_URL = "audio/reveal-lite.wav";
