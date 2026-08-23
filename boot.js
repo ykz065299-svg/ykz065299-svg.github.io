@@ -1,7 +1,10 @@
-/* v143 — 0821 摇签/出签音色；完整一轮 shake.wav，可略放慢并对齐动画 */
+/* v297 — 线上轻量音效：优先 lite，首屏更少字节 */
 (() => {
-  const bust = "?v=106";
+  const bust = "?v=297";
   const NATIVE_SHAKE_SEC = 5.4;
+  const SHAKE_URL = "audio/shake-lite.wav";
+  const REVEAL_URL = "audio/reveal-lite.wav";
+  const AMBIENT_URL = "audio/ambient-lite.wav";
 
   const AudioEngine = {
     ctx: null,
@@ -45,8 +48,8 @@
       await this.ensure();
       this.enabled = true;
       this.startAmbient();
-      this.loadBuffer("shake", "/audio/shake.wav").catch(() => {});
-      this.loadBuffer("reveal", "/audio/reveal.wav").catch(() => {});
+      this.loadBuffer("shake", SHAKE_URL).catch(() => {});
+      this.loadBuffer("reveal", REVEAL_URL).catch(() => {});
     },
 
     async disable() {
@@ -60,7 +63,7 @@
 
     startAmbient() {
       if (this.ambient) return;
-      const a = new Audio("/audio/ambient-lite.wav" + bust);
+      const a = new Audio(AMBIENT_URL + bust);
       a.loop = true;
       a.volume = 0.22;
       a.preload = "none";
@@ -117,13 +120,13 @@
       try {
         await this.ensure();
       } catch (_) {
-        return this._waitHtml("/audio/shake.wav", 0.85, rate, duckSec);
+        return this._waitHtml(SHAKE_URL, 0.85, rate, duckSec);
       }
 
       if (this.enabled) this.duckMusic(duckSec);
 
       try {
-        const buf = await this.loadBuffer("shake", "/audio/shake.wav");
+        const buf = await this.loadBuffer("shake", SHAKE_URL);
         const src = this.ctx.createBufferSource();
         src.buffer = buf;
         src.playbackRate.value = rate;
@@ -165,14 +168,14 @@
           setTimeout(done, (dur + 0.12) * 1000);
         });
       } catch (_) {
-        return this._waitHtml("/audio/shake.wav", 0.85, rate, duckSec);
+        return this._waitHtml(SHAKE_URL, 0.85, rate, duckSec);
       }
     },
 
     async playReveal() {
       try {
         await this.ensure();
-        const buf = await this.loadBuffer("reveal", "/audio/reveal.wav");
+        const buf = await this.loadBuffer("reveal", REVEAL_URL);
         const src = this.ctx.createBufferSource();
         src.buffer = buf;
         const lp = this.ctx.createBiquadFilter();
@@ -196,7 +199,7 @@
           setTimeout(done, (dur + 0.12) * 1000);
         });
       } catch (_) {
-        return this._waitHtml("/audio/reveal.wav", 0.8, 1, 4.8);
+        return this._waitHtml(REVEAL_URL, 0.8, 1, 4.8);
       }
     },
   };
@@ -289,14 +292,26 @@ scrollCue?.addEventListener("click", () => {
 });
 
 if (pageRitual && "IntersectionObserver" in window) {
-  const io = new IntersectionObserver(
+  const assetsIo = new IntersectionObserver(
     ([entry]) => {
-      if (entry.boundingClientRect.top < window.innerHeight * 1.35) ensureRitualAssets();
-      document.body.classList.toggle("ritual-visible", entry.isIntersecting && entry.intersectionRatio > 0.15);
+      if (!entry.isIntersecting) return;
+      ensureRitualAssets();
+      assetsIo.disconnect();
     },
-    { threshold: [0, 0.15, 0.5], rootMargin: "40% 0px 0px 0px" }
+    { rootMargin: "120px 0px" }
   );
-  io.observe(pageRitual);
+  assetsIo.observe(pageRitual);
+
+  const visIo = new IntersectionObserver(
+    ([entry]) => {
+      document.body.classList.toggle(
+        "ritual-visible",
+        entry.isIntersecting && entry.intersectionRatio > 0.15
+      );
+    },
+    { threshold: [0, 0.15, 0.5] }
+  );
+  visIo.observe(pageRitual);
 } else {
   ensureRitualAssets();
   document.body.classList.add("ritual-visible");
@@ -623,7 +638,7 @@ resetIdleCopy();
 
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("/sw.js?v=296").catch(() => {});
+    navigator.serviceWorker.register("sw.js?v=297").catch(() => {});
   });
 }
 /* v295 — 整轮收势放柔；幕间仍稳 */

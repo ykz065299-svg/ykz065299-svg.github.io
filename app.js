@@ -84,14 +84,26 @@ scrollCue?.addEventListener("click", () => {
 });
 
 if (pageRitual && "IntersectionObserver" in window) {
-  const io = new IntersectionObserver(
+  const assetsIo = new IntersectionObserver(
     ([entry]) => {
-      if (entry.boundingClientRect.top < window.innerHeight * 1.35) ensureRitualAssets();
-      document.body.classList.toggle("ritual-visible", entry.isIntersecting && entry.intersectionRatio > 0.15);
+      if (!entry.isIntersecting) return;
+      ensureRitualAssets();
+      assetsIo.disconnect();
     },
-    { threshold: [0, 0.15, 0.5], rootMargin: "40% 0px 0px 0px" }
+    { rootMargin: "120px 0px" }
   );
-  io.observe(pageRitual);
+  assetsIo.observe(pageRitual);
+
+  const visIo = new IntersectionObserver(
+    ([entry]) => {
+      document.body.classList.toggle(
+        "ritual-visible",
+        entry.isIntersecting && entry.intersectionRatio > 0.15
+      );
+    },
+    { threshold: [0, 0.15, 0.5] }
+  );
+  visIo.observe(pageRitual);
 } else {
   ensureRitualAssets();
   document.body.classList.add("ritual-visible");
@@ -418,6 +430,6 @@ resetIdleCopy();
 
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("/sw.js?v=296").catch(() => {});
+    navigator.serviceWorker.register("sw.js?v=297").catch(() => {});
   });
 }
