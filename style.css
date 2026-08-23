@@ -258,10 +258,10 @@ body.ritual-assets-ready .page2-bg {
   opacity: .22;
 }
 .page-ritual.has-slip .ritual {
-  opacity: .12;
-  filter: blur(2.5px) saturate(.85);
+  opacity: .14;
+  filter: blur(1.2px) saturate(.9);
   pointer-events: none;
-  transition: opacity .6s ease, filter .6s ease;
+  transition: opacity .85s cubic-bezier(.33,.08,.25,1), filter .85s cubic-bezier(.33,.08,.25,1);
 }
 .page-ritual.has-slip .ritual-footer {
   opacity: .95;
@@ -349,14 +349,12 @@ body.ritual-assets-ready .page2-bg {
     opacity: 0;
     transform: translate(-50%, -46%);
     letter-spacing: .28em;
-    filter: blur(2px);
   }
-  22% {
-    opacity: .92;
+  18% {
+    opacity: .94;
     transform: translate(-50%, -50%);
-    filter: blur(0);
   }
-  55% {
+  50% {
     opacity: 1;
     transform: translate(-50%, -50%);
     letter-spacing: .5em;
@@ -367,13 +365,23 @@ body.ritual-assets-ready .page2-bg {
   100% {
     opacity: 0;
     transform: translate(-50%, -52%);
-    filter: blur(.6px);
   }
 }
-.page-ritual.act-flashing .tube-stage {
-  filter: none;
+.ritual.is-shaking .tube-stage {
+  transition: none !important;
 }
-.page-ritual.act-flashing .kanshan-seer {
+.ritual.is-shaking .kanshan-seer,
+.ritual.is-shaking .kanshan-seer.casting,
+.kanshan-seer.motion-active {
+  filter: none !important;
+}
+.ritual.is-shaking .tube {
+  filter: none !important;
+}
+.ritual.is-shaking .tube-glow {
+  opacity: 0;
+}
+.page-ritual.act-flashing .tube-stage {
   filter: none;
 }
 
@@ -391,60 +399,50 @@ body.ritual-assets-ready .page2-bg {
   position: absolute;
   left: calc(50% + 108px);
   right: auto;
-  bottom: calc(50% - 178px);
+  bottom: calc(50% - 200px);
   top: auto;
   width: clamp(210px, 40vh, 286px);
-  height: clamp(230px, 44vh, 314px);
+  height: auto;
+  overflow: visible;
   z-index: 2;
   pointer-events: none;
   transform: translateZ(0);
-  transform-origin: 40% 92%;
-  /* drop-shadow 贴合透明轮廓；勿用 art 的矩形 box-shadow */
-  filter: drop-shadow(0 10px 16px rgba(0,0,0,.45));
+  transform-origin: 40% 96%;
+  filter: none;
   animation: none;
   transition: opacity .6s ease, transform .6s cubic-bezier(.22, .8, .28, 1);
-  contain: layout style;
   backface-visibility: hidden;
 }
 .kanshan-seer.casting {
-  /* 起伏由 JS RAF 写 transform；光晕用静态 drop-shadow（不动画 filter） */
   animation: none;
   transition: none;
-  filter:
-    drop-shadow(0 10px 14px rgba(0,0,0,.4))
-    drop-shadow(0 0 16px rgba(255,170,70,.26));
 }
 .kanshan-seer.beating {
   animation: none !important;
 }
 .kanshan-seer.blessing {
-  animation: kanshanBless 1.55s cubic-bezier(.22, .82, .28, 1) 1 forwards;
+  animation: kanshanBless 1.05s cubic-bezier(.22, .82, .28, 1) 1 forwards;
   transition: none;
-  filter:
-    drop-shadow(0 12px 18px rgba(0,0,0,.4))
-    drop-shadow(0 0 22px rgba(255,210,120,.4));
 }
 .kanshan-seer.exiting {
   animation: none !important;
   opacity: 0;
   pointer-events: none;
-  /* transform 由 JS freeze 后写入终点，避免与 keyframe 抢 */
 }
 .page-ritual.has-slip .kanshan-seer {
   opacity: 0;
-  transform: translate3d(10px, 6px, 0);
+  transform: translate3d(8px, 5px, 0) scale(.98);
   animation: none !important;
   pointer-events: none;
-  transition: opacity .55s ease, transform .55s ease;
+  transition: opacity .7s cubic-bezier(.33,.08,.2,1), transform .7s cubic-bezier(.33,.08,.2,1);
 }
 .page-ritual.act-flashing .kanshan-seer {
-  /* 金字时不改 filter，避免闪卡 */
   filter: none;
 }
 @keyframes kanshanBless {
-  0%   { transform: translate3d(0, 5px, 0) scale(.985); }
-  40%  { transform: translate3d(0, -9px, 0) scale(1.055); }
-  72%  { transform: translate3d(0, -2px, 0) scale(1.02); }
+  0%   { transform: translate3d(0, 4px, 0) scale(.98); }
+  42%  { transform: translate3d(0, -9px, 0) scale(1.05); }
+  75%  { transform: translate3d(0, -1px, 0) scale(1.012); }
   100% { transform: translate3d(0, 0, 0) scale(1); }
 }
 .kanshan-seer.casting .kanshan-aura {
@@ -491,10 +489,21 @@ body.ritual-assets-ready .page2-bg {
   background: transparent;
   box-shadow: none;
   transform: translateZ(0);
+  filter:
+    saturate(1.22) contrast(1.14) brightness(1.1)
+    drop-shadow(0 10px 16px rgba(0,0,0,.5));
+}
+.ritual.is-shaking .kanshan-seer-art,
+.kanshan-seer.motion-active .kanshan-seer-art,
+.kanshan-seer.casting .kanshan-seer-art {
+  filter: saturate(1.22) contrast(1.14) brightness(1.1) !important;
 }
 .kanshan-seer-caption {
-  display: block;
-  margin-top: 4px;
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -20px;
+  margin-top: 0;
   text-align: center;
   color: rgba(243, 223, 170, .62);
   font-size: .58rem;
@@ -519,16 +528,14 @@ body.ritual-assets-ready .page2-bg {
   0% { transform: translate(-50%, -50%) rotate(0deg) scale(1); }
   100% { transform: translate(-50%, -50%) rotate(360deg) scale(1); }
 }
-  100% { transform: translate(-50%, -50%) rotate(360deg) scale(1); }
-}
 
 @media (max-width: 720px) {
   .kanshan-seer {
     left: calc(50% + 86px);
     right: auto;
     width: clamp(168px, 34vh, 220px);
-    height: clamp(184px, 37vh, 240px);
-    bottom: calc(50% - 138px);
+    height: auto;
+    bottom: calc(50% - 154px);
   }
 }
 @media (max-width: 420px) {
@@ -536,8 +543,8 @@ body.ritual-assets-ready .page2-bg {
     left: calc(50% + 72px);
     right: auto;
     width: clamp(148px, 32vh, 186px);
-    height: clamp(162px, 35vh, 204px);
-    bottom: calc(50% - 122px);
+    height: auto;
+    bottom: calc(50% - 134px);
   }
   .kanshan-seer-caption { font-size: .55rem; letter-spacing: .12em; text-indent: .12em; }
   .act-flash {
@@ -569,10 +576,12 @@ body.ritual-assets-ready .page2-bg {
 }
 .tube-stage.leaving {
   opacity: 0;
-  transform: translate3d(-50%, -50%, 0) scale(.9);
-  filter: blur(3px);
+  transform: translate3d(-50%, -46%, 0) scale(.94);
+  filter: none;
   pointer-events: none;
-  transition: opacity .45s ease, transform .45s ease, filter .45s ease;
+  transition:
+    opacity .72s cubic-bezier(.33, .08, .25, 1),
+    transform .72s cubic-bezier(.33, .08, .25, 1);
 }
 
 .fate-ring {
@@ -638,9 +647,7 @@ body.ritual-assets-ready .page2-bg {
 }
 .tube.shaking {
   animation: none;
-  filter:
-    drop-shadow(0 16px 14px rgba(0,0,0,.36))
-    drop-shadow(0 0 18px rgba(255,180,80,.28));
+  filter: none;
 }
 .tube-glow {
   position: absolute;
@@ -705,6 +712,11 @@ body.ritual-assets-ready .page2-bg {
   height: 180px;
   width: 12px;
   pointer-events: none;
+  opacity: 1;
+  transition: opacity .48s cubic-bezier(.33, .08, .25, 1);
+}
+.emerging.fade-out {
+  opacity: 0;
 }
 .emerging-stick {
   width: 6px;
@@ -715,7 +727,7 @@ body.ritual-assets-ready .page2-bg {
   box-shadow: 0 0 14px rgba(255,210,100,.85);
   transform-origin: top center;
   transform: scaleY(0);
-  transition: transform 1.05s cubic-bezier(.16,.84,.24,1);
+  transition: transform .95s cubic-bezier(.16, .84, .22, 1);
   position: relative;
   will-change: transform;
 }
@@ -729,11 +741,12 @@ body.ritual-assets-ready .page2-bg {
   color: #8a1a18;
   font-family: var(--display);
   opacity: 0;
-  transition: opacity .3s ease .35s;
+  transition: opacity .32s ease .28s;
 }
 .emerging.show .emerging-tip { opacity: 1; }
+.emerging.fade-out .emerging-tip { opacity: 0; transition-delay: 0s; }
 
-/* —— 签面：相对第二页正中央 —— */
+/* —— 签面：自签芽竖条形态展开，避免扁饼弹出 —— */
 .slip-scroll {
   --slip-h: 420px;
   position: absolute;
@@ -743,16 +756,16 @@ body.ritual-assets-ready .page2-bg {
   height: var(--slip-h);
   display: flex;
   flex-direction: column;
-  transform: translate3d(-50%, -50%, 0) scale(0.12, 0.08);
-  transform-origin: center center;
+  transform: translate3d(-50%, -38%, 0) scale(0.07, 0.38);
+  transform-origin: center top;
   opacity: 0;
   pointer-events: none;
   z-index: 6;
   overflow: hidden;
   border-radius: 6px;
   transition:
-    transform 1.05s cubic-bezier(.18,.78,.2,1),
-    opacity .28s ease;
+    transform 1.18s cubic-bezier(.2, .78, .16, 1),
+    opacity .55s cubic-bezier(.25, .7, .2, 1);
   will-change: transform, opacity;
   backface-visibility: hidden;
   box-shadow: 0 24px 60px rgba(0,0,0,.45);
@@ -899,7 +912,7 @@ body.ritual-assets-ready .page2-bg {
   font-size: .82rem;
   opacity: 0;
   transform: translate3d(0, 8px, 0);
-  transition: opacity .4s ease, transform .4s ease;
+  transition: opacity .52s cubic-bezier(.22,.7,.2,1), transform .52s cubic-bezier(.22,.7,.2,1);
 }
 .slip-grade.supreme { background: rgba(180,40,35,.08); }
 .slip-grade.great { color: #8a3a12; border-color: rgba(160,80,30,.65); }
@@ -915,7 +928,7 @@ body.ritual-assets-ready .page2-bg {
   letter-spacing: .06em;
   opacity: 0;
   transform: translate3d(0, 8px, 0);
-  transition: opacity .4s ease .05s, transform .4s ease .05s;
+  transition: opacity .55s cubic-bezier(.22,.7,.2,1) .04s, transform .55s cubic-bezier(.22,.7,.2,1) .04s;
 }
 .slip-motto {
   margin: 6px 0 0;
@@ -924,14 +937,14 @@ body.ritual-assets-ready .page2-bg {
   font-size: .84rem;
   opacity: 0;
   transform: translate3d(0, 8px, 0);
-  transition: opacity .4s ease .08s, transform .4s ease .08s;
+  transition: opacity .55s cubic-bezier(.22,.7,.2,1) .07s, transform .55s cubic-bezier(.22,.7,.2,1) .07s;
 }
 .gold-line {
   height: 1px;
   margin: 14px 4px;
   background: linear-gradient(90deg, transparent, rgba(160,120,40,.3), transparent);
   opacity: 0;
-  transition: opacity .4s ease .1s, background .6s ease, box-shadow .6s ease;
+  transition: opacity .55s cubic-bezier(.22,.7,.2,1) .1s, background .7s ease, box-shadow .7s ease;
 }
 .slip-oracle {
   margin: 0 0 12px;
@@ -941,7 +954,7 @@ body.ritual-assets-ready .page2-bg {
   font-size: .9rem;
   opacity: 0;
   transform: translate3d(0, 8px, 0);
-  transition: opacity .4s ease .14s, transform .4s ease .14s;
+  transition: opacity .55s cubic-bezier(.22,.7,.2,1) .12s, transform .55s cubic-bezier(.22,.7,.2,1) .12s;
 }
 .slip-title {
   margin: 0 0 10px;
@@ -952,7 +965,7 @@ body.ritual-assets-ready .page2-bg {
   font-weight: 700;
   opacity: 0;
   transform: translate3d(0, 8px, 0);
-  transition: opacity .4s ease .18s, transform .4s ease .18s;
+  transition: opacity .55s cubic-bezier(.22,.7,.2,1) .16s, transform .55s cubic-bezier(.22,.7,.2,1) .16s;
 }
 .slip-summary {
   margin: 0 0 12px;
@@ -966,7 +979,7 @@ body.ritual-assets-ready .page2-bg {
   overflow: hidden;
   opacity: 0;
   transform: translate3d(0, 8px, 0);
-  transition: opacity .4s ease .22s, transform .4s ease .22s;
+  transition: opacity .55s cubic-bezier(.22,.7,.2,1) .2s, transform .55s cubic-bezier(.22,.7,.2,1) .2s;
 }
 .slip-meta {
   margin-bottom: 12px;
@@ -975,7 +988,7 @@ body.ritual-assets-ready .page2-bg {
   letter-spacing: .08em;
   opacity: 0;
   transform: translate3d(0, 8px, 0);
-  transition: opacity .4s ease .26s, transform .4s ease .26s;
+  transition: opacity .55s cubic-bezier(.22,.7,.2,1) .24s, transform .55s cubic-bezier(.22,.7,.2,1) .24s;
 }
 .actions {
   display: flex;
@@ -985,7 +998,7 @@ body.ritual-assets-ready .page2-bg {
   padding-bottom: 10px;
   opacity: 0;
   transform: translate3d(0, 8px, 0);
-  transition: opacity .4s ease .3s, transform .4s ease .3s;
+  transition: opacity .55s cubic-bezier(.22,.7,.2,1) .28s, transform .55s cubic-bezier(.22,.7,.2,1) .28s;
 }
 .slip-scroll.revealed .slip-grade,
 .slip-scroll.revealed .slip-no,
@@ -1000,7 +1013,7 @@ body.ritual-assets-ready .page2-bg {
   transform: translate3d(0, 0, 0);
 }
 
-.link-out, .again, .share-slip {
+.link-out, .again {
   font-family: inherit;
   font-size: .84rem;
   letter-spacing: .06em;
@@ -1022,15 +1035,6 @@ body.ritual-assets-ready .page2-bg {
   color: #5a4030;
   background: rgba(255,250,235,.25);
   border: 1px solid rgba(120,80,30,.38);
-}
-.share-slip {
-  color: var(--gold-soft);
-  background: rgba(8, 12, 24, .35);
-  border: 1px solid rgba(231, 193, 106, .38);
-}
-.share-slip:hover {
-  background: rgba(12, 16, 28, .55);
-  border-color: rgba(231, 193, 106, .55);
 }
 .again:hover {
   background: rgba(255,250,235,.45);
@@ -1125,7 +1129,7 @@ body.ritual-assets-ready .page2-bg {
   .page2-bg { background-position: 50% 70%; }
   .tube { width: 196px; height: 308px; margin-bottom: 42px; }
   .tube-stage { width: 232px; height: 372px; top: 50%; }
-  .kanshan-seer { filter: drop-shadow(0 8px 12px rgba(0,0,0,.4)); }
+  .kanshan-seer-art { filter: saturate(1.18) contrast(1.1) brightness(1.08) drop-shadow(0 8px 12px rgba(0,0,0,.45)); }
   .audio-toggle,
   .scroll-cue { backdrop-filter: none; }
   .slip-scroll {

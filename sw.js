@@ -1,5 +1,5 @@
 /* v180 — 网络优先：HTML/boot/热榜不读旧缓存；封面离线兜底 */
-const CACHE = "kanshan-v180";
+const CACHE = "kanshan-v295";
 const SHELL = ["./cover-mobile.jpg?v=106", "./cover.jpg?v=106"];
 
 self.addEventListener("install", (e) => {
@@ -21,6 +21,7 @@ function networkFirst(url) {
   const p = url.pathname;
   return (
     p.includes("boot.js") ||
+    p.includes("shake-curves") ||
     p.includes("hot-cache") ||
     p.includes("hot-seed") ||
     p.endsWith(".html") ||

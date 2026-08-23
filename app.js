@@ -1,7 +1,6 @@
-/* v180 — 路演 P0：分享签文 + 热榜解析 + SW 注册 */
+/* v184 — 热榜解析 + SW 注册 */
 const drawBtn = document.getElementById("drawBtn");
 const againBtn = document.getElementById("againBtn");
-const shareBtn = document.getElementById("shareBtn");
 const btnLabel = document.getElementById("btnLabel");
 const hint = document.getElementById("hint");
 const phaseText = document.getElementById("phaseText");
@@ -24,9 +23,6 @@ const fortuneCard = document.getElementById("fortuneCard");
 let busy = false;
 let audioOn = false;
 let ritualAssetsReady = false;
-let lastDrawData = null;
-
-const SITE_URL = "https://ykz065299-svg.github.io/";
 
 const ACT_NAMES = new Set(["叩问", "尘定", "认主", "显机"]);
 
@@ -45,45 +41,6 @@ const ACT_META = {
   显机: { phase: "显机", line: "", btn: "求签", hint: "" },
   待命: { phase: "显机", line: "墨迹将现…", btn: "求签", hint: "" },
 };
-
-function buildShareText(data) {
-  const s = data.slip || {};
-  const item = data.item || {};
-  return [
-    "看山今日一签",
-    `${s.label || ""} · ${s.grade || ""}`,
-    data.oracle || "",
-    "",
-    `今日山门题：${item.title || ""}`,
-    `热榜第 ${data.rank ?? "?"} 位`,
-    item.url || SITE_URL,
-    "",
-    SITE_URL,
-  ]
-    .join("\n")
-    .trim();
-}
-
-async function shareSlip() {
-  if (!lastDrawData) return;
-  const text = buildShareText(lastDrawData);
-  const url = lastDrawData.item?.url || SITE_URL;
-  if (navigator.share) {
-    try {
-      await navigator.share({ title: "看山今日一签", text, url });
-      setHint("已唤起分享");
-      return;
-    } catch (err) {
-      if (err?.name === "AbortError") return;
-    }
-  }
-  try {
-    await navigator.clipboard.writeText(text);
-    setHint("签文已复制");
-  } catch (_) {
-    setHint("复制失败，请手动选中文本");
-  }
-}
 
 function setAudioUi() {
   audioToggle.textContent = audioOn ? "氛围音 · 开" : "氛围音 · 关";
@@ -207,8 +164,6 @@ function setPhase(name) {
 }
 
 function settleDoneCopy(data) {
-  lastDrawData = data;
-  if (shareBtn) shareBtn.hidden = false;
   fadeText(phaseText, `${data.slip?.label || ""} · ${data.slip?.grade || ""}`);
   if (storyLine) {
     storyLine.style.opacity = "1";
@@ -248,8 +203,6 @@ function cleanMediaPlaceholder(raw) {
 }
 
 function clearSlip() {
-  lastDrawData = null;
-  if (shareBtn) shareBtn.hidden = true;
   slipGrade.textContent = "";
   slipGrade.className = "slip-grade";
   slipNo.textContent = "";
@@ -460,12 +413,11 @@ async function draw() {
 
 drawBtn.addEventListener("click", draw);
 againBtn?.addEventListener("click", draw);
-shareBtn?.addEventListener("click", shareSlip);
 setAudioUi();
 resetIdleCopy();
 
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("/sw.js?v=180").catch(() => {});
+    navigator.serviceWorker.register("/sw.js?v=295").catch(() => {});
   });
 }
