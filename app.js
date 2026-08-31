@@ -415,6 +415,8 @@ async function retractSlipIfNeeded() {
 async function draw() {
   if (busy) return;
   setBusy(true);
+  const isAgain = pageRitual?.classList.contains("has-slip");
+  window.KanshanTrack?.gameStart(isAgain ? "again" : "draw");
   // 先解锁音频（仍在点击手势内），再做收签等 await
   const audioReady = unlockAudioSync();
   clearSlip();

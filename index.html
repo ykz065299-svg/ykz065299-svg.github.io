@@ -10,12 +10,14 @@
     <meta property="og:site_name" content="看山今日一签" />
     <meta property="og:title" content="看山今日一签" />
     <meta property="og:description" content="摇签入山，一签直达知乎热榜今日山门题。" />
-    <meta property="og:image" content="https://ykz065299-svg.github.io/cover.jpg?v=300" />
+    <meta property="og:image" content="https://ykz065299-svg.github.io/cover.jpg?v=313" />
     <meta property="og:url" content="https://ykz065299-svg.github.io/" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="看山今日一签" />
     <meta name="twitter:description" content="摇签入山，一签直达知乎热榜今日山门题。" />
-    <meta name="twitter:image" content="https://ykz065299-svg.github.io/cover.jpg?v=300" />
+    <meta name="twitter:image" content="https://ykz065299-svg.github.io/cover.jpg?v=313" />
+    <!-- 线上静态页若需上报到自建服务，取消注释并填 collect 地址 -->
+    <!-- <meta name="kanshan-track-endpoint" content="https://你的域名/api/track" /> -->
     <!-- 封面预加载改由下方脚本按机型只拉一张 -->
     <title>看山今日一签</title>
     <!-- CSS 内联：少一次 github.io 慢请求 -->
@@ -71,7 +73,7 @@ body:not(.ritual-visible) .page2-bg {
 }
 .page1-bg {
   top: 0;
-  background-image: url("cover.jpg?v=300");
+  background-image: url("cover.jpg?v=313");
   background-position: 36% 26%;
 }
 .page-seam {
@@ -98,7 +100,8 @@ body:not(.ritual-visible) .page2-bg {
   background-position: 50% 60%;
 }
 body.ritual-assets-ready .page2-bg {
-  background-image: url("page2-bg.jpg?v=300");
+  background-image: url("art/layers/layer-bg-empty.png?v=318");
+  background-position: 50% 42%;
   visibility: visible;
 }
 .page2-mood {
@@ -303,12 +306,12 @@ body.ritual-assets-ready .page2-bg {
 .phase {
   margin: 0;
   min-height: 1.35em;
-  color: var(--gold-soft);
+  color: #fff8e8;
   letter-spacing: .28em;
   text-indent: .28em;
-  font-size: clamp(1rem, 2.6vw, 1.2rem);
+  font-size: clamp(1.05rem, 2.8vw, 1.35rem);
   font-weight: 700;
-  text-shadow: 0 4px 18px rgba(0,0,0,.9), 0 0 24px rgba(231,193,106,.18);
+  text-shadow: 0 2px 12px rgba(0,0,0,.55), 0 0 20px rgba(255,200,100,.25);
   transition: opacity .28s ease, transform .28s ease;
 }
 .story-line {
@@ -316,11 +319,11 @@ body.ritual-assets-ready .page2-bg {
   max-width: min(92vw, 420px);
   min-height: 1.2em;
   text-align: center;
-  color: rgba(243, 223, 170, .78);
+  color: rgba(255, 244, 220, .88);
   font-size: clamp(.82rem, 2.1vw, .95rem);
   letter-spacing: .1em;
   line-height: 1.45;
-  text-shadow: 0 3px 14px rgba(0,0,0,.95);
+  text-shadow: 0 2px 10px rgba(0,0,0,.5);
   transition: opacity .28s ease;
 }
 .page-ritual.is-drawing .story-line,
@@ -428,26 +431,33 @@ body.ritual-assets-ready .page2-bg {
   z-index: 2;
 }
 
-/* 签筒旁：看山卜卦（更大、更靠右） */
+/* 签筒旁：看山（分层素材 · 扶筒姿势） */
 .kanshan-seer {
   position: absolute;
-  left: calc(50% + 108px);
+  left: calc(50% + 64px);
   right: auto;
-  bottom: calc(50% - 200px);
+  bottom: calc(50% - 148px);
   top: auto;
-  width: clamp(210px, 40vh, 286px);
+  width: clamp(132px, 26vh, 188px);
   height: auto;
   overflow: visible;
   z-index: 2;
   pointer-events: none;
   transform: translateZ(0);
-  transform-origin: 40% 96%;
-  filter: none;
-  animation: none;
+  transform-origin: 35% 96%;
+  filter:
+    drop-shadow(10px 8px 10px rgba(40, 22, 8, .38))
+    drop-shadow(-2px -1px 6px rgba(255, 210, 140, .22));
+  animation: kanshanIdleFloat 5.2s ease-in-out infinite;
   transition: opacity .6s ease, transform .6s cubic-bezier(.22, .8, .28, 1);
   backface-visibility: hidden;
 }
-.kanshan-seer.casting {
+@keyframes kanshanIdleFloat {
+  0%, 100% { transform: translate3d(0, 0, 0) rotate(-0.12deg); }
+  50% { transform: translate3d(0, -2.2px, 0) rotate(0.12deg); }
+}
+.kanshan-seer.casting,
+.kanshan-seer.motion-active {
   animation: none;
   transition: none;
 }
@@ -474,9 +484,9 @@ body.ritual-assets-ready .page2-bg {
   filter: none;
 }
 @keyframes kanshanBless {
-  0%   { transform: translate3d(0, 4px, 0) scale(.98); }
-  42%  { transform: translate3d(0, -9px, 0) scale(1.05); }
-  75%  { transform: translate3d(0, -1px, 0) scale(1.012); }
+  0%   { transform: translate3d(0, 3px, 0) scale(.99); }
+  45%  { transform: translate3d(0, -6px, 0) scale(1.032); }
+  78%  { transform: translate3d(0, -0.6px, 0) scale(1.008); }
   100% { transform: translate3d(0, 0, 0) scale(1); }
 }
 .kanshan-seer.casting .kanshan-aura {
@@ -515,7 +525,7 @@ body.ritual-assets-ready .page2-bg {
   display: block;
   width: 100%;
   height: auto;
-  aspect-ratio: 833 / 913;
+  aspect-ratio: 641 / 882;
   object-fit: contain;
   object-position: center bottom;
   -webkit-user-drag: none;
@@ -523,27 +533,15 @@ body.ritual-assets-ready .page2-bg {
   background: transparent;
   box-shadow: none;
   transform: translateZ(0);
-  filter:
-    saturate(1.22) contrast(1.14) brightness(1.1)
-    drop-shadow(0 10px 16px rgba(0,0,0,.5));
+  filter: none;
 }
 .ritual.is-shaking .kanshan-seer-art,
 .kanshan-seer.motion-active .kanshan-seer-art,
 .kanshan-seer.casting .kanshan-seer-art {
-  filter: saturate(1.22) contrast(1.14) brightness(1.1) !important;
+  filter: none !important;
 }
 .kanshan-seer-caption {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: -20px;
-  margin-top: 0;
-  text-align: center;
-  color: rgba(243, 223, 170, .62);
-  font-size: .58rem;
-  letter-spacing: .2em;
-  text-indent: .2em;
-  text-shadow: 0 2px 10px rgba(0,0,0,.9);
+  display: none; /* 分层场景不再叠字 */
 }
 
 @keyframes kanshanIdle {
@@ -565,22 +563,21 @@ body.ritual-assets-ready .page2-bg {
 
 @media (max-width: 720px) {
   .kanshan-seer {
-    left: calc(50% + 86px);
+    left: calc(50% + 52px);
     right: auto;
-    width: clamp(168px, 34vh, 220px);
+    width: clamp(112px, 24vh, 152px);
     height: auto;
-    bottom: calc(50% - 154px);
+    bottom: calc(50% - 118px);
   }
 }
 @media (max-width: 420px) {
   .kanshan-seer {
-    left: calc(50% + 72px);
+    left: calc(50% + 42px);
     right: auto;
-    width: clamp(148px, 32vh, 186px);
+    width: clamp(100px, 22vh, 136px);
     height: auto;
-    bottom: calc(50% - 134px);
+    bottom: calc(50% - 104px);
   }
-  .kanshan-seer-caption { font-size: .55rem; letter-spacing: .12em; text-indent: .12em; }
   .act-flash {
     letter-spacing: .22em;
     font-size: clamp(1.55rem, 7.2vw, 2.1rem);
@@ -599,14 +596,15 @@ body.ritual-assets-ready .page2-bg {
 .tube-stage {
   position: absolute;
   left: 50%;
-  top: 50%;
+  top: 52%;
   transform: translate3d(-50%, -50%, 0);
-  width: 268px;
-  height: 420px;
+  width: 240px;
+  height: 380px;
   z-index: 3;
   display: grid;
   place-items: center;
   transition: opacity .5s ease, transform .5s ease, filter .5s ease;
+  cursor: pointer;
 }
 .tube-stage.leaving {
   opacity: 0;
@@ -670,30 +668,42 @@ body.ritual-assets-ready .page2-bg {
 
 .tube {
   position: relative;
-  width: 228px;
-  height: 352px;
-  margin-bottom: 48px;
+  width: 200px;
+  height: 320px;
+  margin-bottom: 36px;
   z-index: 2;
   transform-origin: 50% 92%;
   transform: translateZ(0);
-  animation: none;
-  filter: drop-shadow(0 16px 14px rgba(0,0,0,.36));
+  animation: tubeIdleBreath 5.2s ease-in-out infinite;
+  filter: drop-shadow(12px 10px 14px rgba(40, 22, 8, .42));
+  cursor: pointer;
 }
 .tube.shaking {
   animation: none;
-  filter: none;
+  filter: drop-shadow(0 10px 12px rgba(40, 22, 8, .38));
+}
+@keyframes tubeIdleBreath {
+  0%, 100% { transform: translate3d(0, 0, 0) rotate(-0.12deg); }
+  50% { transform: translate3d(0, -2.2px, 0) rotate(0.12deg); }
 }
 .tube-glow {
   position: absolute;
   left: 50%;
   bottom: 6%;
-  width: 70%;
-  height: 28%;
+  width: 78%;
+  height: 32%;
   transform: translateX(-50%);
-  background: radial-gradient(ellipse, rgba(255,170,70,.22), transparent 70%);
-  filter: blur(10px);
+  background: radial-gradient(ellipse, rgba(255, 180, 70, .35), transparent 72%);
+  filter: blur(12px);
   pointer-events: none;
   z-index: 0;
+  opacity: .85;
+  transition: opacity .35s ease, transform .35s ease;
+}
+.tube.shaking .tube-glow {
+  opacity: 1;
+  transform: translateX(-50%) scale(1.12);
+  background: radial-gradient(ellipse, rgba(255, 200, 90, .5), transparent 70%);
 }
 .tube-art {
   position: relative;
@@ -723,14 +733,19 @@ body.ritual-assets-ready .page2-bg {
   transform: translateX(-50%);
   margin: 0;
   white-space: nowrap;
-  color: var(--gold);
-  letter-spacing: .3em;
-  text-indent: .3em;
-  font-size: clamp(1rem, 3.2vw, 1.2rem);
+  color: #fff6dc;
+  letter-spacing: .28em;
+  text-indent: .28em;
+  font-size: clamp(1.05rem, 3.4vw, 1.28rem);
   font-family: var(--body);
   font-weight: 700;
-  text-shadow: 0 2px 16px rgba(0,0,0,.95), 0 0 18px rgba(231,193,106,.28);
-  opacity: .9;
+  -webkit-text-stroke: .55px rgba(28, 14, 6, .92);
+  paint-order: stroke fill;
+  text-shadow:
+    0 1px 0 rgba(20, 8, 2, .95),
+    0 2px 4px rgba(0, 0, 0, .9),
+    0 0 12px rgba(0, 0, 0, .75);
+  opacity: 1;
   transition: opacity .45s ease;
 }
 .page-ritual.is-casting .tube-label {
@@ -740,45 +755,36 @@ body.ritual-assets-ready .page2-bg {
 .emerging {
   position: absolute;
   left: 50%;
-  top: 10%;
+  top: 2%;
   transform: translateX(-50%);
   z-index: 5;
-  height: 180px;
-  width: 12px;
+  height: 228px;
+  width: 36px;
   pointer-events: none;
   opacity: 1;
-  transition: opacity .48s cubic-bezier(.33, .08, .25, 1);
+  transition: opacity .42s cubic-bezier(.33, .08, .25, 1);
 }
 .emerging.fade-out {
   opacity: 0;
 }
 .emerging-stick {
-  width: 6px;
+  position: relative;
+  width: 18px;
   height: 100%;
   margin: 0 auto;
-  border-radius: 3px;
-  background: linear-gradient(180deg, #fff8dc, #e7c16a 40%, #b88840);
-  box-shadow: 0 0 14px rgba(255,210,100,.85);
-  transform-origin: top center;
-  transform: scaleY(0);
-  transition: transform .95s cubic-bezier(.16, .84, .22, 1);
-  position: relative;
-  will-change: transform;
+  transform-origin: 50% 100%;
+  transform: scaleY(0.06) translate3d(0, 8px, 0);
+  transition: transform .86s cubic-bezier(.18, .82, .22, 1);
+  background: linear-gradient(180deg, #ffe9a8 0%, #f0c45a 42%, #d4a03a 100%);
+  border-radius: 3px 3px 2px 2px;
+  box-shadow:
+    0 0 16px rgba(255, 196, 80, .7),
+    0 0 28px rgba(255, 170, 50, .35),
+    0 4px 10px rgba(0, 0, 0, .28);
 }
-.emerging.show .emerging-stick { transform: scaleY(1); }
-.emerging-tip {
-  position: absolute;
-  top: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: .55rem;
-  color: #8a1a18;
-  font-family: var(--display);
-  opacity: 0;
-  transition: opacity .32s ease .28s;
+.emerging.show .emerging-stick {
+  transform: scaleY(1) translate3d(0, 0, 0);
 }
-.emerging.show .emerging-tip { opacity: 1; }
-.emerging.fade-out .emerging-tip { opacity: 0; transition-delay: 0s; }
 
 /* —— 签面：自签芽竖条形态展开，避免扁饼弹出 —— */
 .slip-scroll {
@@ -1153,17 +1159,17 @@ body.ritual-assets-ready .page2-bg {
 @media (max-width: 720px) {
   .page1-bg {
     /* 竖版专用封面：完整露出看山脸 + 标题，不再半张脸裁切 */
-    background-image: url("cover-mobile.jpg?v=300");
+    background-image: url("cover-mobile.jpg?v=313");
     background-position: center center;
     background-size: cover;
   }
   .page-cover .scroll-cue {
     margin-bottom: max(8px, env(safe-area-inset-bottom));
   }
-  .page2-bg { background-position: 50% 70%; }
-  .tube { width: 196px; height: 308px; margin-bottom: 42px; }
-  .tube-stage { width: 232px; height: 372px; top: 50%; }
-  .kanshan-seer-art { filter: saturate(1.18) contrast(1.1) brightness(1.08) drop-shadow(0 8px 12px rgba(0,0,0,.45)); }
+  .page2-bg { background-position: 50% 40%; }
+  .tube { width: 176px; height: 280px; margin-bottom: 32px; }
+  .tube-stage { width: 210px; height: 340px; top: 52%; }
+  .kanshan-seer-art { filter: none; }
   .audio-toggle,
   .scroll-cue { backdrop-filter: none; }
   .slip-scroll {
@@ -1179,7 +1185,7 @@ body.ritual-assets-ready .page2-bg {
         var link = document.createElement("link");
         link.rel = "preload";
         link.as = "image";
-        link.href = mobile ? "cover-mobile.jpg?v=300" : "cover.jpg?v=300";
+        link.href = mobile ? "cover-mobile.jpg?v=313" : "cover.jpg?v=313";
         document.head.appendChild(link);
       })();
     </script>
@@ -1210,11 +1216,11 @@ body.ritual-assets-ready .page2-bg {
           <aside class="kanshan-seer" id="kanshanSeer" aria-hidden="true">
             <img
               class="kanshan-seer-art"
-              src="art/kanshan-daoshi-bugua-cut.webp?v=300"
-              data-src="art/kanshan-daoshi-bugua-cut.webp?v=300"
+              src="art/layers/layer-kanshan.png?v=318"
+              data-src="art/layers/layer-kanshan.png?v=318"
               alt=""
-              width="420"
-              height="459"
+              width="649"
+              height="890"
               draggable="false"
               decoding="async"
               fetchpriority="low"
@@ -1226,18 +1232,18 @@ body.ritual-assets-ready .page2-bg {
               <div class="tube-glow" aria-hidden="true"></div>
               <img
                 id="tubeArt"
-                src="tube-clean.webp?v=300"
-                data-src="tube-clean.webp?v=300"
+                src="art/layers/layer-tube.png?v=318"
+                data-src="art/layers/layer-tube.png?v=318"
                 alt=""
                 class="tube-art"
-                width="320"
-                height="692"
+                width="486"
+                height="973"
                 draggable="false"
                 decoding="async"
                 fetchpriority="low"
               />
               <div class="emerging" id="emerging" hidden>
-                <div class="emerging-stick"><span class="emerging-tip">签</span></div>
+                <div class="emerging-stick" aria-hidden="true"></div>
               </div>
             </div>
             <p class="tube-label" id="tubeLabel">百签同栖 · 一签认主</p>
@@ -1279,6 +1285,6 @@ body.ritual-assets-ready .page2-bg {
       </section>
     </main>
 
-    <script src="boot.js?v=300" defer></script>
+    <script src="boot.js?v=318" defer></script>
   </body>
 </html>

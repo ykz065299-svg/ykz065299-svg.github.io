@@ -1,6 +1,6 @@
 /* v300 — 原版摇筒/出签；点击手势内解锁；音效 no-cache */
 (() => {
-  const bust = "?v=300";
+  const bust = "?v=310";
   const NATIVE_SHAKE_SEC = 5.4;
   const SHAKE_URL = "audio/shake.wav";
   const REVEAL_URL = "audio/reveal.wav";
@@ -209,6 +209,127 @@
 
   window.KanshanAudio = AudioEngine;
 })();
+
+/* v301 — 轻量埋点：访问 / 开始求签 + 用户 token */
+(() => {
+  const LS_UID = "kanshan_uid";
+  const LS_TOKEN = "kanshan_token";
+  const SS_PV = "kanshan_pv_sent";
+  const TOKEN_KEYS = ["token", "uid", "user_token", "utm_token", "zh_token"];
+
+  function readUrlToken() {
+    try {
+      const q = new URLSearchParams(location.search);
+      for (const k of TOKEN_KEYS) {
+        const v = (q.get(k) || "").trim();
+        if (v) return v.slice(0, 128);
+      }
+    } catch (_) {}
+    return "";
+  }
+
+  function anonId() {
+    let id = "";
+    try {
+      id = localStorage.getItem(LS_UID) || "";
+      if (!id) {
+        id =
+          "anon_" +
+          Math.random().toString(36).slice(2, 10) +
+          Date.now().toString(36).slice(-4);
+        localStorage.setItem(LS_UID, id);
+      }
+    } catch (_) {
+      id = "anon_session";
+    }
+    return id;
+  }
+
+  function resolveToken() {
+    const fromUrl = readUrlToken();
+    if (fromUrl) {
+      try {
+        localStorage.setItem(LS_TOKEN, fromUrl);
+      } catch (_) {}
+      return fromUrl;
+    }
+    try {
+      const saved = localStorage.getItem(LS_TOKEN);
+      if (saved) return saved.slice(0, 128);
+    } catch (_) {}
+    return anonId();
+  }
+
+  function endpoint() {
+    const meta = document.querySelector('meta[name="kanshan-track-endpoint"]');
+    const href = (meta && meta.getAttribute("content")) || "/api/track";
+    return href.trim() || "/api/track";
+  }
+
+  function sessionId() {
+    try {
+      let s = sessionStorage.getItem("kanshan_sid");
+      if (!s) {
+        s = "s_" + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+        sessionStorage.setItem("kanshan_sid", s);
+      }
+      return s;
+    } catch (_) {
+      return "s_fallback";
+    }
+  }
+
+  function track(event, props) {
+    const payload = {
+      event: String(event || "unknown").slice(0, 64),
+      token: resolveToken(),
+      session: sessionId(),
+      ts: Date.now(),
+      path: location.pathname + location.search,
+      mobile: window.matchMedia("(max-width: 720px)").matches,
+      ...(props || {}),
+    };
+    const url = endpoint();
+    const body = JSON.stringify(payload);
+    try {
+      if (navigator.sendBeacon) {
+        const ok = navigator.sendBeacon(url, new Blob([body], { type: "application/json" }));
+        if (ok) return;
+      }
+    } catch (_) {}
+    fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body,
+      keepalive: true,
+      cache: "no-store",
+    }).catch(() => {});
+  }
+
+  function pageViewOnce() {
+    try {
+      if (sessionStorage.getItem(SS_PV)) return;
+      sessionStorage.setItem(SS_PV, "1");
+    } catch (_) {}
+    track("page_view");
+  }
+
+  window.KanshanTrack = {
+    getToken: resolveToken,
+    track,
+    pageViewOnce,
+    gameStart(kind) {
+      track("game_start", { kind: kind || "draw" });
+    },
+  };
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", pageViewOnce);
+  } else {
+    pageViewOnce();
+  }
+})();
+
 /* v184 — 热榜解析 + SW 注册 */
 const drawBtn = document.getElementById("drawBtn");
 const againBtn = document.getElementById("againBtn");
@@ -230,10 +351,21 @@ const audioToggle = document.getElementById("audioToggle");
 const pageRitual = document.getElementById("pageRitual");
 const scrollCue = document.getElementById("scrollCue");
 const fortuneCard = document.getElementById("fortuneCard");
+const tubeStage = document.getElementById("tubeStage");
+const shareBtn = document.getElementById("shareBtn");
+const shareOverlay = document.getElementById("shareOverlay");
+const shareCard = document.getElementById("shareCard");
+const shareOracle = document.getElementById("shareOracle");
+const shareTitle = document.getElementById("shareTitle");
+const shareGrade = document.getElementById("shareGrade");
+const shareSaveBtn = document.getElementById("shareSaveBtn");
+const sharePinBtn = document.getElementById("sharePinBtn");
+const shareCloseBtn = document.getElementById("shareCloseBtn");
 
 let busy = false;
 let audioOn = false;
 let ritualAssetsReady = false;
+let lastDraw = null;
 
 const ACT_NAMES = new Set(["叩问", "尘定", "认主", "显机"]);
 
@@ -243,7 +375,7 @@ const ACT_META = {
     phase: "静候开筒",
     line: "心念一事，再请看山开筒",
     btn: "求签",
-    hint: "心诚则灵",
+    hint: "点击签筒 · 心诚则灵",
   },
   摇签: { phase: "摇签", line: "", btn: "求签", hint: "" },
   叩问: { phase: "叩问", line: "", btn: "求签", hint: "" },
@@ -448,6 +580,12 @@ function cleanMediaPlaceholder(raw) {
   return s;
 }
 
+function aiSearchUrl(title) {
+  const q = String(title || "").trim();
+  if (!q) return "https://zhida.zhihu.com/";
+  return `https://zhida.zhihu.com/search?q=${encodeURIComponent(q)}`;
+}
+
 function clearSlip() {
   slipGrade.textContent = "";
   slipGrade.className = "slip-grade";
@@ -459,9 +597,10 @@ function clearSlip() {
   topicSummary.textContent = "";
   topicSummary.hidden = true;
   topicLink.href = "#";
+  lastDraw = null;
   if (fortuneCard) {
     fortuneCard.style.removeProperty("--slip-h");
-    fortuneCard.classList.remove("fit", "measuring");
+    fortuneCard.classList.remove("fit", "measuring", "preglow");
   }
 }
 
@@ -483,7 +622,10 @@ function fillSlip(data) {
     topicSummary.textContent = "";
     topicSummary.hidden = true;
   }
-  topicLink.href = item.url || "#";
+  const ai = item.ai_url || aiSearchUrl(item.title);
+  topicLink.href = ai;
+  topicLink.dataset.topicUrl = item.url || "";
+  lastDraw = data;
 }
 
 function prepareSlipSize() {
@@ -591,7 +733,7 @@ async function localDrawFallback() {
       grade_key: g.key,
       motto: g.motto,
     },
-    item: { title, url, summary },
+    item: { title, url, ai_url: aiSearchUrl(title), summary },
     source,
   };
 }
@@ -618,7 +760,7 @@ async function retractSlipIfNeeded() {
   await wait(420);
   pageRitual.classList.remove("slip-retracting", "has-slip");
   if (fortuneCard) {
-    fortuneCard.classList.remove("visible", "glowing", "revealed");
+    fortuneCard.classList.remove("visible", "glowing", "revealed", "preglow");
     fortuneCard.hidden = true;
   }
 }
@@ -626,6 +768,8 @@ async function retractSlipIfNeeded() {
 async function draw() {
   if (busy) return;
   setBusy(true);
+  const isAgain = pageRitual?.classList.contains("has-slip");
+  window.KanshanTrack?.gameStart(isAgain ? "again" : "draw");
   // 先解锁音频（仍在点击手势内），再做收签等 await
   const audioReady = unlockAudioSync();
   clearSlip();
@@ -661,14 +805,243 @@ async function draw() {
 
 drawBtn.addEventListener("click", draw);
 againBtn?.addEventListener("click", draw);
+tubeStage?.addEventListener("click", (e) => {
+  if (busy) return;
+  if (pageRitual?.classList.contains("has-slip")) return;
+  e.preventDefault();
+  draw();
+});
+tubeStage?.addEventListener("keydown", (e) => {
+  if (e.key !== "Enter" && e.key !== " ") return;
+  e.preventDefault();
+  if (busy || pageRitual?.classList.contains("has-slip")) return;
+  draw();
+});
+
+topicLink?.addEventListener("click", () => {
+  window.KanshanTrack?.track?.("topic_click", {
+    kind: "ai_search",
+    title: (lastDraw?.item?.title || "").slice(0, 80),
+  });
+});
+
+function openShareSheet() {
+  if (!lastDraw || !shareOverlay) return;
+  const item = lastDraw.item || {};
+  const s = lastDraw.slip || {};
+  if (shareOracle) shareOracle.textContent = lastDraw.oracle || "心诚则灵";
+  if (shareTitle) shareTitle.textContent = item.title || "看山今日一签";
+  if (shareGrade) shareGrade.textContent = s.grade || "中平签";
+  shareOverlay.hidden = false;
+  document.body.classList.add("share-open");
+  window.KanshanTrack?.track?.("share_open", { kind: "card" });
+}
+
+function closeShareSheet() {
+  if (!shareOverlay) return;
+  shareOverlay.hidden = true;
+  document.body.classList.remove("share-open");
+}
+
+async function renderSharePng() {
+  if (!shareCard) return null;
+  const w = 720;
+  const h = 1280;
+  const canvas = document.createElement("canvas");
+  canvas.width = w;
+  canvas.height = h;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return null;
+
+  // dark premium bg
+  const g = ctx.createRadialGradient(w * 0.5, h * 0.42, 40, w * 0.5, h * 0.5, h * 0.7);
+  g.addColorStop(0, "#2a2218");
+  g.addColorStop(0.45, "#14110e");
+  g.addColorStop(1, "#070605");
+  ctx.fillStyle = g;
+  ctx.fillRect(0, 0, w, h);
+
+  // sparkles
+  ctx.fillStyle = "rgba(231,193,106,.35)";
+  for (let i = 0; i < 48; i++) {
+    const x = (Math.sin(i * 12.1) * 0.5 + 0.5) * w;
+    const y = (Math.cos(i * 7.7) * 0.5 + 0.5) * h;
+    const r = 0.6 + (i % 3) * 0.5;
+    ctx.beginPath();
+    ctx.arc(x, y, r, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  // title
+  ctx.fillStyle = "#f3dfaa";
+  ctx.textAlign = "center";
+  ctx.font = "600 42px 'Songti SC','Noto Serif SC',serif";
+  ctx.fillText("一签入手，万念归心", w / 2, 110);
+  ctx.font = "28px 'Songti SC','Noto Serif SC',serif";
+  ctx.fillStyle = "rgba(243,223,170,.72)";
+  ctx.fillText("生成你的今日问心签笺", w / 2, 160);
+
+  // card frame
+  const cx = w * 0.38;
+  const cy = h * 0.52;
+  const cw = 280;
+  const ch = 560;
+  ctx.save();
+  ctx.shadowColor = "rgba(231,193,106,.45)";
+  ctx.shadowBlur = 36;
+  ctx.fillStyle = "#1a140f";
+  roundRect(ctx, cx - cw / 2, cy - ch / 2, cw, ch, 18);
+  ctx.fill();
+  ctx.restore();
+
+  // gold border
+  ctx.strokeStyle = "rgba(231,193,106,.75)";
+  ctx.lineWidth = 3;
+  roundRect(ctx, cx - cw / 2 + 10, cy - ch / 2 + 10, cw - 20, ch - 20, 12);
+  ctx.stroke();
+
+  // parchment
+  const px = cx - 70;
+  const py = cy - 200;
+  const pw = 140;
+  const ph = 360;
+  ctx.fillStyle = "#efe2c4";
+  roundRect(ctx, px, py, pw, ph, 6);
+  ctx.fill();
+
+  // vertical oracle
+  const oracle = String(lastDraw?.oracle || "心诚则灵").slice(0, 16);
+  ctx.fillStyle = "#1a1208";
+  ctx.font = "600 28px 'Songti SC','Noto Serif SC',serif";
+  ctx.textAlign = "center";
+  const chars = [...oracle];
+  const startY = py + 48;
+  const gap = Math.min(34, (ph - 96) / Math.max(1, chars.length));
+  chars.forEach((ch, i) => {
+    ctx.fillText(ch, px + pw / 2, startY + i * gap);
+  });
+
+  // seal
+  ctx.strokeStyle = "rgba(180,40,35,.85)";
+  ctx.fillStyle = "rgba(180,40,35,.85)";
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.arc(cx, cy + ch / 2 - 56, 22, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.font = "22px 'Songti SC',serif";
+  ctx.fillText("签", cx, cy + ch / 2 - 48);
+
+  // tube hint right
+  ctx.fillStyle = "rgba(243,223,170,.55)";
+  ctx.font = "22px sans-serif";
+  ctx.textAlign = "left";
+  const grade = lastDraw?.slip?.grade || "";
+  const title = String(lastDraw?.item?.title || "").slice(0, 18);
+  ctx.fillText(grade, cx + cw / 2 + 24, cy - 40);
+  wrapText(ctx, title, cx + cw / 2 + 24, cy - 8, 160, 28);
+
+  ctx.fillStyle = "rgba(243,223,170,.45)";
+  ctx.textAlign = "center";
+  ctx.font = "22px 'Songti SC',serif";
+  ctx.fillText("看山今日一签 · 心诚则灵", w / 2, h - 64);
+
+  return new Promise((resolve) => {
+    canvas.toBlob((blob) => resolve(blob), "image/png");
+  });
+}
+
+function roundRect(ctx, x, y, w, h, r) {
+  const rr = Math.min(r, w / 2, h / 2);
+  ctx.beginPath();
+  ctx.moveTo(x + rr, y);
+  ctx.arcTo(x + w, y, x + w, y + h, rr);
+  ctx.arcTo(x + w, y + h, x, y + h, rr);
+  ctx.arcTo(x, y + h, x, y, rr);
+  ctx.arcTo(x, y, x + w, y, rr);
+  ctx.closePath();
+}
+
+function wrapText(ctx, text, x, y, maxW, lineH) {
+  const chars = [...text];
+  let line = "";
+  let yy = y;
+  for (const ch of chars) {
+    const test = line + ch;
+    if (ctx.measureText(test).width > maxW && line) {
+      ctx.fillText(line, x, yy);
+      line = ch;
+      yy += lineH;
+    } else line = test;
+  }
+  if (line) ctx.fillText(line, x, yy);
+}
+
+async function saveShareCard() {
+  const blob = await renderSharePng();
+  if (!blob) return;
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `kanshan-slip-${Date.now()}.png`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1500);
+  window.KanshanTrack?.track?.("share_save", { kind: "png" });
+}
+
+async function shareToPin() {
+  const blob = await renderSharePng();
+  const text = [
+    "一签入手，万念归心",
+    lastDraw?.oracle || "",
+    lastDraw?.item?.title ? `今日问心：${lastDraw.item.title}` : "",
+    "——看山今日一签",
+  ]
+    .filter(Boolean)
+    .join("\n");
+
+  try {
+    if (blob && navigator.share && navigator.canShare) {
+      const file = new File([blob], "kanshan-slip.png", { type: "image/png" });
+      if (navigator.canShare({ files: [file] })) {
+        await navigator.share({ files: [file], text, title: "看山今日一签" });
+        window.KanshanTrack?.track?.("share_pin", { kind: "webshare" });
+        return;
+      }
+    }
+  } catch (_) {}
+
+  try {
+    await navigator.clipboard?.writeText?.(text);
+  } catch (_) {}
+  if (blob) await saveShareCard();
+  window.open("https://www.zhihu.com/pin/edit", "_blank", "noopener");
+  window.KanshanTrack?.track?.("share_pin", { kind: "pin_edit" });
+  setHint("卡片已留存，可粘贴到想法");
+}
+
+shareBtn?.addEventListener("click", openShareSheet);
+shareCloseBtn?.addEventListener("click", closeShareSheet);
+shareOverlay?.addEventListener("click", (e) => {
+  if (e.target === shareOverlay) closeShareSheet();
+});
+shareSaveBtn?.addEventListener("click", () => {
+  saveShareCard().catch(() => setHint("留存失败，请重试"));
+});
+sharePinBtn?.addEventListener("click", () => {
+  shareToPin().catch(() => setHint("分享未完成，可先留存卡片"));
+});
+
 setAudioUi();
 resetIdleCopy();
 
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("sw.js?v=300").catch(() => {});
+    navigator.serviceWorker.register("sw.js?v=318").catch(() => {});
   });
 }
+
 /* v295 — 整轮收势放柔；幕间仍稳 */
 (() => {
   const tube = document.getElementById("tube");
@@ -700,11 +1073,11 @@ if ("serviceWorker" in navigator) {
   let shakeRaf = 0;
   let settleRaf = 0;
   let smoothTube = { tx: 0, ty: 0, rot: 0, sx: 1, sy: 1 };
-  let smoothSeer = { y: 0, scale: 1 };
+  let smoothSeer = { y: 0, scale: 1, rot: 0 };
 
   function resetSmoothMotion() {
     smoothTube = { tx: 0, ty: 0, rot: 0, sx: 1, sy: 1 };
-    smoothSeer = { y: 0, scale: 1 };
+    smoothSeer = { y: 0, scale: 1, rot: 0 };
   }
 
   function lerp(a, b, t) {
@@ -767,15 +1140,29 @@ if ("serviceWorker" in navigator) {
     const amp = Math.min(1, peakAmp * 0.95 + tubeAmp * 0.12);
     const targetScale = 1 + amp * PEAK_AMP_S;
     const targetTy = -amp * PEAK_AMP_Y;
+    const targetRot = smoothTube.rot * 0.28;
     const snap = amp < 0.08 ? 0.5 : LERP_SEER;
     smoothSeer.y = lerp(smoothSeer.y, targetTy, snap);
     smoothSeer.scale = lerp(smoothSeer.scale, targetScale, snap);
-    if (amp < 0.04) {
-      kanshanSeer.style.transform = "translate3d(0,0,0) scale(1)";
-      smoothSeer = { y: 0, scale: 1 };
+    smoothSeer.rot = lerp(smoothSeer.rot, targetRot, snap);
+    if (amp < 0.03 && Math.abs(smoothTube.rot) < 0.25) {
+      smoothSeer.y = lerp(smoothSeer.y, 0, 0.42);
+      smoothSeer.scale = lerp(smoothSeer.scale, 1, 0.42);
+      smoothSeer.rot = lerp(smoothSeer.rot, 0, 0.42);
+      if (Math.abs(smoothSeer.y) < 0.15 && Math.abs(smoothSeer.rot) < 0.08) {
+        kanshanSeer.style.transform = "";
+        smoothSeer = { y: 0, scale: 1, rot: 0 };
+      } else {
+        kanshanSeer.style.transform =
+          `translate3d(0,${smoothSeer.y.toFixed(2)}px,0) ` +
+          `rotate(${smoothSeer.rot.toFixed(2)}deg) ` +
+          `scale(${smoothSeer.scale.toFixed(4)})`;
+      }
     } else {
       kanshanSeer.style.transform =
-        `translate3d(0,${smoothSeer.y.toFixed(2)}px,0) scale(${smoothSeer.scale.toFixed(4)})`;
+        `translate3d(0,${smoothSeer.y.toFixed(2)}px,0) ` +
+        `rotate(${smoothSeer.rot.toFixed(2)}deg) ` +
+        `scale(${smoothSeer.scale.toFixed(4)})`;
     }
   }
 
@@ -793,7 +1180,7 @@ if ("serviceWorker" in navigator) {
         const e = 1 - Math.pow(1 - p, 4);
         const s = 1 + (1 - e) * 0.015;
         const y = (1 - e) * -0.8;
-        el.style.transform = `translate3d(0, ${y.toFixed(2)}px, 0) scale(${s.toFixed(4)})`;
+        el.style.transform = `translate3d(0, ${y.toFixed(2)}px, 0) rotate(0deg) scale(${s.toFixed(4)})`;
         if (p < 1) {
           settleRaf = requestAnimationFrame(tick);
         } else {
@@ -915,13 +1302,13 @@ if ("serviceWorker" in navigator) {
         }
 
         const rot =
-          Math.sin(t * f1) * amp * 11.5 +
-          Math.sin(t * f2) * amp * 2.6 +
-          Math.sin(t * f3 * 0.55) * amp * 1.4;
-        const tx = Math.sin(t * f3) * amp * 8 + Math.sin(t * f4 * 1.3) * amp * 2.2;
-        const ty = Math.abs(Math.cos(t * f4)) * amp * 5.5;
-        const squish = 1 - amp * 0.03;
-        const scaleY = 1 + amp * 0.018;
+          Math.sin(t * f1) * amp * 7.4 +
+          Math.sin(t * f2) * amp * 1.8 +
+          Math.sin(t * f3 * 0.55) * amp * 0.9;
+        const tx = Math.sin(t * f3) * amp * 5.4 + Math.sin(t * f4 * 1.3) * amp * 1.5;
+        const ty = Math.abs(Math.cos(t * f4)) * amp * 3.6;
+        const squish = 1 - amp * 0.022;
+        const scaleY = 1 + amp * 0.014;
 
         // 幕间仍较快归零；仅整轮收势时用慢插值
         let snap = LERP_TUBE;
@@ -934,9 +1321,24 @@ if ("serviceWorker" in navigator) {
         smoothTube.sx = lerp(smoothTube.sx, squish, snap);
         smoothTube.sy = lerp(smoothTube.sy, scaleY, snap);
 
-        if (!hushAfterReveal && amp < 0.035) {
-          tube.style.transform = "translate3d(0,0,0) rotate(0deg) scale(1,1)";
-          smoothTube = { tx: 0, ty: 0, rot: 0, sx: 1, sy: 1 };
+        if (!hushAfterReveal && amp < 0.03) {
+          smoothTube.tx = lerp(smoothTube.tx, 0, 0.48);
+          smoothTube.ty = lerp(smoothTube.ty, 0, 0.48);
+          smoothTube.rot = lerp(smoothTube.rot, 0, 0.48);
+          smoothTube.sx = lerp(smoothTube.sx, 1, 0.48);
+          smoothTube.sy = lerp(smoothTube.sy, 1, 0.48);
+          if (
+            Math.abs(smoothTube.tx) < 0.12 &&
+            Math.abs(smoothTube.rot) < 0.08
+          ) {
+            tube.style.transform = "";
+            smoothTube = { tx: 0, ty: 0, rot: 0, sx: 1, sy: 1 };
+          } else {
+            tube.style.transform =
+              `translate3d(${smoothTube.tx.toFixed(2)}px,${smoothTube.ty.toFixed(2)}px,0) ` +
+              `rotate(${smoothTube.rot.toFixed(2)}deg) ` +
+              `scale(${smoothTube.sx.toFixed(4)},${smoothTube.sy.toFixed(4)})`;
+          }
         } else {
           tube.style.transform =
             `translate3d(${smoothTube.tx.toFixed(2)}px,${smoothTube.ty.toFixed(2)}px,0) ` +
@@ -980,12 +1382,12 @@ if ("serviceWorker" in navigator) {
     emerging.hidden = true;
     emerging.classList.remove("show", "fade-out");
     fortuneCard.hidden = true;
-    fortuneCard.classList.remove("visible", "glowing", "revealed", "measuring", "fit");
+    fortuneCard.classList.remove("visible", "glowing", "revealed", "preglow", "measuring", "fit");
     fortuneCard.style.removeProperty("--slip-h");
     fortuneCard.style.height = "";
     fortuneCard.style.willChange = "auto";
     tube.style.willChange = "auto";
-    pageRitual?.classList.remove("has-slip");
+    pageRitual?.classList.remove("has-slip", "gold-burst");
   }
 
   async function playShakeAndDraw(onPhase) {
@@ -1039,7 +1441,7 @@ if ("serviceWorker" in navigator) {
     const bellP = window.KanshanAudio?.playReveal?.() || Promise.resolve();
 
     // 1) 祝福起势 + 签芽抽出（重叠，不等到祝福完全结束）
-    await wait(720);
+    await wait(480);
 
     // 2) 看山顺势退场（签芽仍在）
     if (kanshanSeer) {
@@ -1077,14 +1479,17 @@ if ("serviceWorker" in navigator) {
       kanshanSeer.style.transition = "";
     }
 
-    // 4) 展卷中段就开始落字，不必等缩放完全停住
+    // 4) 展卷中段先冒金光，再落签名/签语（金光在字前）
     const h = opts.height || 420;
     const expandMs = Math.round(780 + Math.min(320, (h - 280) * 0.48));
-    await wait(Math.max(280, expandMs - 360));
+    await wait(Math.max(240, expandMs - 420));
+    fortuneCard.classList.add("preglow", "glowing");
+    pageRitual?.classList.add("gold-burst");
+    await wait(520);
     fortuneCard.classList.add("revealed");
-    await wait(Math.max(420, expandMs * 0.42));
-    fortuneCard.classList.add("glowing");
-    await wait(360);
+    pageRitual?.classList.remove("gold-burst");
+    await wait(Math.max(360, expandMs * 0.36));
+    fortuneCard.classList.remove("preglow");
     fortuneCard.style.willChange = "auto";
     await Promise.resolve(bellP).catch(() => {});
   }
@@ -1105,3 +1510,4 @@ if ("serviceWorker" in navigator) {
 
   resetRitualVisual();
 })();
+
