@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>出签小块对照 · 看山今日一签</title>
+<style>
+:root {
+  --song: "Songti SC", "STSong", "SimSun", "Noto Serif SC", "Source Han Serif SC", serif;
+  --slip-red: #8a2c1c;
+  --slip-ink: #6e2b21;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; min-height: 100%; font-family: var(--song); color: #f4eee6; background: #12100e; }
+body { padding: 24px 16px 80px; }
+.intro { max-width: 1200px; margin: 0 auto 28px; }
+.intro h1 { margin: 0 0 8px; font-size: 1.55rem; letter-spacing: .14em; }
+.intro p { margin: 0; color: #c9b8a4; font-size: 1.02rem; line-height: 1.75; max-width: 46em; }
+.wall {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 28px;
+}
+@media (min-width: 980px) {
+  .wall { grid-template-columns: 1fr 1fr; }
+}
+.shot {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px;
+  border-radius: 16px;
+  background: #1c1815;
+}
+.shot h2 { margin: 0; font-size: 1.25rem; letter-spacing: .08em; }
+.shot h2 b { margin-right: 8px; font-size: 1.45rem; }
+.shot .note { margin: 0; font-size: .95rem; color: #b7a28c; line-height: 1.55; }
+
+.phone {
+  width: min(100%, 360px);
+  margin: 0 auto;
+  background:
+    radial-gradient(ellipse 80% 50% at 50% 18%, rgba(90, 62, 28, .28), transparent 70%),
+    #2a2118;
+  border-radius: 12px;
+  padding: 22px 18px 18px;
+}
+
+.block {
+  width: min(244px, 76%);
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.slip-paper {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 508 / 994;
+  container-type: inline-size;
+  color: var(--slip-ink);
+  background: url("art/slip-plate.webp?v=358") center / 100% 100% no-repeat;
+  filter: drop-shadow(0 16px 28px rgba(0,0,0,.36));
+}
+.slip-no {
+  position: absolute;
+  top: 5.43%;
+  left: 70.15%;
+  margin: 0;
+  writing-mode: vertical-rl;
+  white-space: nowrap;
+  font-size: 5.3cqw;
+  font-weight: 600;
+  letter-spacing: .2em;
+}
+.slip-name {
+  position: absolute;
+  top: 20.68%;
+  left: 66.81%;
+  margin: 0;
+  writing-mode: vertical-rl;
+  white-space: nowrap;
+  font-size: 15.05cqw;
+  font-weight: 700;
+  letter-spacing: .12em;
+  line-height: 1.02;
+}
+.slip-seal {
+  position: absolute;
+  top: 54.88%;
+  left: 69.04%;
+  writing-mode: vertical-rl;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 15.61%;
+  height: 14.63%;
+  border-radius: 999px;
+  background: #9c241c;
+  box-shadow: inset 0 0 0 1.5px rgba(247, 239, 228, .88);
+  color: #f7efe4;
+  font-size: 5.02cqw;
+  letter-spacing: .14em;
+  font-weight: 700;
+}
+.slip-badge {
+  position: absolute;
+  top: 6.67%;
+  left: 30.85%;
+  writing-mode: vertical-rl;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 8.08%;
+  height: 7.83%;
+  border: 1.15px solid var(--slip-red);
+  border-radius: 999px;
+  font-size: 4.46cqw;
+  letter-spacing: .08em;
+  font-weight: 600;
+}
+.slip-verse {
+  position: absolute;
+  top: 15.73%;
+  left: 16.63%;
+  margin: 0;
+  display: flex;
+  flex-direction: row-reverse;
+  gap: 5.02cqw;
+}
+.slip-verse span {
+  writing-mode: vertical-rl;
+  white-space: nowrap;
+  font-size: 10.03cqw;
+  font-weight: 600;
+  line-height: 1.18;
+  letter-spacing: .16em;
+}
+.slip-unlock {
+  position: absolute;
+  left: 5.76%;
+  top: 71.77%;
+  width: 88.08%;
+  height: 20.81%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1% 2%;
+  color: var(--slip-ink);
+  font-size: 4.6cqw;
+  line-height: 1.58;
+  letter-spacing: .03em;
+  text-align: center;
+}
+.slip-unlock em { font-style: normal; font-weight: 700; }
+.slip-unlock i { font-style: normal; color: var(--slip-red); font-weight: 700; }
+
+.paper-disc {
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  bottom: 2.4%;
+  margin: 0;
+  color: rgba(110, 43, 33, .62);
+  font-size: 3.4cqw;
+  line-height: 1.45;
+  letter-spacing: .02em;
+  text-align: center;
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.again, .share {
+  font-family: inherit;
+  font-size: 1rem;
+  letter-spacing: .12em;
+  border-radius: 999px;
+  padding: 12px 16px;
+  width: 100%;
+  text-align: center;
+  border: none;
+}
+.again {
+  color: #f4efe4;
+  background: rgba(18, 14, 10, .42);
+  border: 1px solid rgba(244, 239, 228, .28);
+}
+.share {
+  color: #1a1208;
+  background: linear-gradient(180deg, #f6e4b4, #e4bc62);
+  box-shadow: 0 4px 12px rgba(120,80,20,.22);
+}
+
+.disc-under {
+  margin: 2px 0 0;
+  color: rgba(232, 220, 196, .58);
+  font-size: .62rem;
+  line-height: 1.65;
+  letter-spacing: .03em;
+  text-align: center;
+}
+.disc-stroke {
+  margin: 4px 0 0;
+  color: #fff4dc;
+  font-size: .64rem;
+  line-height: 1.65;
+  letter-spacing: .04em;
+  text-align: center;
+  -webkit-text-stroke: .4px rgba(28, 14, 6, .88);
+  paint-order: stroke fill;
+  text-shadow: 0 1px 4px rgba(0,0,0,.75);
+}
+.disc-tiny {
+  margin: 8px 0 0;
+  color: rgba(214, 204, 186, .5);
+  font-size: .58rem;
+  line-height: 1.65;
+  letter-spacing: .04em;
+  text-align: center;
+  text-shadow: 0 1px 6px rgba(0,0,0,.7);
+}
+</style>
+</head>
+<body>
+<div class="intro">
+  <h1>出签小块对照</h1>
+  <p>只画抽出签之后这一小块：纸笺 + 再来一签 / 分享到想法。看山、签筒、封面都没动。声明文案都是「本活动为传统文化趣味玩法，内容仅供娱乐参考，不构成任何运势预测或现实指导」。点一个编号告诉我用哪版。</p>
+</div>
+<div class="wall">
+
+<div class="shot" id="jia">
+  <h2><b>甲</b>声明写在纸笺底下</h2>
+  <p class="note">贴在签面里、引导区下方。跟纸是一块，出签后一定能看见。</p>
+  <div class="phone">
+    <div class="block">
+      <div class="slip-paper">
+        <h2 class="slip-no">第十签</h2>
+        <p class="slip-name">人间有味</p>
+        <span class="slip-seal">清欢签</span>
+        <span class="slip-badge">签文</span>
+        <p class="slip-verse"><span>一盏清茶又一春。</span><span>半窗烟火半窗月，</span></p>
+        <div class="slip-unlock">
+          <span>这一签只说到这里，<br>别人的故事或许还有下文。</span>
+          <span>点击查看「<em>内容发现</em>」模块 <i>›</i></span>
+          <span>即可解锁你的签</span>
+        </div>
+        <p class="paper-disc">本活动为传统文化趣味玩法，内容仅供娱乐参考，不构成任何运势预测或现实指导</p>
+      </div>
+      <div class="actions">
+        <button type="button" class="again">再来一签</button>
+        <button type="button" class="share">分享到想法</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="shot" id="yi">
+  <h2><b>乙</b>声明放在两个按钮下面</h2>
+  <p class="note">纸笺保持原样。声明跟按钮同一块，出签后才出现。</p>
+  <div class="phone">
+    <div class="block">
+      <div class="slip-paper">
+        <h2 class="slip-no">第十签</h2>
+        <p class="slip-name">人间有味</p>
+        <span class="slip-seal">清欢签</span>
+        <span class="slip-badge">签文</span>
+        <p class="slip-verse"><span>一盏清茶又一春。</span><span>半窗烟火半窗月，</span></p>
+        <div class="slip-unlock">
+          <span>这一签只说到这里，<br>别人的故事或许还有下文。</span>
+          <span>点击查看「<em>内容发现</em>」模块 <i>›</i></span>
+          <span>即可解锁你的签</span>
+        </div>
+      </div>
+      <div class="actions">
+        <button type="button" class="again">再来一签</button>
+        <button type="button" class="share">分享到想法</button>
+      </div>
+      <p class="disc-under">本活动为传统文化趣味玩法，内容仅供娱乐参考，不构成任何运势预测或现实指导</p>
+    </div>
+  </div>
+</div>
+
+<div class="shot" id="bing">
+  <h2><b>丙</b>小楷描边，跟「百签同栖」一类</h2>
+  <p class="note">仍在按钮下，字略亮一点，深描边，远看也能读。</p>
+  <div class="phone">
+    <div class="block">
+      <div class="slip-paper">
+        <h2 class="slip-no">第十签</h2>
+        <p class="slip-name">人间有味</p>
+        <span class="slip-seal">清欢签</span>
+        <span class="slip-badge">签文</span>
+        <p class="slip-verse"><span>一盏清茶又一春。</span><span>半窗烟火半窗月，</span></p>
+        <div class="slip-unlock">
+          <span>这一签只说到这里，<br>别人的故事或许还有下文。</span>
+          <span>点击查看「<em>内容发现</em>」模块 <i>›</i></span>
+          <span>即可解锁你的签</span>
+        </div>
+      </div>
+      <div class="actions">
+        <button type="button" class="again">再来一签</button>
+        <button type="button" class="share">分享到想法</button>
+      </div>
+      <p class="disc-stroke">本活动为传统文化趣味玩法，内容仅供娱乐参考，不构成任何运势预测或现实指导</p>
+    </div>
+  </div>
+</div>
+
+<div class="shot" id="ding">
+  <h2><b>丁</b>更淡的页底细字</h2>
+  <p class="note">上一版直接贴到求签页底的那种。对照用，默认不推荐。</p>
+  <div class="phone">
+    <div class="block">
+      <div class="slip-paper">
+        <h2 class="slip-no">第十签</h2>
+        <p class="slip-name">人间有味</p>
+        <span class="slip-seal">清欢签</span>
+        <span class="slip-badge">签文</span>
+        <p class="slip-verse"><span>一盏清茶又一春。</span><span>半窗烟火半窗月，</span></p>
+        <div class="slip-unlock">
+          <span>这一签只说到这里，<br>别人的故事或许还有下文。</span>
+          <span>点击查看「<em>内容发现</em>」模块 <i>›</i></span>
+          <span>即可解锁你的签</span>
+        </div>
+      </div>
+      <div class="actions">
+        <button type="button" class="again">再来一签</button>
+        <button type="button" class="share">分享到想法</button>
+      </div>
+    </div>
+    <p class="disc-tiny">本活动为传统文化趣味玩法，内容仅供娱乐参考，不构成任何运势预测或现实指导</p>
+  </div>
+</div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>金签特写对照 · 看山今日一签</title>
+<style>
+:root { --song: "Songti SC","STSong","SimSun","Noto Serif SC",serif; }
+* { box-sizing: border-box; }
+html, body { margin: 0; min-height: 100%; font-family: var(--song); color: #f4eee6; background: #12100e; }
+body { padding: 24px 16px 80px; }
+.intro { max-width: 1100px; margin: 0 auto 28px; }
+.intro h1 { margin: 0 0 8px; font-size: 1.55rem; letter-spacing: .14em; }
+.intro p { margin: 0; color: #c9b8a4; font-size: 1.05rem; line-height: 1.75; }
+.wall { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 1fr; gap: 28px; }
+@media (min-width: 900px) { .wall { grid-template-columns: 1fr 1fr; } }
+.shot { display: flex; flex-direction: column; gap: 10px; padding: 16px; border-radius: 16px; background: #1c1815; }
+.shot.ref { outline: 3px solid #c9a24a; }
+.shot h2 { margin: 0; font-size: 1.28rem; letter-spacing: .08em; }
+.shot h2 b { margin-right: 8px; font-size: 1.5rem; }
+.shot .note { margin: 0; font-size: .98rem; color: #b7a28c; line-height: 1.55; }
+.board { background: #000; border-radius: 12px; overflow: hidden; }
+.board img { display: block; width: 100%; height: auto; cursor: zoom-in; }
+#lightbox { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.92); z-index: 9; align-items: center; justify-content: center; padding: 16px; cursor: zoom-out; }
+#lightbox.on { display: flex; }
+#lightbox img { max-width: min(98vw, 1200px); max-height: 96vh; object-fit: contain; }
+</style>
+</head>
+<body>
+<div class="intro">
+  <h1>金签特写对照</h1>
+  <p>封面筒口已按用户截图锁定原图透亮「清欢签」。甲 / 06 不要再嵌：<a href="gold-stick-20.html?v=381" style="color:#e8c37a">金签重画 20 版</a>。抽出的签仍空白。</p>
+</div>
+<div class="wall">
+  <div class="shot" id="yuan">
+    <h2><b>原</b>选定前的封面特写</h2>
+    <p class="note">对照用，未再进封面。</p>
+    <div class="board"><img src="art/gold-stick/yuan.png?v=376" alt="原 清欢签特写" /></div>
+  </div>
+  <div class="shot" id="jia">
+    <h2><b>甲</b>字贴回原金面</h2>
+    <p class="note">完整屋脊尖 + 「清欢签」。曾嵌封面，用户打回。</p>
+    <div class="board"><img src="art/gold-stick/jia.png?v=379" alt="甲 清欢签贴金面" /></div>
+  </div>
+  <div class="shot" id="yi">
+    <h2><b>乙</b>更透的琥珀金</h2>
+    <p class="note">同尖，签身更透的琥珀金，字仍是「清欢签」。</p>
+    <div class="board"><img src="art/gold-stick/yi.png?v=379" alt="乙 透光清欢签" /></div>
+  </div>
+  <div class="shot" id="bing">
+    <h2><b>丙</b>空白金签</h2>
+    <p class="note">同尖同光，不写字。给出签空签用。</p>
+    <div class="board"><img src="art/gold-stick/bing.png?v=379" alt="丙 空白金签" /></div>
+  </div>
+</div>
+<div id="lightbox"><img alt="" /></div>
+<script>
+const box = document.getElementById("lightbox");
+const img = box.querySelector("img");
+document.querySelectorAll(".board img").forEach((el) => {
+  el.addEventListener("click", () => {
+    img.src = el.src;
+    box.classList.add("on");
+  });
+});
+box.addEventListener("click", () => box.classList.remove("on"));
+</script>
+</body>
+</html>

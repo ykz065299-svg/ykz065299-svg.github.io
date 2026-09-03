@@ -2,7 +2,7 @@
 <html lang="zh-CN">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="theme-color" content="#070b16" />
     <meta name="description" content="摇签入山，一签直达知乎热榜。看山今日一签。" />
     <meta property="og:type" content="website" />
@@ -10,16 +10,19 @@
     <meta property="og:site_name" content="看山今日一签" />
     <meta property="og:title" content="看山今日一签" />
     <meta property="og:description" content="摇签入山，一签直达知乎热榜今日山门题。" />
-    <meta property="og:image" content="https://ykz065299-svg.github.io/cover.jpg?v=313" />
+    <meta property="og:image" content="https://ykz065299-svg.github.io/cover.jpg?v=397" />
     <meta property="og:url" content="https://ykz065299-svg.github.io/" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="看山今日一签" />
     <meta name="twitter:description" content="摇签入山，一签直达知乎热榜今日山门题。" />
-    <meta name="twitter:image" content="https://ykz065299-svg.github.io/cover.jpg?v=313" />
+    <meta name="twitter:image" content="https://ykz065299-svg.github.io/cover.jpg?v=397" />
     <!-- 线上静态页若需上报到自建服务，取消注释并填 collect 地址 -->
     <!-- <meta name="kanshan-track-endpoint" content="https://你的域名/api/track" /> -->
     <!-- 封面预加载改由下方脚本按机型只拉一张 -->
     <title>看山今日一签</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@500;600;700;900&family=ZCOOL+XiaoWei&display=swap" rel="stylesheet" />
     <!-- CSS 内联：少一次 github.io 慢请求 -->
     <style>
 /* v106 — v103观感+加速： 首屏加速：系统字体；二页背景懒加载；去掉噪点滤镜 */
@@ -31,8 +34,15 @@
   --paper-ink: #2a2118;
   --night: #070b16;
   --veil: rgba(7, 11, 22, .55);
-  --display: "Kaiti SC", "STKaiti", "KaiTi", "Songti SC", serif;
-  --body: "Songti SC", "STSong", "Noto Serif CJK SC", "Source Han Serif SC", "PingFang SC", serif;
+  --display: "ZCOOL XiaoWei", "Kaiti SC", "STKaiti", "KaiTi", "Songti SC", serif;
+  --body: "Noto Serif SC", "Songti SC", "STSong", "Source Han Serif SC", "PingFang SC", serif;
+  --tube-w: clamp(140px, 42vmin, 200px);
+  --tube-h: calc(var(--tube-w) * 1.6);
+  --tube-stage-w: calc(var(--tube-w) * 1.2);
+  --tube-stage-h: calc(var(--tube-h) * 1.19);
+  --seer-w: clamp(118px, calc(var(--tube-w) * 0.92), 210px);
+  --seer-x: clamp(18px, 6.5vw, 58px);
+  --seer-y: calc(var(--seer-w) * 0.73);
 }
 
 * { box-sizing: border-box; }
@@ -45,6 +55,8 @@ html, body {
   background: var(--night, #070b16);
   overflow-x: hidden;
   position: relative;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 /* 第一页时冻结第二页，避免双页同时烧 GPU */
 body:not(.ritual-visible) .page2-bg {
@@ -73,8 +85,13 @@ body:not(.ritual-visible) .page2-bg {
 }
 .page1-bg {
   top: 0;
-  background-image: url("cover.jpg?v=313");
-  background-position: 36% 26%;
+  background-image: url("cover.jpg?v=397");
+  background-position: center center;
+}
+@media (orientation: portrait) {
+  .page1-bg {
+    background-image: url("cover-mobile.jpg?v=397");
+  }
 }
 .page-seam {
   position: absolute;
@@ -195,8 +212,8 @@ body.ritual-assets-ready .page2-bg {
 
 .audio-toggle {
   position: fixed;
-  top: 14px;
-  right: 14px;
+  top: max(14px, env(safe-area-inset-top));
+  right: max(14px, env(safe-area-inset-right));
   z-index: 8;
   border: 1px solid rgba(231,193,106,.38);
   background: rgba(8,12,24,.62);
@@ -218,20 +235,22 @@ body.ritual-assets-ready .page2-bg {
 .world {
   position: relative;
   z-index: 2;
-  width: min(440px, calc(100% - 28px));
-  margin: 0 auto;
+  width: 100%;
+  max-width: none;
+  margin: 0;
 }
 
 .page {
   position: relative;
   min-height: 100vh;
+  min-height: 100dvh;
   display: flex;
   flex-direction: column;
 }
 
 .page-cover {
   justify-content: flex-end;
-  padding: 0 0 36px;
+  padding: 0 0 max(28px, env(safe-area-inset-bottom));
 }
 .cover-spacer { flex: 1; }
 .scroll-cue {
@@ -257,20 +276,19 @@ body.ritual-assets-ready .page2-bg {
 }
 .page-ritual.slip-retracting .slip-scroll {
   opacity: 0;
-  transform: translate(-50%, -46%) scaleY(.06);
-  transition: opacity .4s ease, transform .42s cubic-bezier(.4,0,.2,1);
+  transform: translate3d(-50%, -50%, 0) scale(.08);
+  transition: opacity .32s ease, transform .32s ease;
 }
 .page-ritual.slip-retracting .ritual {
   opacity: .55;
-  filter: blur(1px);
-  transition: opacity .35s ease, filter .35s ease;
+  transition: opacity .35s ease;
 }
 
 .page-ritual {
   position: relative;
   justify-content: flex-start;
   align-items: center;
-  padding: 16px 0 22px;
+  padding: 16px max(10px, env(safe-area-inset-right)) 22px max(10px, env(safe-area-inset-left));
   text-align: center;
   /* 整页作为签的定位坐标系 */
   min-height: 100vh;
@@ -283,13 +301,16 @@ body.ritual-assets-ready .page2-bg {
   opacity: .22;
 }
 .page-ritual.has-slip .ritual {
-  opacity: .14;
-  filter: blur(1.2px) saturate(.9);
+  opacity: .18;
   pointer-events: none;
-  transition: opacity .85s cubic-bezier(.33,.08,.25,1), filter .85s cubic-bezier(.33,.08,.25,1);
+  transition: opacity .55s ease;
 }
 .page-ritual.has-slip .ritual-footer {
-  opacity: .95;
+  opacity: 0;
+  pointer-events: none;
+  height: 0;
+  padding: 0;
+  overflow: hidden;
 }
 
 .story-head {
@@ -311,8 +332,7 @@ body.ritual-assets-ready .page2-bg {
   text-indent: .28em;
   font-size: clamp(1.05rem, 2.8vw, 1.35rem);
   font-weight: 700;
-  text-shadow: 0 2px 12px rgba(0,0,0,.55), 0 0 20px rgba(255,200,100,.25);
-  transition: opacity .28s ease, transform .28s ease;
+  text-shadow: 0 2px 8px rgba(0,0,0,.55);
 }
 .story-line {
   margin: 0;
@@ -323,8 +343,7 @@ body.ritual-assets-ready .page2-bg {
   font-size: clamp(.82rem, 2.1vw, .95rem);
   letter-spacing: .1em;
   line-height: 1.45;
-  text-shadow: 0 2px 10px rgba(0,0,0,.5);
-  transition: opacity .28s ease;
+  text-shadow: 0 2px 8px rgba(0,0,0,.5);
 }
 .page-ritual.is-drawing .story-line,
 .page-ritual.is-casting .story-line {
@@ -332,7 +351,7 @@ body.ritual-assets-ready .page2-bg {
 }
 .page-ritual.is-drawing .phase,
 .page-ritual.is-casting .phase {
-  opacity: .35;
+  opacity: 1;
 }
 
 /* 幕次金字：竖排 · 神秘淡现（克制，不炫光） */
@@ -340,7 +359,7 @@ body.ritual-assets-ready .page2-bg {
   position: absolute;
   left: 50%;
   top: 36%;
-  transform: translate(-50%, -50%);
+  transform: translate3d(-50%, -50%, 0);
   z-index: 30;
   margin: 0;
   padding: .15em 0;
@@ -349,7 +368,7 @@ body.ritual-assets-ready .page2-bg {
   font-weight: 700;
   writing-mode: vertical-rl;
   text-orientation: upright;
-  letter-spacing: .5em;
+  letter-spacing: .45em;
   white-space: nowrap;
   pointer-events: none;
   opacity: 0;
@@ -357,13 +376,14 @@ body.ritual-assets-ready .page2-bg {
     0 2px 12px rgba(0, 0, 0, .9),
     0 0 14px rgba(231, 193, 106, .22);
   filter: none;
+  will-change: opacity, transform;
 }
 .act-flash::before {
-  display: none; /* 去掉光晕炸开 */
+  display: none;
 }
 .act-flash.show,
 .act-flash.show.punch {
-  animation: actMysticIn 1.35s ease forwards;
+  animation: actMysticIn .9s ease forwards;
 }
 .act-flash.show::before,
 .act-flash.show.punch::before {
@@ -372,24 +392,19 @@ body.ritual-assets-ready .page2-bg {
 @keyframes actMysticIn {
   0% {
     opacity: 0;
-    transform: translate(-50%, -46%);
-    letter-spacing: .28em;
+    transform: translate3d(-50%, -46%, 0);
   }
-  18% {
-    opacity: .94;
-    transform: translate(-50%, -50%);
-  }
-  50% {
+  20% {
     opacity: 1;
-    transform: translate(-50%, -50%);
-    letter-spacing: .5em;
+    transform: translate3d(-50%, -50%, 0);
   }
-  78% {
-    opacity: .88;
+  68% {
+    opacity: 1;
+    transform: translate3d(-50%, -50%, 0);
   }
   100% {
     opacity: 0;
-    transform: translate(-50%, -52%);
+    transform: translate3d(-50%, -50%, 0);
   }
 }
 .ritual.is-shaking .tube-stage {
@@ -398,6 +413,7 @@ body.ritual-assets-ready .page2-bg {
 .ritual.is-shaking .kanshan-seer,
 .ritual.is-shaking .kanshan-seer.casting,
 .kanshan-seer.motion-active {
+  animation: none;
   filter: none !important;
 }
 .ritual.is-shaking .tube {
@@ -426,35 +442,35 @@ body.ritual-assets-ready .page2-bg {
   position: relative;
   width: 100%;
   flex: 1 1 auto;
-  min-height: clamp(360px, 52vh, 560px);
+  min-height: clamp(280px, 48dvh, 560px);
   margin: 0 auto;
   z-index: 2;
 }
 
-/* 签筒旁：看山（分层素材 · 扶筒姿势） */
+/* 签筒旁：举签戊（斜举一支，身上有晨光体积） */
 .kanshan-seer {
   position: absolute;
-  left: calc(50% + 64px);
+  left: calc(50% + var(--seer-x));
   right: auto;
-  bottom: calc(50% - 148px);
+  bottom: calc(50% - var(--seer-y));
   top: auto;
-  width: clamp(132px, 26vh, 188px);
+  width: var(--seer-w);
   height: auto;
   overflow: visible;
-  z-index: 2;
+  z-index: 4;
   pointer-events: none;
   transform: translateZ(0);
-  transform-origin: 35% 96%;
+  transform-origin: 54% 96%;
   filter:
-    drop-shadow(10px 8px 10px rgba(40, 22, 8, .38))
-    drop-shadow(-2px -1px 6px rgba(255, 210, 140, .22));
-  animation: kanshanIdleFloat 5.2s ease-in-out infinite;
+    drop-shadow(-8px -4px 12px rgba(255, 186, 96, .26))
+    drop-shadow(18px 28px 22px rgba(42, 24, 10, .16));
+  animation: kanshanIdleFloat 8.6s ease-in-out infinite;
   transition: opacity .6s ease, transform .6s cubic-bezier(.22, .8, .28, 1);
   backface-visibility: hidden;
 }
 @keyframes kanshanIdleFloat {
-  0%, 100% { transform: translate3d(0, 0, 0) rotate(-0.12deg); }
-  50% { transform: translate3d(0, -2.2px, 0) rotate(0.12deg); }
+  0%, 100% { transform: translate3d(0, 0, 0) rotate(-0.7deg); }
+  50% { transform: translate3d(-2px, -4px, 0) rotate(0.55deg); }
 }
 .kanshan-seer.casting,
 .kanshan-seer.motion-active {
@@ -484,10 +500,9 @@ body.ritual-assets-ready .page2-bg {
   filter: none;
 }
 @keyframes kanshanBless {
-  0%   { transform: translate3d(0, 3px, 0) scale(.99); }
-  45%  { transform: translate3d(0, -6px, 0) scale(1.032); }
-  78%  { transform: translate3d(0, -0.6px, 0) scale(1.008); }
-  100% { transform: translate3d(0, 0, 0) scale(1); }
+  0%   { transform: translate3d(0, 2px, 0) rotate(-0.3deg); }
+  48%  { transform: translate3d(-3px, -5px, 0) rotate(-1.6deg); }
+  100% { transform: translate3d(0, 0, 0) rotate(-0.35deg); }
 }
 .kanshan-seer.casting .kanshan-aura {
   animation-duration: 2.4s;
@@ -525,9 +540,9 @@ body.ritual-assets-ready .page2-bg {
   display: block;
   width: 100%;
   height: auto;
-  aspect-ratio: 641 / 882;
+  aspect-ratio: 994 / 1366;
   object-fit: contain;
-  object-position: center bottom;
+  object-position: 50% bottom;
   -webkit-user-drag: none;
   user-select: none;
   background: transparent;
@@ -535,9 +550,18 @@ body.ritual-assets-ready .page2-bg {
   transform: translateZ(0);
   filter: none;
 }
+.kanshan-seer.blessing .kanshan-seer-art {
+  animation: heldStickPresent 1.05s cubic-bezier(.22, .82, .28, 1) 1;
+}
+@keyframes heldStickPresent {
+  0%   { transform: rotate(0deg) translate3d(0, 2px, 0); }
+  42%  { transform: rotate(-2.2deg) translate3d(-3px, -3px, 0); }
+  100% { transform: rotate(0deg) translate3d(0, 0, 0); }
+}
 .ritual.is-shaking .kanshan-seer-art,
 .kanshan-seer.motion-active .kanshan-seer-art,
 .kanshan-seer.casting .kanshan-seer-art {
+  animation: none;
   filter: none !important;
 }
 .kanshan-seer-caption {
@@ -561,22 +585,9 @@ body.ritual-assets-ready .page2-bg {
   100% { transform: translate(-50%, -50%) rotate(360deg) scale(1); }
 }
 
-@media (max-width: 720px) {
-  .kanshan-seer {
-    left: calc(50% + 52px);
-    right: auto;
-    width: clamp(112px, 24vh, 152px);
-    height: auto;
-    bottom: calc(50% - 118px);
-  }
-}
 @media (max-width: 420px) {
-  .kanshan-seer {
-    left: calc(50% + 42px);
-    right: auto;
-    width: clamp(100px, 22vh, 136px);
-    height: auto;
-    bottom: calc(50% - 104px);
+  :root {
+    --seer-x: clamp(16px, 5.2vw, 32px);
   }
   .act-flash {
     letter-spacing: .22em;
@@ -584,12 +595,41 @@ body.ritual-assets-ready .page2-bg {
   }
 }
 
+.ritual-bottom {
+  position: relative;
+  z-index: 4;
+  width: 100%;
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
 .ritual-footer {
   position: relative;
   z-index: 4;
   width: 100%;
-  padding: 8px 0 10px;
-  margin-top: auto;
+  padding: 8px max(8px, env(safe-area-inset-right)) max(10px, env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-left));
+  margin-top: 0;
+}
+.ritual-disclaimer {
+  display: block;
+  width: 100%;
+  margin: 8px 0 0;
+  padding: 0 8px;
+  box-sizing: border-box;
+  color: rgba(244, 232, 208, .78);
+  font-size: clamp(.48rem, 2.15vw, .66rem);
+  line-height: 1.45;
+  letter-spacing: .02em;
+  text-align: center;
+  white-space: nowrap;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, .9);
+  pointer-events: none;
+}
+.slip-actions .ritual-disclaimer {
+  margin-top: 10px;
+  padding: 0 4px;
+  white-space: normal;
 }
 
 /* —— 签筒 —— */
@@ -598,8 +638,8 @@ body.ritual-assets-ready .page2-bg {
   left: 50%;
   top: 52%;
   transform: translate3d(-50%, -50%, 0);
-  width: 240px;
-  height: 380px;
+  width: var(--tube-stage-w);
+  height: var(--tube-stage-h);
   z-index: 3;
   display: grid;
   place-items: center;
@@ -668,9 +708,9 @@ body.ritual-assets-ready .page2-bg {
 
 .tube {
   position: relative;
-  width: 200px;
-  height: 320px;
-  margin-bottom: 36px;
+  width: var(--tube-w);
+  height: var(--tube-h);
+  margin-bottom: calc(var(--tube-w) * 0.18);
   z-index: 2;
   transform-origin: 50% 92%;
   transform: translateZ(0);
@@ -758,8 +798,8 @@ body.ritual-assets-ready .page2-bg {
   top: 2%;
   transform: translateX(-50%);
   z-index: 5;
-  height: 228px;
-  width: 36px;
+  height: calc(var(--tube-h) * 0.71);
+  width: calc(var(--tube-w) * 0.18);
   pointer-events: none;
   opacity: 1;
   transition: opacity .42s cubic-bezier(.33, .08, .25, 1);
@@ -786,29 +826,27 @@ body.ritual-assets-ready .page2-bg {
   transform: scaleY(1) translate3d(0, 0, 0);
 }
 
-/* —— 签面：自签芽竖条形态展开，避免扁饼弹出 —— */
+/* —— 签面：签名 + 签文（竖排纸笺） —— */
 .slip-scroll {
-  --slip-h: 420px;
+  --slip-h: auto;
   position: absolute;
   left: 50%;
   top: 50%;
-  width: min(272px, 84vw);
-  height: var(--slip-h);
+  width: min(244px, 70vw, calc(72dvh * 508 / 994));
+  height: auto;
   display: flex;
   flex-direction: column;
-  transform: translate3d(-50%, -38%, 0) scale(0.07, 0.38);
-  transform-origin: center top;
+  transform: translate3d(-50%, -50%, 0) scale(0.08);
+  transform-origin: center center;
   opacity: 0;
   pointer-events: none;
   z-index: 6;
-  overflow: hidden;
-  border-radius: 6px;
+  overflow: visible;
+  border-radius: 12px;
   transition:
-    transform 1.18s cubic-bezier(.2, .78, .16, 1),
-    opacity .55s cubic-bezier(.25, .7, .2, 1);
-  will-change: transform, opacity;
+    transform .72s cubic-bezier(.2, .78, .16, 1),
+    opacity .36s ease;
   backface-visibility: hidden;
-  box-shadow: 0 24px 60px rgba(0,0,0,.45);
 }
 .slip-scroll.visible {
   opacity: 1;
@@ -826,47 +864,19 @@ body.ritual-assets-ready .page2-bg {
   overflow: visible !important;
   transition: none !important;
 }
-.slip-scroll.measuring .slip-grade,
-.slip-scroll.measuring .slip-no,
-.slip-scroll.measuring .slip-motto,
-.slip-scroll.measuring .gold-line,
-.slip-scroll.measuring .slip-oracle,
-.slip-scroll.measuring .slip-title,
-.slip-scroll.measuring .slip-summary,
-.slip-scroll.measuring .slip-meta,
-.slip-scroll.measuring .actions,
-.slip-scroll.measuring .slip-edge {
+.slip-scroll.measuring .slip-paper,
+.slip-scroll.measuring .slip-actions {
   opacity: 1 !important;
-  transform: none !important;
   transition: none !important;
-  filter: none !important;
 }
 
 /* v4：内容完全放下时不出现滚动条 */
 .slip-scroll.fit .scroll-body {
-  overflow: hidden;
+  overflow: visible;
 }
 .slip-scroll.glowing .scroll-glow { opacity: 1; }
-.slip-scroll.glowing .stamp {
-  border-color: rgba(180,40,35,.85);
-  color: rgba(180,40,35,.92);
-  text-shadow: 0 0 8px rgba(255,80,60,.35);
-  box-shadow: 0 0 14px rgba(180,40,35,.28);
-  opacity: 1;
-}
-.slip-scroll.glowing .gold-line {
-  background: linear-gradient(90deg, transparent, rgba(231,193,106,.95), transparent);
-  box-shadow: 0 0 12px rgba(231,193,106,.45);
-}
-.slip-scroll.glowing .slip-edge {
-  opacity: .9;
-  color: rgba(160, 110, 40, .55);
-  text-shadow: 0 0 12px rgba(255,200,100,.4);
-}
 .slip-scroll.visible {
-  box-shadow:
-    0 24px 60px rgba(0,0,0,.48),
-    0 0 40px rgba(255,200,120,.12);
+  box-shadow: none;
 }
 
 .scroll-glow {
@@ -880,222 +890,246 @@ body.ritual-assets-ready .page2-bg {
   z-index: 0;
 }
 
-.slip-edge {
-  position: absolute;
-  top: 14%;
-  writing-mode: vertical-rl;
-  letter-spacing: .6em;
-  font-family: var(--display);
-  font-size: .95rem;
-  color: rgba(140, 95, 35, .42);
-  opacity: 0;
-  transition: opacity .75s ease;
-  z-index: 2;
-  pointer-events: none;
-}
-.slip-edge.left { left: 6px; }
-.slip-edge.right { right: 6px; }
-
-.scroll-roll {
-  position: relative;
-  z-index: 2;
-  height: 12px;
-  width: 100%;
-  border-radius: 7px;
-  background: linear-gradient(180deg, #d4b06a, #8a6230 55%, #5a3a14);
-  box-shadow: 0 2px 8px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,240,200,.35);
-  flex: 0 0 auto;
-}
-.scroll-roll.top { margin-bottom: -2px; }
-.scroll-roll.bot { margin-top: -2px; }
-
 .scroll-body {
   position: relative;
   z-index: 1;
   flex: 1 1 auto;
   min-height: 0;
-  overflow-y: auto;
-  overflow-x: hidden;
-  background:
-    linear-gradient(90deg, rgba(90,60,20,.12), transparent 16%, transparent 84%, rgba(90,60,20,.12)),
-    repeating-linear-gradient(
-      180deg,
-      transparent 0 28px,
-      rgba(120, 80, 30, .045) 28px 29px
-    ),
-    radial-gradient(ellipse at 50% 0%, rgba(255,250,230,.35), transparent 55%),
-    linear-gradient(180deg, #f6e9c8, #e3ce97 70%, #dcc48a);
-  border-left: 1px solid rgba(160,110,40,.42);
-  border-right: 1px solid rgba(160,110,40,.42);
-  box-shadow:
-    0 16px 44px rgba(0,0,0,.45),
-    inset 0 0 40px rgba(120,80,30,.06);
-  scrollbar-width: thin;
-  -webkit-overflow-scrolling: touch;
+  overflow: visible;
+  background: transparent;
+  border: none;
+  box-shadow: none;
 }
 
 .scroll-inner {
   position: relative;
-  padding: 20px 26px 24px;
+  padding: 0;
   color: var(--paper-ink);
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
-.slip-grade {
-  display: inline-block;
-  padding: 2px 8px;
-  border: 1px solid rgba(180,40,35,.65);
-  color: #a02018;
-  letter-spacing: .18em;
-  text-indent: .18em;
-  margin-bottom: 6px;
-  font-size: .82rem;
+.slip-paper {
+  --slip-red: #8a2c1c;
+  --slip-ink: #6e2b21;
+  --slip-font: "Songti SC", "STSong", "SimSun", "Noto Serif SC", "Source Han Serif SC", serif;
+  position: relative;
+  flex: 0 0 auto;
+  width: 100%;
+  aspect-ratio: 508 / 994;
+  height: auto;
+  border-radius: 0;
+  color: var(--slip-ink);
+  container-type: inline-size;
+  background:
+    url("art/slip-plate.webp?v=358") center / 100% 100% no-repeat;
+  border: none;
+  box-shadow: none;
+  filter: drop-shadow(0 16px 28px rgba(0,0,0,.36));
+  overflow: visible;
   opacity: 0;
-  transform: translate3d(0, 8px, 0);
-  transition: opacity .55s cubic-bezier(.22,.7,.2,1), transform .55s cubic-bezier(.22,.7,.2,1);
+  transition: opacity .32s ease;
 }
-.slip-grade.supreme { background: rgba(180,40,35,.08); }
-.slip-grade.great { color: #8a3a12; border-color: rgba(160,80,30,.65); }
-.slip-grade.plain { color: #4a5560; border-color: rgba(70,80,90,.4); }
-.slip-grade.odd { color: #4a2a7a; border-color: rgba(90,50,140,.4); }
+
+.slip-frame,
+.slip-wash,
+.slip-main,
+.slip-rule,
+.slip-col-verse,
+.slip-col-name { display: none; }
 
 .slip-no {
+  position: absolute;
+  top: 5.43%;
+  left: 70.15%;
   margin: 0;
-  font-family: var(--display);
-  font-size: clamp(1.55rem, 4vw, 2rem);
-  font-weight: 400;
-  color: #7a5a18;
-  letter-spacing: .06em;
-  opacity: 0;
-  transform: translate3d(0, 8px, 0);
-  transition: opacity .55s cubic-bezier(.22,.7,.2,1) .04s, transform .55s cubic-bezier(.22,.7,.2,1) .04s;
+  writing-mode: vertical-rl;
+  white-space: nowrap;
+  font-family: var(--slip-font);
+  font-size: 5.3cqw;
+  font-weight: 600;
+  color: var(--slip-ink);
+  letter-spacing: .2em;
+  line-height: 1;
 }
-.slip-motto {
-  margin: 6px 0 0;
-  color: #6a5638;
-  letter-spacing: .08em;
-  font-size: .84rem;
-  opacity: 0;
-  transform: translate3d(0, 8px, 0);
-  transition: opacity .55s cubic-bezier(.22,.7,.2,1) .07s, transform .55s cubic-bezier(.22,.7,.2,1) .07s;
-}
-.gold-line {
-  height: 1px;
-  margin: 14px 4px;
-  background: linear-gradient(90deg, transparent, rgba(160,120,40,.3), transparent);
-  opacity: 0;
-  transition: opacity .55s cubic-bezier(.22,.7,.2,1) .1s, background .7s ease, box-shadow .7s ease;
-}
-.slip-oracle {
-  margin: 0 0 12px;
-  color: #5a4030;
-  line-height: 1.8;
-  text-align: left;
-  font-size: .9rem;
-  opacity: 0;
-  transform: translate3d(0, 8px, 0);
-  transition: opacity .55s cubic-bezier(.22,.7,.2,1) .12s, transform .55s cubic-bezier(.22,.7,.2,1) .12s;
-}
-.slip-title {
-  margin: 0 0 10px;
-  font-family: var(--body);
-  font-size: .98rem;
-  line-height: 1.55;
-  text-align: left;
+
+.slip-name {
+  position: absolute;
+  top: 20.68%;
+  left: 66.81%;
+  margin: 0;
+  writing-mode: vertical-rl;
+  white-space: nowrap;
+  font-family: var(--slip-font);
+  font-size: 15.05cqw;
   font-weight: 700;
-  opacity: 0;
-  transform: translate3d(0, 8px, 0);
-  transition: opacity .55s cubic-bezier(.22,.7,.2,1) .16s, transform .55s cubic-bezier(.22,.7,.2,1) .16s;
+  color: var(--slip-ink);
+  letter-spacing: .12em;
+  line-height: 1.02;
 }
-.slip-summary {
-  margin: 0 0 12px;
-  color: #6a5a48;
-  line-height: 1.7;
-  text-align: left;
-  font-size: .86rem;
-  display: -webkit-box;
-  -webkit-line-clamp: 7;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  opacity: 0;
-  transform: translate3d(0, 8px, 0);
-  transition: opacity .55s cubic-bezier(.22,.7,.2,1) .2s, transform .55s cubic-bezier(.22,.7,.2,1) .2s;
+
+.slip-seal {
+  position: absolute;
+  top: 54.88%;
+  left: 69.04%;
+  writing-mode: vertical-rl;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 15.61%;
+  height: 14.63%;
+  padding: 0;
+  border-radius: 999px;
+  background: #9c241c;
+  box-shadow: inset 0 0 0 1.5px rgba(247, 239, 228, .88);
+  color: #f7efe4;
+  font-family: var(--slip-font);
+  font-size: 5.02cqw;
+  letter-spacing: .14em;
+  line-height: 1;
+  font-weight: 700;
 }
-.slip-meta {
-  margin-bottom: 12px;
-  color: #8a7358;
-  font-size: .78rem;
+.slip-seal.calm,
+.slip-seal.free,
+.slip-seal.joy { background: #9c241c; }
+
+.slip-badge {
+  position: absolute;
+  top: 6.67%;
+  left: 30.85%;
+  writing-mode: vertical-rl;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 8.08%;
+  height: 7.83%;
+  padding: 0;
+  border: 1.15px solid var(--slip-red);
+  border-radius: 999px;
+  color: var(--slip-ink);
+  font-family: var(--slip-font);
+  font-size: 4.46cqw;
   letter-spacing: .08em;
-  opacity: 0;
-  transform: translate3d(0, 8px, 0);
-  transition: opacity .55s cubic-bezier(.22,.7,.2,1) .24s, transform .55s cubic-bezier(.22,.7,.2,1) .24s;
+  font-weight: 600;
+  background: transparent;
 }
-.actions {
+
+.slip-verse {
+  position: absolute;
+  top: 15.73%;
+  left: 16.63%;
+  margin: 0;
+  display: flex;
+  flex-direction: row-reverse;
+  width: auto;
+  gap: 5.02cqw;
+  align-items: flex-start;
+  justify-content: flex-start;
+}
+.slip-verse span {
+  writing-mode: vertical-rl;
+  white-space: nowrap;
+  font-family: var(--slip-font);
+  font-size: 10.03cqw;
+  font-weight: 600;
+  line-height: 1.18;
+  letter-spacing: .16em;
+  color: var(--slip-ink);
+}
+
+.slip-unlock {
+  position: absolute;
+  z-index: 1;
+  appearance: none;
+  left: 5.76%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  top: 71.77%;
+  width: 88.08%;
+  height: 20.81%;
+  margin: 0;
+  padding: 1% 2%;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  color: var(--slip-ink);
+  font-family: var(--slip-font);
+  font-size: 4.6cqw;
+  line-height: 1.58;
+  letter-spacing: .03em;
+  text-align: center;
+  cursor: pointer;
+}
+.slip-unlock::before {
+  display: none;
+}
+.slip-unlock-copy {
+  display: block;
+  max-width: 94%;
+}
+.slip-unlock-cta {
+  display: block;
+  margin: 1px 0;
+  font-weight: 400;
+  color: var(--slip-ink);
+}
+.slip-unlock-cta em {
+  font-style: normal;
+  font-weight: 700;
+}
+.slip-unlock-cta i {
+  font-style: normal;
+  color: var(--slip-red);
+  font-weight: 700;
+}
+.slip-unlock-hint {
+  display: block;
+}
+
+.slip-actions {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  align-items: center;
-  padding-bottom: 10px;
+  align-items: stretch;
+  flex: 0 0 auto;
   opacity: 0;
-  transform: translate3d(0, 8px, 0);
-  transition: opacity .55s cubic-bezier(.22,.7,.2,1) .28s, transform .55s cubic-bezier(.22,.7,.2,1) .28s;
+  transition: opacity .32s ease;
 }
-.slip-scroll.revealed .slip-grade,
-.slip-scroll.revealed .slip-no,
-.slip-scroll.revealed .slip-motto,
-.slip-scroll.revealed .gold-line,
-.slip-scroll.revealed .slip-oracle,
-.slip-scroll.revealed .slip-title,
-.slip-scroll.revealed .slip-summary,
-.slip-scroll.revealed .slip-meta,
-.slip-scroll.revealed .actions {
+.slip-scroll.revealed .slip-paper,
+.slip-scroll.revealed .slip-actions {
   opacity: 1;
-  transform: translate3d(0, 0, 0);
 }
 
-.link-out, .again {
+.again, .share-thoughts {
   font-family: inherit;
-  font-size: .84rem;
-  letter-spacing: .06em;
+  font-size: 1rem;
+  letter-spacing: .12em;
   border-radius: 999px;
-  padding: 8px 14px;
-  text-decoration: none;
+  padding: 12px 16px;
   cursor: pointer;
   width: 100%;
-  max-width: 180px;
   text-align: center;
 }
-.link-out {
+.again {
+  color: #f4efe4;
+  background: rgba(18, 14, 10, .42);
+  border: 1px solid rgba(244, 239, 228, .28);
+}
+.again:hover {
+  background: rgba(18, 14, 10, .55);
+}
+.share-thoughts {
   color: #1a1208;
   background: linear-gradient(180deg, #f6e4b4, #e4bc62);
   border: none;
-  box-shadow: 0 4px 12px rgba(120,80,20,.2);
-}
-.again {
-  color: #5a4030;
-  background: rgba(255,250,235,.25);
-  border: 1px solid rgba(120,80,30,.38);
-}
-.again:hover {
-  background: rgba(255,250,235,.45);
-}
-.stamp {
-  position: absolute;
-  right: 12px;
-  bottom: 16px;
-  width: 42px;
-  height: 42px;
-  border: 2px solid transparent;
-  color: transparent;
-  border-radius: 4px;
-  display: grid;
-  place-items: center;
-  font-family: var(--display);
-  font-size: 1.25rem;
-  transform: rotate(-12deg);
-  transition: opacity .6s ease, color .6s ease, border-color .6s ease, box-shadow .6s ease;
-  opacity: 0;
-  pointer-events: none;
+  box-shadow: 0 4px 12px rgba(120,80,20,.22);
 }
 
 .draw-btn {
@@ -1107,10 +1141,11 @@ body.ritual-assets-ready .page2-bg {
     linear-gradient(180deg, #3f2e14, #1a1208);
   color: var(--gold-soft);
   font-family: inherit;
-  font-size: 1.05rem;
+  font-size: clamp(.95rem, 2.6vw, 1.05rem);
   letter-spacing: .46em;
   text-indent: .46em;
-  padding: 14px 48px;
+  padding: 14px max(28px, 8vw);
+  max-width: min(420px, calc(100% - 8px));
   border-radius: 999px;
   cursor: pointer;
   overflow: hidden;
@@ -1141,12 +1176,11 @@ body.ritual-assets-ready .page2-bg {
 }
 
 .hint {
-  margin: 14px 0 0;
-  color: rgba(196,189,174,.72);
+  margin: 12px 0 0;
+  color: rgba(236, 228, 210, .92);
   font-size: .78rem;
-  letter-spacing: .12em;
-  text-indent: .12em;
-  text-shadow: 0 2px 10px rgba(0,0,0,.8);
+  letter-spacing: .08em;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, .85), 0 0 10px rgba(0, 0, 0, .55);
   min-height: 1.35em;
   transition: opacity .35s ease;
 }
@@ -1157,23 +1191,62 @@ body.ritual-assets-ready .page2-bg {
 .source { display: none !important; }
 
 @media (max-width: 720px) {
-  .page1-bg {
-    /* 竖版专用封面：完整露出看山脸 + 标题，不再半张脸裁切 */
-    background-image: url("cover-mobile.jpg?v=313");
-    background-position: center center;
-    background-size: cover;
-  }
   .page-cover .scroll-cue {
     margin-bottom: max(8px, env(safe-area-inset-bottom));
   }
   .page2-bg { background-position: 50% 40%; }
-  .tube { width: 176px; height: 280px; margin-bottom: 32px; }
-  .tube-stage { width: 210px; height: 340px; top: 52%; }
   .kanshan-seer-art { filter: none; }
   .audio-toggle,
   .scroll-cue { backdrop-filter: none; }
   .slip-scroll {
-    width: min(256px, 88vw);
+    width: min(244px, 76vw, calc(68dvh * 508 / 994));
+  }
+  .slip-paper {
+    min-height: 0;
+  }
+}
+
+@media (min-width: 900px) and (orientation: landscape) {
+  :root {
+    --tube-w: clamp(180px, 22vh, 220px);
+    --seer-w: clamp(160px, calc(var(--tube-w) * 0.96), 230px);
+  }
+}
+
+@media (max-height: 620px) {
+  :root {
+    --tube-w: clamp(120px, 32vmin, 168px);
+  }
+  .page-ritual {
+    padding-top: 8px;
+    padding-bottom: 10px;
+  }
+  .story-head {
+    margin-top: 4px;
+    min-height: 1.5em;
+    gap: 2px;
+  }
+  .ritual {
+    min-height: clamp(200px, 42dvh, 340px);
+  }
+  .draw-btn {
+    padding: 10px 32px;
+  }
+  .hint { margin-top: 8px; }
+  .ritual-disclaimer { margin-top: 6px; }
+}
+
+@media (max-width: 360px) {
+  .ritual-disclaimer {
+    letter-spacing: 0;
+    font-size: .46rem;
+    padding: 0 4px;
+  }
+  .scroll-cue {
+    letter-spacing: .22em;
+    text-indent: .22em;
+    font-size: .7rem;
+    padding: 8px 14px;
   }
 }
 
@@ -1181,11 +1254,11 @@ body.ritual-assets-ready .page2-bg {
     <script>
       // 只预加载当前设备封面
       (function () {
-        var mobile = window.matchMedia("(max-width: 720px)").matches;
+        var portrait = window.matchMedia("(orientation: portrait)").matches;
         var link = document.createElement("link");
         link.rel = "preload";
         link.as = "image";
-        link.href = mobile ? "cover-mobile.jpg?v=313" : "cover.jpg?v=313";
+        link.href = portrait ? "cover-mobile.jpg?v=397" : "cover.jpg?v=397";
         document.head.appendChild(link);
       })();
     </script>
@@ -1216,11 +1289,11 @@ body.ritual-assets-ready .page2-bg {
           <aside class="kanshan-seer" id="kanshanSeer" aria-hidden="true">
             <img
               class="kanshan-seer-art"
-              src="art/layers/layer-kanshan.png?v=318"
-              data-src="art/layers/layer-kanshan.png?v=318"
+              src="art/layers/layer-kanshan-hold.png?v=372"
+              data-src="art/layers/layer-kanshan-hold.png?v=372"
               alt=""
-              width="649"
-              height="890"
+              width="994"
+              height="1366"
               draggable="false"
               decoding="async"
               fetchpriority="low"
@@ -1252,39 +1325,42 @@ body.ritual-assets-ready .page2-bg {
 
         <div class="slip-scroll" id="fortuneCard" hidden>
           <div class="scroll-glow" aria-hidden="true"></div>
-          <div class="slip-edge left" aria-hidden="true">宿命</div>
-          <div class="slip-edge right" aria-hidden="true">天机</div>
-          <div class="scroll-roll top" aria-hidden="true"></div>
           <div class="scroll-body">
             <div class="scroll-inner">
-              <div class="slip-grade" id="slipGrade"></div>
-              <h2 class="slip-no" id="slipNo"></h2>
-              <p class="slip-motto" id="slipMotto"></p>
-              <div class="gold-line" id="goldLine"></div>
-              <p class="slip-oracle" id="oracleText"></p>
-              <h3 class="slip-title" id="topicTitle"></h3>
-              <p class="slip-summary" id="topicSummary" hidden></p>
-              <div class="slip-meta">热榜第 <span id="rank">?</span> 位</div>
-              <div class="actions">
-                <a class="link-out" id="topicLink" href="#" target="_blank" rel="noopener">上山看原题</a>
-                <button type="button" class="again" id="againBtn">再求一签</button>
+              <div class="slip-paper">
+                <h2 class="slip-no" id="slipNo"></h2>
+                <p class="slip-name" id="topicTitle"></p>
+                <span class="slip-seal" id="slipGrade"></span>
+                <span class="slip-badge" id="verseBadge">签文</span>
+                <p class="slip-verse" id="oracleText"></p>
+                <button type="button" class="slip-unlock" id="unlockBtn">
+                  <span class="slip-unlock-copy" id="unlockCopy">这一签只说到这里，别人的故事或许还有下文。</span>
+                  <span class="slip-unlock-cta">点击查看「<em>内容发现</em>」模块 <i aria-hidden="true">›</i></span>
+                  <span class="slip-unlock-hint">即可解锁你的签</span>
+                </button>
               </div>
-              <div class="stamp" id="stamp">山</div>
+              <div class="slip-actions">
+                <button type="button" class="again" id="againBtn">再来一签</button>
+                <button type="button" class="share-thoughts" id="shareBtn">分享到想法</button>
+                <p class="ritual-disclaimer">本活动为传统文化趣味玩法，内容仅供娱乐参考，不构成任何运势预测或现实指导</p>
+              </div>
             </div>
           </div>
-          <div class="scroll-roll bot" aria-hidden="true"></div>
         </div>
 
-        <div class="ritual-footer">
-          <button type="button" class="draw-btn" id="drawBtn">
-            <span class="btn-glow" aria-hidden="true"></span>
-            <span class="btn-label" id="btnLabel">求签</span>
-          </button>
-          <p class="hint" id="hint">心诚则灵</p>
+        <div class="ritual-bottom">
+          <div class="ritual-footer">
+            <button type="button" class="draw-btn" id="drawBtn">
+              <span class="btn-glow" aria-hidden="true"></span>
+              <span class="btn-label" id="btnLabel">求签</span>
+            </button>
+            <p class="hint" id="hint">点击签筒 · 心诚则灵</p>
+            <p class="ritual-disclaimer">本活动为传统文化趣味玩法，内容仅供娱乐参考，不构成任何运势预测或现实指导</p>
+          </div>
         </div>
       </section>
     </main>
 
-    <script src="boot.js?v=318" defer></script>
+    <script src="boot.js?v=397" defer></script>
   </body>
 </html>

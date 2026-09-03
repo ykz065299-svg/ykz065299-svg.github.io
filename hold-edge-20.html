@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>看山黑边 · 20 版放大</title>
+<style>
+:root { --song: "Songti SC","STSong","SimSun","Noto Serif SC",serif; }
+* { box-sizing: border-box; }
+html, body { margin: 0; background: #12100e; color: #f4eee6; font-family: var(--song); }
+body { padding: 24px 16px 80px; }
+.intro { max-width: 1100px; margin: 0 auto 22px; }
+.intro h1 { margin: 0 0 8px; font-size: 1.5rem; letter-spacing: .12em; }
+.intro p { margin: 0 0 8px; color: #c9b8a4; font-size: 1.05rem; line-height: 1.75; }
+.swatch { display: inline-block; width: 14px; height: 14px; background: #e83078; vertical-align: -2px; margin-right: 4px; }
+.wall { max-width: 1100px; margin: 0 auto; display: grid; gap: 28px; }
+.shot { padding: 16px; border-radius: 14px; background: #1c1815; }
+.shot h2 { margin: 0 0 10px; font-size: 1.25rem; }
+.shot h2 b { margin-right: 10px; }
+.row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+@media (max-width: 720px) { .row { grid-template-columns: 1fr; } }
+.row img { width: 100%; height: auto; image-rendering: pixelated; background: #d6c4a6; border-radius: 8px; }
+.cap { margin: 6px 0 0; font-size: .82rem; color: #9a8570; }
+.body { margin-top: 10px; width: min(240px, 100%); height: auto; background: #d6c4a6; border-radius: 8px; }
+</style>
+</head>
+<body>
+<div class="intro">
+  <h1>看山黑边 · 同一块边放大 8 倍</h1>
+  <p>上一版缩略图看不出。现在每一张切的是头顶同一块，像素放大。左边是处理后的边，右边粉色是相对 01 删掉的像素。<span class="swatch"></span>粉越多，切得越狠。01 是现在求签页。点一个编号。</p>
+  <p>求签页身上还有一圈深色投影（CSS），对照页已经关掉，只看图层本身。</p>
+</div>
+<div class="wall">
+<div class="shot" id="01">
+  <h2><b>01</b>现行 0px</h2>
+  <div class="row">
+    <div>
+      <img src="art/hold-edge20/01-peep.webp?v=371" alt="01 边" />
+      <p class="cap">头顶边缘 ×8</p>
+    </div>
+    <div>
+      <img src="art/hold-edge20/01-diff.webp?v=371" alt="" />
+      <p class="cap">粉色 = 相对 01 去掉的边</p>
+    </div>
+  </div>
+  <img class="body" src="art/hold-edge20/01-plate.webp?v=371" alt="" />
+</div>
+<div class="shot" id="02">
+  <h2><b>02</b>内收 0.4px</h2>
+  <div class="row">
+    <div>
+      <img src="art/hold-edge20/02-peep.webp?v=371" alt="02 边" />
+      <p class="cap">头顶边缘 ×8</p>
+    </div>
+    <div>
+      <img src="art/hold-edge20/02-diff.webp?v=371" alt="" />
+      <p class="cap">粉色 = 相对 01 去掉的边</p>
+    </div>
+  </div>
+  <img class="body" src="art/hold-edge20/02-plate.webp?v=371" alt="" />
+</div>
+<div class="shot" id="03">
+  <h2><b>03</b>内收 0.8px</h2>
+  <div class="row">
+    <div>
+      <img src="art/hold-edge20/03-peep.webp?v=371" alt="03 边" />
+      <p class="cap">头顶边缘 ×8</p>
+    </div>
+    <div>
+      <img src="art/hold-edge20/03-diff.webp?v=371" alt="" />
+      <p class="cap">粉色 = 相对 01 去掉的边</p>
+    </div>
+  </div>
+  <img class="body" src="art/hold-edge20/03-plate.webp?v=371" alt="" />
+</div>
+<div class="shot" id="04">
+  <h2><b>04</b>内收 1.3px</h2>
+  <div class="row">
+    <div>
+      <img src="art/hold-edge20/04-peep.webp?v=371" alt="04 边" />
+      <p class="cap">头顶边缘 ×8</p>
+    </div>
+    <div>
+      <img src="art/hold-edge20/04-diff.webp?v=371" alt="" />
+      <p class="cap">粉色 = 相对 01 去掉的边</p>
+    </div>
+  </div>
+  <img class="body" src="art/hold-edge20/04-plate.webp?v=371" alt="" />
+</div>
+<div class="shot" id="05">
+  <h2><b>05</b>内收 1.7px</h2>
+  <div class="row">
+    <div>
+      <img src="art/hold-edge20/05-peep.webp?v=371" alt="05 边" />
+      <p class="cap">头顶边缘 ×8</p>
+    </div>
+    <div>
+      <img src="art/hold-edge20/05-diff.webp?v=371" alt="" />
+      <p class="cap">粉色 = 相对 01 去掉的边</p>
+    </div>
+  </div>
+  <img class="body" src="art/hold-edge20/05-plate.webp?v=371" alt="" />
+</div>
+<div class="shot" id="06">
+  <h2><b>06</b>内收 2.1px</h2>
+  <div class="row">
+    <div>
+      <img src="art/hold-edge20/06-peep.webp?v=371" alt="06 边" />
+      <p class="cap">头顶边缘 ×8</p>
+    </div>
+    <div>
+      <img src="art/hold-edge20/06-diff.webp?v=371" alt="" />
+      <p class="cap">粉色 = 相对 01 去掉的边</p>
+    </div>
+  </div>
+  <img class="body" src="art/hold-edge20/06-plate.webp?v=371" alt="" />
+</div>
+<div class="shot" id="07">
+  <h2><b>07</b>内收 2.5px</h2>
+  <div class="row">
+    <div>
+      <img src="art/hold-edge20/07-peep.webp?v=371" alt="07 边" />
+      <p class="cap">头顶边缘 ×8</p>
+    </div>
+    <div>
+      <img src="art/hold-edge20/07-diff.webp?v=371" alt="" />
+      <p class="cap">粉色 = 相对 01 去掉的边</p>
+    </div>
+  </div>
+  <img class="body" src="art/hold-edge20/07-plate.webp?v=371" alt="" />
+</div>
+<div class="shot" id="08">
+  <h2><b>08</b>内收 2.9px</h2>
+  <div class="row">
+    <div>
+      <img src="art/hold-edge20/08-peep.webp?v=371" alt="08 边" />
+      <p class="cap">头顶边缘 ×8</p>
+    </div>
+    <div>
+      <img src="art/hold-edge20/08-diff.webp?v=371" alt="" />
+      <p class="cap">粉色 = 相对 01 去掉的边</p>
+    </div>
+  </div>
+  <img class="body" src="art/hold-edge20/08-plate.webp?v=371" alt="" />
+</div>
+<div class="shot" id="09">
+  <h2><b>09</b>内收 3.4px</h2>
+  <div class="row">
+    <div>
+      <img src="art/hold-edge20/09-peep.webp?v=371" alt="09 边" />
+      <p class="cap">头顶边缘 ×8</p>
+    </div>
+    <div>
+      <img src="art/hold-edge20/09-diff.webp?v=371" alt="" />
+      <p class="cap">粉色 = 相对 01 去掉的边</p>
+    </div>
+  </div>
+  <img class="body" src="art/hold-edge20/09-plate.webp?v=371" alt="" />
+</div>
+<div class="shot" id="10">
+  <h2><b>10</b>内收 3.8px</h2>
+  <div class="row">
+    <div>
+      <img src="art/hold-edge20/10-peep.webp?v=371" alt="10 边" />
+      <p class="cap">头顶边缘 ×8</p>
+    </div>
+    <div>
+      <img src="art/hold-edge20/10-diff.webp?v=371" alt="" />
+      <p class="cap">粉色 = 相对 01 去掉的边</p>
+    </div>
+  </div>
+  <img class="body" src="art/hold-edge20/10-plate.webp?v=371" alt="" />
+</div>
+<div class="shot" id="11">
+  <h2><b>11</b>内收 4.2px</h2>
+  <div class="row">
+    <div>
+      <img src="art/hold-edge20/11-peep.webp?v=371" alt="11 边" />
+      <p class="cap">头顶边缘 ×8</p>
+    </div>
+    <div>
+      <img src="art/hold-edge20/11-diff.webp?v=371" alt="" />
+      <p class="cap">粉色 = 相对 01 去掉的边</p>
+    </div>
+  </div>
+  <img class="body" src="art/hold-edge20/11-plate.webp?v=371" alt="" />
+</div>
+<div class="shot" id="12">
+  <h2><b>12</b>内收 4.6px</h2>
+  <div class="row">
+    <div>
+      <img src="art/hold-edge20/12-peep.webp?v=371" alt="12 边" />
+      <p class="cap">头顶边缘 ×8</p>
+    </div>
+    <div>
+      <img src="art/hold-edge20/12-diff.webp?v=371" alt="" />
+      <p class="cap">粉色 = 相对 01 去掉的边</p>
+    </div>
+  </div>
+  <img class="body" src="art/hold-edge20/12-plate.webp?v=371" alt="" />
+</div>
+<div class="shot" id="13">
+  <h2><b>13</b>内收 5.0px</h2>
+  <div class="row">
+    <div>
+      <img src="art/hold-edge20/13-peep.webp?v=371" alt="13 边" />
+      <p class="cap">头顶边缘 ×8</p>
+    </div>
+    <div>
+      <img src="art/hold-edge20/13-diff.webp?v=371" alt="" />
+      <p class="cap">粉色 = 相对 01 去掉的边</p>
+    </div>
+  </div>
+  <img class="body" src="art/hold-edge20/13-plate.webp?v=371" alt="" />
+</div>
+<div class="shot" id="14">
+  <h2><b>14</b>内收 5.5px</h2>
+  <div class="row">
+    <div>
+      <img src="art/hold-edge20/14-peep.webp?v=371" alt="14 边" />
+      <p class="cap">头顶边缘 ×8</p>
+    </div>
+    <div>
+      <img src="art/hold-edge20/14-diff.webp?v=371" alt="" />
+      <p class="cap">粉色 = 相对 01 去掉的边</p>
+    </div>
+  </div>
+  <img class="body" src="art/hold-edge20/14-plate.webp?v=371" alt="" />
+</div>
+<div class="shot" id="15">
+  <h2><b>15</b>内收 5.9px</h2>
+  <div class="row">
+    <div>
+      <img src="art/hold-edge20/15-peep.webp?v=371" alt="15 边" />
+      <p class="cap">头顶边缘 ×8</p>
+    </div>
+    <div>
+      <img src="art/hold-edge20/15-diff.webp?v=371" alt="" />
+      <p class="cap">粉色 = 相对 01 去掉的边</p>
+    </div>
+  </div>
+  <img class="body" src="art/hold-edge20/15-plate.webp?v=371" alt="" />
+</div>
+<div class="shot" id="16">
+  <h2><b>16</b>内收 6.3px</h2>
+  <div class="row">
+    <div>
+      <img src="art/hold-edge20/16-peep.webp?v=371" alt="16 边" />
+      <p class="cap">头顶边缘 ×8</p>
+    </div>
+    <div>
+      <img src="art/hold-edge20/16-diff.webp?v=371" alt="" />
+      <p class="cap">粉色 = 相对 01 去掉的边</p>
+    </div>
+  </div>
+  <img class="body" src="art/hold-edge20/16-plate.webp?v=371" alt="" />
+</div>
+<div class="shot" id="17">
+  <h2><b>17</b>内收 6.7px</h2>
+  <div class="row">
+    <div>
+      <img src="art/hold-edge20/17-peep.webp?v=371" alt="17 边" />
+      <p class="cap">头顶边缘 ×8</p>
+    </div>
+    <div>
+      <img src="art/hold-edge20/17-diff.webp?v=371" alt="" />
+      <p class="cap">粉色 = 相对 01 去掉的边</p>
+    </div>
+  </div>
+  <img class="body" src="art/hold-edge20/17-plate.webp?v=371" alt="" />
+</div>
+<div class="shot" id="18">
+  <h2><b>18</b>内收 7.1px</h2>
+  <div class="row">
+    <div>
+      <img src="art/hold-edge20/18-peep.webp?v=371" alt="18 边" />
+      <p class="cap">头顶边缘 ×8</p>
+    </div>
+    <div>
+      <img src="art/hold-edge20/18-diff.webp?v=371" alt="" />
+      <p class="cap">粉色 = 相对 01 去掉的边</p>
+    </div>
+  </div>
+  <img class="body" src="art/hold-edge20/18-plate.webp?v=371" alt="" />
+</div>
+<div class="shot" id="19">
+  <h2><b>19</b>内收 7.6px</h2>
+  <div class="row">
+    <div>
+      <img src="art/hold-edge20/19-peep.webp?v=371" alt="19 边" />
+      <p class="cap">头顶边缘 ×8</p>
+    </div>
+    <div>
+      <img src="art/hold-edge20/19-diff.webp?v=371" alt="" />
+      <p class="cap">粉色 = 相对 01 去掉的边</p>
+    </div>
+  </div>
+  <img class="body" src="art/hold-edge20/19-plate.webp?v=371" alt="" />
+</div>
+<div class="shot" id="20">
+  <h2><b>20</b>内收 8.0px</h2>
+  <div class="row">
+    <div>
+      <img src="art/hold-edge20/20-peep.webp?v=371" alt="20 边" />
+      <p class="cap">头顶边缘 ×8</p>
+    </div>
+    <div>
+      <img src="art/hold-edge20/20-diff.webp?v=371" alt="" />
+      <p class="cap">粉色 = 相对 01 去掉的边</p>
+    </div>
+  </div>
+  <img class="body" src="art/hold-edge20/20-plate.webp?v=371" alt="" />
+</div>
+</div></body></html>

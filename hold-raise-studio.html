@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>举签对照 · 看山今日一签</title>
+<style>
+:root { --song: "Songti SC","STSong","SimSun","Noto Serif SC",serif; }
+* { box-sizing: border-box; }
+html, body { margin: 0; min-height: 100%; font-family: var(--song); color: #f4eee6; background: #12100e; }
+body { padding: 24px 16px 80px; }
+.intro { max-width: 1200px; margin: 0 auto 28px; }
+.intro h1 { margin: 0 0 8px; font-size: 1.65rem; letter-spacing: .14em; }
+.intro p { margin: 0; color: #c9b8a4; font-size: 1.05rem; line-height: 1.75; }
+.wall { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1fr; gap: 36px; }
+@media (min-width: 980px) {
+  .wall { grid-template-columns: 1fr 1fr; }
+}
+.shot { display: flex; flex-direction: column; gap: 12px; padding: 18px; border-radius: 16px; background: #1c1815; }
+.shot.ref { outline: 3px solid #c9a24a; }
+.shot h2 { margin: 0; font-size: 1.3rem; letter-spacing: .1em; }
+.shot h2 b { margin-right: 10px; font-size: 1.5rem; }
+.shot .note { margin: 0; font-size: 1rem; color: #b7a28c; line-height: 1.6; }
+.board { background: #000; border-radius: 12px; overflow: hidden; }
+.board img { display: block; width: 100%; height: auto; cursor: zoom-in; }
+.hand { display: block; width: 100%; height: auto; border-radius: 12px; cursor: zoom-in; background: #000; }
+.lbl { margin: 4px 0 0; font-size: .85rem; color: #9a8570; letter-spacing: .08em; }
+#lightbox { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.92); z-index: 9; align-items: center; justify-content: center; padding: 16px; cursor: zoom-out; }
+#lightbox.on { display: flex; }
+#lightbox img { max-width: min(98vw, 1400px); max-height: 96vh; object-fit: contain; }
+</style>
+</head>
+<body>
+<div class="intro">
+  <h1>举签对照 · 道士姿势</h1>
+  <p>图已经放大。上排全身，下排是举签的手；点图还能再放大。原图是备份里那只高举手，甲到辛是白绒红围巾。看清后回一个编号。</p>
+</div>
+<div class="wall">
+<div class="shot ref" id="原">
+  <h2><b>原</b>道士备份</h2>
+  <p class="note">蓝袍八卦那版：一只爪高举两根发光金签，另一只手前伸。只作姿势参考。</p>
+  <div class="board">
+    <img src="art/hold-raise/原-plate.webp?v=364" alt="原 全身" />
+  </div>
+  <p class="lbl">举签的手</p>
+  <img class="hand" src="art/hold-raise/原-z.webp?v=364" alt="原 手" />
+</div>
+<div class="shot" id="甲">
+  <h2><b>甲</b>斜举一支</h2>
+  <p class="note">3/4 朝左，远侧臂斜上举，三瓣爪握住一支长金签</p>
+  <div class="board">
+    <img src="art/hold-raise/甲-plate.webp?v=364" alt="甲 全身" />
+  </div>
+  <p class="lbl">举签的手</p>
+  <img class="hand" src="art/hold-raise/甲-z.webp?v=364" alt="甲 手" />
+</div>
+<div class="shot" id="乙">
+  <h2><b>乙</b>举得更高</h2>
+  <p class="note">手臂举过耳际，金签更长，爪从前面包住签</p>
+  <div class="board">
+    <img src="art/hold-raise/乙-plate.webp?v=364" alt="乙 全身" />
+  </div>
+  <p class="lbl">举签的手</p>
+  <img class="hand" src="art/hold-raise/乙-z.webp?v=364" alt="乙 手" />
+</div>
+<div class="shot" id="丙">
+  <h2><b>丙</b>签自带光</h2>
+  <p class="note">握一支微光金签，爪瓣从前绕过去</p>
+  <div class="board">
+    <img src="art/hold-raise/丙-plate.webp?v=364" alt="丙 全身" />
+  </div>
+  <p class="lbl">举签的手</p>
+  <img class="hand" src="art/hold-raise/丙-z.webp?v=364" alt="丙 手" />
+</div>
+<div class="shot" id="丁">
+  <h2><b>丁</b>朝右举签</h2>
+  <p class="note">身子朝右，近侧臂上举，爪捏一支金签</p>
+  <div class="board">
+    <img src="art/hold-raise/丁-plate.webp?v=364" alt="丁 全身" />
+  </div>
+  <p class="lbl">举签的手</p>
+  <img class="hand" src="art/hold-raise/丁-z.webp?v=364" alt="丁 手" />
+</div>
+<div class="shot" id="戊">
+  <h2><b>戊</b>斜举长签</h2>
+  <p class="note">远侧臂斜举，三瓣明确绕住一支空白金签</p>
+  <div class="board">
+    <img src="art/hold-raise/戊-plate.webp?v=364" alt="戊 全身" />
+  </div>
+  <p class="lbl">举签的手</p>
+  <img class="hand" src="art/hold-raise/戊-z.webp?v=364" alt="戊 手" />
+</div>
+<div class="shot" id="己">
+  <h2><b>己</b>双签 + 前伸</h2>
+  <p class="note">最近道士：高举两根签，另一只爪在胸前张开</p>
+  <div class="board">
+    <img src="art/hold-raise/己-plate.webp?v=364" alt="己 全身" />
+  </div>
+  <p class="lbl">举签的手</p>
+  <img class="hand" src="art/hold-raise/己-z.webp?v=364" alt="己 手" />
+</div>
+<div class="shot" id="庚">
+  <h2><b>庚</b>双签高举</h2>
+  <p class="note">手臂几乎举直，两根金签，另一只手前伸</p>
+  <div class="board">
+    <img src="art/hold-raise/庚-plate.webp?v=364" alt="庚 全身" />
+  </div>
+  <p class="lbl">举签的手</p>
+  <img class="hand" src="art/hold-raise/庚-z.webp?v=364" alt="庚 手" />
+</div>
+<div class="shot" id="辛">
+  <h2><b>辛</b>单签 + 开掌</h2>
+  <p class="note">高举一支长金签，另一只臂侧伸开掌</p>
+  <div class="board">
+    <img src="art/hold-raise/辛-plate.webp?v=364" alt="辛 全身" />
+  </div>
+  <p class="lbl">举签的手</p>
+  <img class="hand" src="art/hold-raise/辛-z.webp?v=364" alt="辛 手" />
+</div>
+</div>
+<div id="lightbox"><img alt="" /></div>
+<script>
+const box = document.getElementById("lightbox");
+const big = box.querySelector("img");
+document.querySelectorAll(".board img, .hand").forEach((img) => {
+  img.addEventListener("click", () => { big.src = img.src; box.classList.add("on"); });
+});
+box.addEventListener("click", () => box.classList.remove("on"));
+</script>
+</body></html>

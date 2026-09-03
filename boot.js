@@ -344,6 +344,8 @@ const slipNo = document.getElementById("slipNo");
 const slipMotto = document.getElementById("slipMotto");
 const rankEl = document.getElementById("rank");
 const oracleText = document.getElementById("oracleText");
+const unlockCopy = document.getElementById("unlockCopy");
+const UNLOCK_FALLBACK = "这一签只说到这里，别人的故事或许还有下文。";
 const topicTitle = document.getElementById("topicTitle");
 const topicSummary = document.getElementById("topicSummary");
 const topicLink = document.getElementById("topicLink");
@@ -353,6 +355,7 @@ const scrollCue = document.getElementById("scrollCue");
 const fortuneCard = document.getElementById("fortuneCard");
 const tubeStage = document.getElementById("tubeStage");
 const shareBtn = document.getElementById("shareBtn");
+const unlockBtn = document.getElementById("unlockBtn");
 const shareOverlay = document.getElementById("shareOverlay");
 const shareCard = document.getElementById("shareCard");
 const shareOracle = document.getElementById("shareOracle");
@@ -483,15 +486,15 @@ function setBusy(on) {
 
 function fadeText(el, text) {
   if (!el) return;
-  el.style.opacity = "0";
-  requestAnimationFrame(() => {
-    el.textContent = text || "";
-    el.style.opacity = "1";
-  });
+  const next = text || "";
+  if (el.textContent !== next) el.textContent = next;
+  el.style.opacity = "";
 }
 
 function setHint(text) {
-  fadeText(hint, text);
+  if (!hint) return;
+  hint.textContent = text || "";
+  hint.style.opacity = text ? "1" : "0";
 }
 
 function setPhase(name) {
@@ -506,34 +509,18 @@ function setPhase(name) {
     待命: "看山展卷",
   };
 
-  if (ACT_NAMES.has(name)) {
-    if (phaseText) {
-      phaseText.textContent = "";
-      phaseText.style.opacity = "0";
-    }
-    if (storyLine) storyLine.style.opacity = "0";
-    if (hint) {
-      hint.textContent = "";
-      hint.style.opacity = "0";
-    }
-    if (btnLabel) btnLabel.textContent = "求签";
-    if (tubeLabel) tubeLabel.textContent = "百签同栖 · 一签认主";
-    if (seerCaption) seerCaption.textContent = seerMap[name] || "看山候你";
-    return;
+  if (phaseText) {
+    phaseText.textContent = meta.phase;
+    phaseText.style.opacity = "";
   }
-
-  fadeText(phaseText, meta.phase);
   if (storyLine) {
-    if (meta.line) fadeText(storyLine, meta.line);
-    else storyLine.style.opacity = "0";
+    storyLine.textContent = meta.line || "";
+    storyLine.style.opacity = meta.line ? "" : "0";
   }
-  if (btnLabel) btnLabel.textContent = meta.btn;
-  if (meta.hint) {
-    if (hint) hint.style.opacity = "1";
-    setHint(meta.hint);
-  } else if (hint) {
-    hint.textContent = "";
-    hint.style.opacity = "0";
+  if (btnLabel) btnLabel.textContent = meta.btn || "求签";
+  if (hint) {
+    hint.textContent = meta.hint || "";
+    hint.style.opacity = meta.hint ? "1" : "0";
   }
   if ((name === "idle" || name === "摇签") && tubeLabel) {
     tubeLabel.textContent = "百签同栖 · 一签认主";
@@ -542,15 +529,13 @@ function setPhase(name) {
 }
 
 function settleDoneCopy(data) {
-  fadeText(phaseText, `${data.slip?.label || ""} · ${data.slip?.grade || ""}`);
+  const s = data?.slip || {};
+  if (phaseText) phaseText.textContent = s.name || s.label || "一签已定";
   if (storyLine) {
     storyLine.style.opacity = "1";
-    fadeText(storyLine, "此签即今日山顶热议");
+    storyLine.textContent = s.label || "";
   }
-  if (hint) {
-    hint.style.opacity = "1";
-    fadeText(hint, "一签已定 · 可再求");
-  }
+  if (hint) hint.style.opacity = "0";
   if (btnLabel) btnLabel.textContent = "求签";
   if (seerCaption) seerCaption.textContent = "看山已决";
   if (tubeLabel) tubeLabel.textContent = "一签认主";
@@ -586,128 +571,20 @@ function aiSearchUrl(title) {
   return `https://zhida.zhihu.com/search?q=${encodeURIComponent(q)}`;
 }
 
-function clearSlip() {
-  slipGrade.textContent = "";
-  slipGrade.className = "slip-grade";
-  slipNo.textContent = "";
-  slipMotto.textContent = "";
-  rankEl.textContent = "?";
-  oracleText.textContent = "";
-  topicTitle.textContent = "";
-  topicSummary.textContent = "";
-  topicSummary.hidden = true;
-  topicLink.href = "#";
-  lastDraw = null;
-  if (fortuneCard) {
-    fortuneCard.style.removeProperty("--slip-h");
-    fortuneCard.classList.remove("fit", "measuring", "preglow");
+function splitVerse(raw) {
+  const s = String(raw || "").trim();
+  if (!s) return [];
+  const cut = s.search(/[，,]/);
+  if (cut >= 0) {
+    const left = s.slice(0, cut + 1).trim();
+    const right = s.slice(cut + 1).trim();
+    return [left, right].filter(Boolean);
   }
+  return [s];
 }
 
-function fillSlip(data) {
-  const item = data.item || {};
-  const s = data.slip || {};
-  slipNo.textContent = s.label || `第${data.rank}签`;
-  slipGrade.textContent = s.grade || "中平签";
-  slipGrade.className = "slip-grade " + (s.grade_key || "plain");
-  slipMotto.textContent = s.motto || "";
-  rankEl.textContent = String(data.rank ?? "?");
-  oracleText.textContent = data.oracle || "";
-  topicTitle.textContent = item.title || "（无名之签）";
-  const sum = cleanMediaPlaceholder(item.summary || "");
-  if (sum) {
-    topicSummary.hidden = false;
-    topicSummary.textContent = sum.length > 200 ? sum.slice(0, 200) + "…" : sum;
-  } else {
-    topicSummary.textContent = "";
-    topicSummary.hidden = true;
-  }
-  const ai = item.ai_url || aiSearchUrl(item.title);
-  topicLink.href = ai;
-  topicLink.dataset.topicUrl = item.url || "";
-  lastDraw = data;
-}
-
-function prepareSlipSize() {
-  if (!fortuneCard) return 420;
-
-  const body = fortuneCard.querySelector(".scroll-body");
-  const inner = fortuneCard.querySelector(".scroll-inner");
-  const rollH = 24;
-
-  fortuneCard.hidden = false;
-  fortuneCard.classList.remove("visible", "glowing", "revealed", "fit");
-  fortuneCard.classList.add("measuring");
-  fortuneCard.style.height = "auto";
-  if (body) body.style.overflow = "visible";
-
-  void fortuneCard.offsetHeight;
-  const contentH = inner ? inner.scrollHeight : 360;
-  const natural = contentH + rollH + 4;
-
-  const vh = window.innerHeight || 700;
-  const minH = Math.round(Math.max(260, vh * 0.34));
-  const maxH = Math.round(Math.min(620, vh * 0.74));
-  let target = Math.round(natural + 6);
-  const fits = target <= maxH;
-  target = Math.max(minH, Math.min(maxH, target));
-
-  fortuneCard.style.setProperty("--slip-h", `${target}px`);
-  fortuneCard.style.height = `${target}px`;
-  fortuneCard.classList.toggle("fit", fits);
-  if (body) body.style.overflow = "";
-
-  fortuneCard.classList.remove("measuring");
-  fortuneCard.hidden = true;
-
-  return target;
-}
-
-async function localDrawFallback() {
-  let items = [];
-  let source = "static-seed";
-  for (const [path, tag] of [
-    ["data/hot-cache.json", "hot-cache"],
-    ["data/hot-seed.json", "static-seed"],
-  ]) {
-    try {
-      const r = await fetch(path, { cache: "no-store" });
-      if (!r.ok) continue;
-      const payload = await r.json();
-      const list =
-        payload.Items ||
-        payload.items ||
-        payload.Data?.Items ||
-        [];
-      if (list.length) {
-        items = list;
-        source = tag;
-        break;
-      }
-    } catch (_) {}
-  }
-  if (!items.length) throw new Error("签库为空");
-  const pick = items[Math.floor(Math.random() * items.length)];
-  const title = pick.Title || pick.title || "";
-  const url = pick.Url || pick.url || "https://www.zhihu.com/hot";
-  const summary = cleanMediaPlaceholder(pick.Summary || pick.summary || "");
-  const rank = Math.max(1, items.indexOf(pick) + 1);
-  const slipNo = 1 + Math.floor(Math.random() * 100);
-  const grades = [
-    { label: "上上签", key: "supreme", motto: "天时正盛，宜顺势探问" },
-    { label: "上签", key: "great", motto: "机缘已现，宜深入一读" },
-    { label: "中平签", key: "plain", motto: "不疾不徐，宜辨其真伪" },
-    { label: "玄机签", key: "odd", motto: "看似冷门，或藏异答" },
-  ];
-  const g = grades[Math.floor(Math.random() * grades.length)];
-  const oracles = [
-    "筒中落下的，是此刻山顶最响的一声问——热榜即今日山门题。",
-    "此签不讲命运，只讲今日：热榜之上，风正从这里过。",
-    "签意已定：此题搅动山顶风云，宜深读，忌人云亦云。",
-    "看山有言：热闹处未必见真章，却最见人心。",
-    "山门已开：莫急着站队，先把原题读完。",
-    "一签认主。点开链接上山，便是你与今日的相遇。",
-  ];
+function slipFromPool(pick, total) {
+  const id = Number(pick.id || 1);
   const digits = "零一二三四五六七八九";
   const toCn = (n) => {
     if (n <= 0) return "零";
@@ -720,22 +597,86 @@ async function localDrawFallback() {
     }
     return String(n);
   };
+  const grade = pick.type || "从容签";
+  const keys = { 从容签: "calm", 自在签: "free", 清欢签: "joy" };
+  const name = pick.name || "";
   return {
     ok: true,
-    oracle: oracles[Math.floor(Math.random() * oracles.length)],
-    rank,
-    total: items.length,
+    oracle: pick.verse || "",
+    rank: id,
+    total,
     slip: {
-      no: slipNo,
-      no_cn: toCn(slipNo),
-      label: `第${toCn(slipNo)}签`,
-      grade: g.label,
-      grade_key: g.key,
-      motto: g.motto,
+      no: id,
+      no_cn: toCn(id),
+      label: `第${toCn(id)}签`,
+      name,
+      grade,
+      grade_key: keys[grade] || "calm",
+      aspect: pick.aspect || "",
+      meaning: pick.meaning || "",
+      question: pick.question || "",
     },
-    item: { title, url, ai_url: aiSearchUrl(title), summary },
-    source,
+    item: { title: name },
+    source: "slips",
   };
+}
+
+function clearSlip() {
+  if (slipGrade) {
+    slipGrade.textContent = "";
+    slipGrade.className = "slip-seal";
+  }
+  if (slipNo) slipNo.textContent = "";
+  if (oracleText) oracleText.replaceChildren();
+  if (topicTitle) topicTitle.textContent = "";
+  if (unlockCopy) unlockCopy.textContent = UNLOCK_FALLBACK;
+  lastDraw = null;
+  if (fortuneCard) {
+    fortuneCard.style.removeProperty("--slip-h");
+    fortuneCard.classList.remove("fit", "measuring", "preglow");
+  }
+}
+
+function fillSlip(data) {
+  const s = data.slip || {};
+  if (slipNo) slipNo.textContent = s.label || `第${data.rank}签`;
+  if (slipGrade) {
+    slipGrade.textContent = s.grade || "从容签";
+    slipGrade.className = "slip-seal " + (s.grade_key || "calm");
+  }
+  if (topicTitle) topicTitle.textContent = s.name || data.item?.title || "";
+  if (oracleText) {
+    oracleText.replaceChildren();
+    splitVerse(data.oracle || "").forEach((line) => {
+      const span = document.createElement("span");
+      span.textContent = line;
+      oracleText.appendChild(span);
+    });
+  }
+  if (unlockCopy) unlockCopy.textContent = s.question || UNLOCK_FALLBACK;
+  lastDraw = data;
+}
+
+function prepareSlipSize() {
+  if (!fortuneCard) return 380;
+  fortuneCard.hidden = false;
+  fortuneCard.classList.remove("visible", "glowing", "revealed", "preglow");
+  fortuneCard.classList.add("measuring", "fit");
+  fortuneCard.style.height = "auto";
+  void fortuneCard.offsetHeight;
+  const h = Math.ceil(fortuneCard.getBoundingClientRect().height);
+  fortuneCard.classList.remove("measuring");
+  fortuneCard.hidden = true;
+  return Math.max(280, h);
+}
+
+async function localDrawFallback() {
+  const r = await fetch("data/slips.json", { cache: "no-store" });
+  if (!r.ok) throw new Error("签库为空");
+  const list = await r.json();
+  if (!Array.isArray(list) || !list.length) throw new Error("签库为空");
+  const pick = list[Math.floor(Math.random() * list.length)];
+  return slipFromPool(pick, list.length);
 }
 
 async function fetchDraw() {
@@ -825,16 +766,30 @@ topicLink?.addEventListener("click", () => {
   });
 });
 
-function openShareSheet() {
-  if (!lastDraw || !shareOverlay) return;
-  const item = lastDraw.item || {};
+async function shareToThoughts() {
+  if (!lastDraw) return;
   const s = lastDraw.slip || {};
-  if (shareOracle) shareOracle.textContent = lastDraw.oracle || "心诚则灵";
-  if (shareTitle) shareTitle.textContent = item.title || "看山今日一签";
-  if (shareGrade) shareGrade.textContent = s.grade || "中平签";
-  shareOverlay.hidden = false;
-  document.body.classList.add("share-open");
-  window.KanshanTrack?.track?.("share_open", { kind: "card" });
+  const verse = String(lastDraw.oracle || "");
+  const text = `${s.label || ""}  ${s.name || ""}\n${verse}\n——看山今日一签`;
+  window.KanshanTrack?.track?.("share_open", { kind: "thoughts" });
+  if (navigator.share) {
+    try {
+      await navigator.share({ title: s.name || "看山今日一签", text });
+      return;
+    } catch (err) {
+      if (err?.name === "AbortError") return;
+    }
+  }
+  try {
+    await navigator.clipboard.writeText(text);
+    setHint("签文已复制，可粘贴到想法");
+  } catch (_) {
+    setHint("分享未完成，可先截图留存");
+  }
+}
+
+function openShareSheet() {
+  shareToThoughts();
 }
 
 function closeShareSheet() {
@@ -1022,6 +977,9 @@ async function shareToPin() {
 }
 
 shareBtn?.addEventListener("click", openShareSheet);
+unlockBtn?.addEventListener("click", () => {
+  setHint("内容发现即将接入");
+});
 shareCloseBtn?.addEventListener("click", closeShareSheet);
 shareOverlay?.addEventListener("click", (e) => {
   if (e.target === shareOverlay) closeShareSheet();
@@ -1036,9 +994,32 @@ sharePinBtn?.addEventListener("click", () => {
 setAudioUi();
 resetIdleCopy();
 
+(async function previewNamedSlip() {
+  const id = Number(new URLSearchParams(location.search).get("slip") || 0);
+  if (!Number.isFinite(id) || id < 1) return;
+  try {
+    const list = await (await fetch("data/slips.json", { cache: "no-store" })).json();
+    const pick = list.find((s) => Number(s.id) === id);
+    if (!pick) return;
+    const data = slipFromPool(pick, list.length);
+    ensureRitualAssets();
+    document.body.classList.add("ritual-visible");
+    document.getElementById("pageCover")?.setAttribute("hidden", "");
+    pageRitual?.classList.add("has-slip");
+    fillSlip(data);
+    if (fortuneCard) {
+      fortuneCard.hidden = false;
+      fortuneCard.classList.add("visible", "revealed", "fit");
+    }
+    settleDoneCopy(data);
+    window.scrollTo(0, 0);
+    pageRitual?.scrollIntoView({ block: "start" });
+  } catch (_) {}
+})();
+
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("sw.js?v=318").catch(() => {});
+    navigator.serviceWorker.register("sw.js?v=397").catch(() => {});
   });
 }
 
@@ -1063,8 +1044,8 @@ if ("serviceWorker" in navigator) {
   const MOBILE =
     typeof window.matchMedia === "function" &&
     window.matchMedia("(max-width: 720px)").matches;
-  const PEAK_AMP_Y = MOBILE ? 3.4 : 4.8;
-  const PEAK_AMP_S = MOBILE ? 0.034 : 0.048;
+  const PEAK_AMP_Y = MOBILE ? 2.4 : 3.2;
+  const PEAK_AMP_S = MOBILE ? 0.018 : 0.024;
   const SEER_PEAK_WIDTH = 0.26;
   const SEER_REACT_S = 0.06;
   const LERP_TUBE = 0.42;
@@ -1140,7 +1121,7 @@ if ("serviceWorker" in navigator) {
     const amp = Math.min(1, peakAmp * 0.95 + tubeAmp * 0.12);
     const targetScale = 1 + amp * PEAK_AMP_S;
     const targetTy = -amp * PEAK_AMP_Y;
-    const targetRot = smoothTube.rot * 0.28;
+    const targetRot = smoothTube.rot * 0.16;
     const snap = amp < 0.08 ? 0.5 : LERP_SEER;
     smoothSeer.y = lerp(smoothSeer.y, targetTy, snap);
     smoothSeer.scale = lerp(smoothSeer.scale, targetScale, snap);
@@ -1195,17 +1176,15 @@ if ("serviceWorker" in navigator) {
 
   function flashActNow(word) {
     if (!actFlash || !word) return;
-    clearTimeout(flashActNow._delay);
     clearTimeout(flashActNow._t);
-    flashActNow._delay = setTimeout(() => {
-      actFlash.textContent = word;
-      actFlash.classList.remove("show");
-      void actFlash.offsetWidth;
+    actFlash.textContent = word;
+    actFlash.classList.remove("show");
+    requestAnimationFrame(() => {
       actFlash.classList.add("show");
-      flashActNow._t = setTimeout(() => {
-        actFlash.classList.remove("show");
-      }, 1350);
-    }, 200);
+    });
+    flashActNow._t = setTimeout(() => {
+      actFlash.classList.remove("show");
+    }, 900);
   }
 
   function settleTube(ms = 520) {
@@ -1375,7 +1354,6 @@ if ("serviceWorker" in navigator) {
       actFlash.textContent = "";
     }
     clearTimeout(flashActNow._t);
-    clearTimeout(flashActNow._delay);
     tubeStage.classList.remove("leaving");
     tubeStage.style.removeProperty("transform");
     tubeStage.style.removeProperty("transition");
@@ -1458,8 +1436,8 @@ if ("serviceWorker" in navigator) {
     // 3) 签筒淡出，签面自签芽形态展开（交叉叠化）
     if (opts.height) {
       fortuneCard.style.setProperty("--slip-h", `${opts.height}px`);
-      fortuneCard.style.height = `${opts.height}px`;
     }
+    fortuneCard.style.height = "auto";
     fortuneCard.hidden = false;
     fortuneCard.style.willChange = "transform, opacity";
     pageRitual?.classList.add("has-slip");
@@ -1467,10 +1445,10 @@ if ("serviceWorker" in navigator) {
 
     tubeStage.classList.add("leaving");
     fortuneCard.classList.add("visible");
-    await wait(160);
+    await wait(120);
     emerging.classList.add("fade-out");
 
-    await wait(520);
+    await wait(280);
     emerging.classList.remove("show", "fade-out");
     emerging.hidden = true;
     setSeer(null);
@@ -1479,17 +1457,9 @@ if ("serviceWorker" in navigator) {
       kanshanSeer.style.transition = "";
     }
 
-    // 4) 展卷中段先冒金光，再落签名/签语（金光在字前）
-    const h = opts.height || 420;
-    const expandMs = Math.round(780 + Math.min(320, (h - 280) * 0.48));
-    await wait(Math.max(240, expandMs - 420));
-    fortuneCard.classList.add("preglow", "glowing");
-    pageRitual?.classList.add("gold-burst");
-    await wait(520);
     fortuneCard.classList.add("revealed");
     pageRitual?.classList.remove("gold-burst");
-    await wait(Math.max(360, expandMs * 0.36));
-    fortuneCard.classList.remove("preglow");
+    await wait(280);
     fortuneCard.style.willChange = "auto";
     await Promise.resolve(bellP).catch(() => {});
   }

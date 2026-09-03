@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>封面高清 · 03 再升清 · 看山今日一签</title>
+<style>
+:root { --song: "Songti SC","STSong","SimSun","Noto Serif SC",serif; }
+* { box-sizing: border-box; }
+html, body { margin: 0; min-height: 100%; font-family: var(--song); color: #f4eee6; background: #12100e; }
+body { padding: 24px 16px 80px; }
+.intro { max-width: 1200px; margin: 0 auto 28px; }
+.intro h1 { margin: 0 0 8px; font-size: 1.55rem; letter-spacing: .14em; }
+.intro p { margin: 0 0 8px; color: #c9b8a4; font-size: 1.05rem; line-height: 1.75; }
+.wall { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1fr; gap: 22px; }
+@media (min-width: 900px) { .wall { grid-template-columns: 1fr 1fr; } }
+.shot { display: flex; flex-direction: column; gap: 8px; padding: 14px; border-radius: 16px; background: #1c1815; }
+.shot.pick { outline: 1px solid #c4a574; }
+.shot h2 { margin: 0; font-size: 1.2rem; letter-spacing: .06em; }
+.shot h2 b { margin-right: 8px; font-size: 1.4rem; }
+.shot .note { margin: 0; font-size: .92rem; color: #b7a28c; line-height: 1.5; }
+.pair { display: grid; grid-template-columns: 1.4fr .8fr; gap: 8px; }
+@media (max-width: 640px) { .pair { grid-template-columns: 1fr; } }
+.board { background: #000; border-radius: 12px; overflow: hidden; }
+.board img { display: block; width: 100%; height: auto; cursor: zoom-in; }
+#lightbox { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.92); z-index: 9; align-items: center; justify-content: center; padding: 16px; cursor: zoom-out; }
+#lightbox.on { display: flex; }
+#lightbox img { max-width: min(98vw, 1400px); max-height: 96vh; object-fit: contain; }
+</style>
+</head>
+<body>
+<div class="intro">
+  <h1>03 再升清 · 三档</h1>
+  <p>还没换主封面。构图、看山、清欢签都没重画，只把你选的 03 再做清楚。点图可放大。回 甲 / 乙 / 丙。</p>
+  <p>下面仍留着原来的 01–06，方便对照。</p>
+</div>
+<div class="wall">
+  <div class="shot" id="03">
+    <h2><b>03</b>原先那版</h2>
+    <p class="note">你选的：OpenCV 放大 + 中锐。截图放大会发糊。</p>
+    <div class="pair">
+      <div class="board"><img src="art/cover-hd6/03.jpg?v=394" alt="03 全图" /></div>
+      <div class="board"><img src="art/cover-hd6/03-stick.jpg?v=394" alt="03 清欢签" /></div>
+    </div>
+  </div>
+  <div class="shot pick" id="03a">
+    <h2><b>甲</b>AI 超分 · 轻锐</h2>
+    <p class="note">同一张截图，Real-ESRGAN 4 倍再收回。绒毛和「清欢签」会清楚很多，锐化克制。</p>
+    <div class="pair">
+      <div class="board"><img src="art/cover-hd6/03a.jpg?v=394" alt="03甲 全图" /></div>
+      <div class="board"><img src="art/cover-hd6/03a-stick.jpg?v=394" alt="03甲 清欢签" /></div>
+    </div>
+  </div>
+  <div class="shot pick" id="03b">
+    <h2><b>乙</b>AI 超分 · 中锐</h2>
+    <p class="note">甲的底，锐化力度跟原先 03 一样。字更利，边缘可能略硬。</p>
+    <div class="pair">
+      <div class="board"><img src="art/cover-hd6/03b.jpg?v=394" alt="03乙 全图" /></div>
+      <div class="board"><img src="art/cover-hd6/03b-stick.jpg?v=394" alt="03乙 清欢签" /></div>
+    </div>
+  </div>
+  <div class="shot pick" id="03c">
+    <h2><b>丙</b>03 气氛 + 原高清细节</h2>
+    <p class="note">颜色按你那张，绒毛和字用原 3072 底补上。会最清楚，但和截图不完全同一张。</p>
+    <div class="pair">
+      <div class="board"><img src="art/cover-hd6/03c.jpg?v=394" alt="03丙 全图" /></div>
+      <div class="board"><img src="art/cover-hd6/03c-stick.jpg?v=394" alt="03丙 清欢签" /></div>
+    </div>
+  </div>
+  <div class="shot" id="01">
+    <h2><b>01</b>三次放大</h2>
+    <p class="note">现在封面上的那版。能看，但截图放大会发糊。</p>
+    <div class="pair">
+      <div class="board"><img src="art/cover-hd6/01.jpg?v=394" alt="01 全图" /></div>
+      <div class="board"><img src="art/cover-hd6/01-stick.jpg?v=394" alt="01 清欢签" /></div>
+    </div>
+  </div>
+  <div class="shot" id="02">
+    <h2><b>02</b>更锐</h2>
+    <p class="note">先放大再锐化。字更利，绒毛可能有一点发硬。</p>
+    <div class="pair">
+      <div class="board"><img src="art/cover-hd6/02.jpg?v=394" alt="02 全图" /></div>
+      <div class="board"><img src="art/cover-hd6/02-stick.jpg?v=394" alt="02 清欢签" /></div>
+    </div>
+  </div>
+  <div class="shot" id="04">
+    <h2><b>04</b>去颗粒</h2>
+    <p class="note">先去噪再放大。画面干净，细节会少一点。</p>
+    <div class="pair">
+      <div class="board"><img src="art/cover-hd6/04.jpg?v=394" alt="04 全图" /></div>
+      <div class="board"><img src="art/cover-hd6/04-stick.jpg?v=394" alt="04 清欢签" /></div>
+    </div>
+  </div>
+  <div class="shot" id="05">
+    <h2><b>05</b>原高清底</h2>
+    <p class="note">构图跟你那张一样，用的是原 3072 高清。看山绒毛和「清欢签」最清楚。</p>
+    <div class="pair">
+      <div class="board"><img src="art/cover-hd6/05.jpg?v=394" alt="05 全图" /></div>
+      <div class="board"><img src="art/cover-hd6/05-stick.jpg?v=394" alt="05 清欢签" /></div>
+    </div>
+  </div>
+  <div class="shot" id="06">
+    <h2><b>06</b>原高清微锐</h2>
+    <p class="note">05 再轻轻锐一下、对比略加。仍是原高清底，不是重画。</p>
+    <div class="pair">
+      <div class="board"><img src="art/cover-hd6/06.jpg?v=394" alt="06 全图" /></div>
+      <div class="board"><img src="art/cover-hd6/06-stick.jpg?v=394" alt="06 清欢签" /></div>
+    </div>
+  </div>
+</div>
+<div id="lightbox"><img alt="" /></div>
+<script>
+const box = document.getElementById("lightbox");
+const img = box.querySelector("img");
+document.querySelectorAll(".board img").forEach((el) => {
+  el.addEventListener("click", () => {
+    img.src = el.src;
+    box.classList.add("on");
+  });
+});
+box.addEventListener("click", () => box.classList.remove("on"));
+</script>
+</body>
+</html>

@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>签面试稿 · 看山今日一签</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@500;600;700;900&display=swap" rel="stylesheet" />
+    <style>
+:root {
+  --song: "Songti SC", "STSong", "SimSun", "Noto Serif SC", "Source Han Serif SC", serif;
+}
+* { box-sizing: border-box; }
+html, body {
+  margin: 0;
+  min-height: 100%;
+  font-family: var(--song);
+  color: #f3ebe0;
+  background: #1c1612;
+}
+body { padding: 28px 20px 64px; }
+.intro {
+  max-width: 1120px;
+  margin: 0 auto 28px;
+}
+.intro h1 {
+  margin: 0 0 8px;
+  font-size: 1.7rem;
+  font-weight: 700;
+  letter-spacing: .18em;
+}
+.intro p {
+  margin: 0;
+  color: rgba(243,235,224,.68);
+  font-size: .88rem;
+  line-height: 1.7;
+}
+.wall {
+  max-width: 1120px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 36px 20px;
+  align-items: start;
+}
+.shot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+.shot h2 {
+  margin: 0;
+  font-size: .78rem;
+  font-weight: 500;
+  letter-spacing: .2em;
+  color: rgba(243,235,224,.78);
+}
+.shot h2 b { font-weight: 700; color: #f3ebe0; }
+.shot .note {
+  margin: -6px 0 0;
+  font-size: .72rem;
+  letter-spacing: .06em;
+  color: rgba(243,235,224,.46);
+  text-align: center;
+}
+
+.slip {
+  --red: #8a2c1c;
+  --ink: #1a120e;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 232px;
+  height: auto;
+  min-height: 0;
+  border-radius: 10px;
+  color: var(--ink);
+  font-family: var(--song);
+  background:
+    url("art/slip-paper.webp?v=351") center / cover no-repeat,
+    #eec89e;
+  box-shadow: 0 18px 40px rgba(0,0,0,.42);
+  overflow: hidden;
+}
+.slip svg.frame {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+}
+.slip::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background:
+    radial-gradient(ellipse 80% 26% at 8% 92%, rgba(92, 52, 32, .13), transparent 72%),
+    radial-gradient(ellipse 70% 22% at 96% 90%, rgba(78, 44, 28, .1), transparent 70%);
+}
+.slip-main {
+  position: relative;
+  z-index: 1;
+  flex: 0 0 auto;
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  gap: 8px;
+  padding: 22px 14px 12px;
+}
+.col-verse {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  flex: 0 0 auto;
+}
+.rule {
+  width: 1px;
+  align-self: stretch;
+  margin: 0 5px;
+  background: var(--red);
+  opacity: .55;
+  flex: 0 0 auto;
+}
+.col-name {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  flex: 0 0 auto;
+}
+.no {
+  margin: 0;
+  writing-mode: vertical-rl;
+  white-space: nowrap;
+  font-size: .64rem;
+  font-weight: 600;
+  letter-spacing: .16em;
+}
+.name {
+  margin: 0;
+  writing-mode: vertical-rl;
+  white-space: nowrap;
+  font-size: 2.1rem;
+  font-weight: 700;
+  line-height: 1.06;
+  letter-spacing: .12em;
+}
+.seal {
+  writing-mode: vertical-rl;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 3.8em;
+  padding: .4em .22em;
+  border-radius: 999px;
+  background: var(--red);
+  color: #f7efe4;
+  font-size: .58rem;
+  font-weight: 700;
+  letter-spacing: .16em;
+}
+.badge {
+  writing-mode: vertical-rl;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.4em;
+  padding: .16em .12em;
+  border: 1.3px solid var(--red);
+  border-radius: 999px;
+  font-size: .6rem;
+  font-weight: 600;
+  letter-spacing: .12em;
+}
+.verse {
+  margin: 0;
+  display: flex;
+  flex-direction: row-reverse;
+  width: auto;
+  gap: 4px;
+  justify-content: center;
+}
+.verse span {
+  writing-mode: vertical-rl;
+  white-space: nowrap;
+  font-size: 1.58rem;
+  font-weight: 600;
+  line-height: 1.28;
+  letter-spacing: .22em;
+}
+.cta {
+  position: relative;
+  z-index: 1;
+  width: calc(100% - 16%);
+  margin: 0 auto 16px;
+  padding: 8px 7px 7px;
+  border: 1.2px solid var(--red);
+  background: transparent;
+  color: #2a1814;
+  font: inherit;
+  font-size: .64rem;
+  font-weight: 600;
+  line-height: 1.75;
+  letter-spacing: .04em;
+  text-align: center;
+}
+.cta em { font-style: normal; font-weight: 700; }
+.cta i { font-style: normal; color: var(--red); font-weight: 700; }
+
+/* 甲 · 稿字靠中 */
+.v-jia .name { font-size: 2.1rem; }
+
+/* 戊 · 稿字加重：签名更沉，签文更满 */
+.v-wu .name {
+  font-size: 2.38rem;
+  font-weight: 900;
+  letter-spacing: .08em;
+}
+.v-wu .verse { gap: 2px; }
+.v-wu .verse span {
+  font-size: 1.72rem;
+  font-weight: 700;
+  letter-spacing: .16em;
+}
+.v-wu .slip-main { padding: 20px 12px 10px; gap: 6px; }
+.v-wu .rule { margin: 0 3px; }
+
+/* 己 · 稿字疏朗：字略小，栏距松开一点 */
+.v-ji {
+  width: 248px;
+}
+.v-ji .slip-main { padding: 26px 18px 14px; gap: 14px; }
+.v-ji .name {
+  font-size: 1.88rem;
+  font-weight: 700;
+  letter-spacing: .16em;
+}
+.v-ji .verse { gap: 10px; }
+.v-ji .verse span {
+  font-size: 1.38rem;
+  font-weight: 600;
+  letter-spacing: .2em;
+}
+.v-ji .rule { margin: 0 8px; }
+
+@media (max-width: 680px) {
+  .wall { grid-template-columns: 1fr; }
+}
+    </style>
+  </head>
+  <body>
+    <header class="intro">
+      <h1>签面试稿</h1>
+      <p>己已选定并迁回主流程。甲、戊只留对照。</p>
+    </header>
+
+    <main class="wall">
+      <section class="shot">
+        <h2><b>甲 · 稿字靠中</b></h2>
+        <p class="note">宋体 · 字靠中</p>
+        <article class="slip v-jia">
+          <svg class="frame" viewBox="0 0 360 530" preserveAspectRatio="none" aria-hidden="true">
+            <rect x="5.5" y="5.5" width="349" height="519" rx="13" fill="none" stroke="#8a2c1c" stroke-width="1.35"/>
+            <path fill="none" stroke="#8a2c1c" stroke-width="1.2" d="M24 14 H336 A10 10 0 0 1 346 24 V506 A10 10 0 0 1 336 516 H24 A10 10 0 0 1 14 506 V24 A10 10 0 0 1 24 14 Z"/>
+          </svg>
+          <div class="slip-main">
+            <div class="col-verse">
+              <span class="badge">签文</span>
+              <p class="verse"><span>案前灯火经长夜，</span><span>卷里文章见远山。</span></p>
+            </div>
+            <div class="rule"></div>
+            <div class="col-name">
+              <p class="no">第二十八签</p>
+              <p class="name">灯火见山</p>
+              <span class="seal">从容签</span>
+            </div>
+          </div>
+          <p class="cta">这一签只说到这里，<br>别人的故事或许还有下文。<br>点击查看「<em>内容发现</em>」模块 <i>›</i><br>即可解锁你的签</p>
+        </article>
+      </section>
+
+      <section class="shot">
+        <h2><b>戊 · 稿字加重</b></h2>
+        <p class="note">宋体加黑 · 签文更大更紧</p>
+        <article class="slip v-wu">
+          <svg class="frame" viewBox="0 0 360 530" preserveAspectRatio="none" aria-hidden="true">
+            <rect x="5.5" y="5.5" width="349" height="519" rx="13" fill="none" stroke="#8a2c1c" stroke-width="1.35"/>
+            <path fill="none" stroke="#8a2c1c" stroke-width="1.2" d="M24 14 H336 A10 10 0 0 1 346 24 V506 A10 10 0 0 1 336 516 H24 A10 10 0 0 1 14 506 V24 A10 10 0 0 1 24 14 Z"/>
+          </svg>
+          <div class="slip-main">
+            <div class="col-verse">
+              <span class="badge">签文</span>
+              <p class="verse"><span>案前灯火经长夜，</span><span>卷里文章见远山。</span></p>
+            </div>
+            <div class="rule"></div>
+            <div class="col-name">
+              <p class="no">第二十八签</p>
+              <p class="name">灯火见山</p>
+              <span class="seal">从容签</span>
+            </div>
+          </div>
+          <p class="cta">这一签只说到这里，<br>别人的故事或许还有下文。<br>点击查看「<em>内容发现</em>」模块 <i>›</i><br>即可解锁你的签</p>
+        </article>
+      </section>
+
+      <section class="shot">
+        <h2><b>己 · 稿字疏朗</b></h2>
+        <p class="note">宋体略小 · 两栏松开 · 已进主流程</p>
+        <article class="slip v-ji">
+          <svg class="frame" viewBox="0 0 360 530" preserveAspectRatio="none" aria-hidden="true">
+            <rect x="5.5" y="5.5" width="349" height="519" rx="13" fill="none" stroke="#8a2c1c" stroke-width="1.35"/>
+            <path fill="none" stroke="#8a2c1c" stroke-width="1.2" d="M24 14 H336 A10 10 0 0 1 346 24 V506 A10 10 0 0 1 336 516 H24 A10 10 0 0 1 14 506 V24 A10 10 0 0 1 24 14 Z"/>
+          </svg>
+          <div class="slip-main">
+            <div class="col-verse">
+              <span class="badge">签文</span>
+              <p class="verse"><span>案前灯火经长夜，</span><span>卷里文章见远山。</span></p>
+            </div>
+            <div class="rule"></div>
+            <div class="col-name">
+              <p class="no">第二十八签</p>
+              <p class="name">灯火见山</p>
+              <span class="seal">从容签</span>
+            </div>
+          </div>
+          <p class="cta">这一签只说到这里，<br>别人的故事或许还有下文。<br>点击查看「<em>内容发现</em>」模块 <i>›</i><br>即可解锁你的签</p>
+        </article>
+      </section>
+    </main>
+  </body>
+</html>

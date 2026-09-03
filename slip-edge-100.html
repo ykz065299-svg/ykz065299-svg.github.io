@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>签面抠边 · 100 版</title>
+<style>
+:root { --song: "Songti SC", "STSong", "SimSun", "Noto Serif SC", serif; }
+* { box-sizing: border-box; }
+html, body { margin: 0; min-height: 100%; font-family: var(--song); color: #f3ebe0; background: #1c1612; }
+body { padding: 28px 20px 80px; }
+.intro { max-width: 1180px; margin: 0 auto 22px; }
+.intro h1 { margin: 0 0 8px; font-size: 1.5rem; letter-spacing: .16em; }
+.intro p { margin: 0 0 10px; color: rgba(243,235,224,.68); font-size: .86rem; line-height: 1.7; }
+.tools { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+.tools button { appearance: none; border: 1px solid rgba(243,235,224,.24); background: rgba(0,0,0,.28); color: #f3ebe0; padding: 6px 12px; border-radius: 999px; cursor: pointer; font: inherit; font-size: .78rem; letter-spacing: .08em; }
+.tools button.on { background: #8a2c1c; border-color: #8a2c1c; }
+.wall { max-width: 1180px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 28px 16px; }
+.shot { text-decoration: none; color: inherit; display: flex; flex-direction: column; gap: 10px; }
+.shot h2 { margin: 0; font-size: .78rem; font-weight: 500; letter-spacing: .08em; color: rgba(243,235,224,.78); }
+.shot h2 b { font-weight: 700; color: #f3ebe0; margin-right: 6px; }
+.pair { display: flex; align-items: flex-end; gap: 10px; padding: 12px; border-radius: 10px; background: #2a1c14; }
+body.bg-green .pair { background: #2f6b45; }
+body.bg-check .pair {
+  background-color: #c8c8c8;
+  background-image: linear-gradient(45deg,#bbb 25%,transparent 25%),linear-gradient(-45deg,#bbb 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#bbb 75%),linear-gradient(-45deg,transparent 75%,#bbb 75%);
+  background-size: 16px 16px; background-position: 0 0,0 8px,8px -8px,-8px 0;
+}
+.card { width: 132px; height: auto; display: block; }
+.zoom { width: 132px; height: 132px; object-fit: cover; display: block; image-rendering: auto; }
+.shot:target .pair { outline: 2px solid #e4bc62; }
+</style>
+</head>
+<body>
+<div class="intro">
+  <h1>签面抠边 · 100 版</h1>
+  <p>左边整张，右边左上凹角放大。深底最容易看出白毛边。先看 <b>066</b>（已临时接到主流程），再点编号告诉我换哪一版。</p>
+  <p>01 是上一轮硬切。32 起是超采样软边。55–100 是红框贴边精修。</p>
+  <div class="tools">
+    <button type="button" data-bg="dark" class="on">深底</button>
+    <button type="button" data-bg="green">绿底</button>
+    <button type="button" data-bg="check">棋盘</button>
+  </div>
+</div>
+<div class="wall">
+<a class="shot" href="#e001" id="e001">
+  <h2><b>001</b> 01 现行硬切</h2>
+  <div class="pair">
+    <img class="card" src="art/slip-edge100/e001.webp" alt="001" width="168" height="329" />
+    <img class="zoom" src="art/slip-edge100/z001.webp" alt="" width="220" height="220" />
+  </div>
+</a>
+<a class="shot" href="#e002" id="e002">
+  <h2><b>002</b> 洪水亮218</h2>
+  <div class="pair">
+    <img class="card" src="art/slip-edge100/e002.webp" alt="002" width="168" height="329" />
+    <img class="zoom" src="art/slip-edge100/z002.webp" alt="" width="220" height="220" />
+  </div>
+</a>
+<a class="shot" href="#e003" id="e003">
+  <h2><b>003</b> 洪水亮222</h2>
+  <div class="pair">
+    <img class="card" src="art/slip-edge100/e003.webp" alt="003" width="168" height="329" />
+    <img class="zoom" src="art/slip-edge100/z003.webp" alt="" width="220" height="220" />
+  </div>
+</a>
+<a class="shot" href="#e004" id="e004">
+  <h2><b>004</b> 洪水亮226</h2>
+  <div class="pair">
+    <img class="card" src="art/slip-edge100/e004.webp" alt="004" width="168" height="329" />
+    <img class="zoom" src="art/slip-edge100/z004.webp" alt="" width="220" height="220" />
+  </div>
+</a>
+<a class="shot" href="#e005" id="e005">
+  <h2><b>005</b> 洪水亮230</h2>
+  <div class="pair">
+    <img class="card" src="art/slip-edge100/e005.webp" alt="005" width="168" height="329" />
+    <img class="zoom" src="art/slip-edge100/z005.webp" alt="" width="220" height="220" />
+  </div>
+</a>
+<a class="shot" href="#e006" id="e006">
+  <h2><b>006</b> 洪水亮234</h2>
+  <div class="pair">
+    <img class="card" src="art/slip-edge100/e006.webp" alt="006" width="168" height="329" />
+    <img class="zoom" src="art/slip-edge100/z006.webp" alt="" width="220" height="220" />
+  </div>
+</a>
+<a class="shot" href="#e007" id="e007">
+  <h2><b>007</b> 洪水亮238</h2>
+  <div class="pair">
+    <img class="card" src="art/slip-edge100/e007.webp" alt="007" width="168" height="329" />
+    <img class="zoom" src="art/slip-edge100/z007.webp" alt="" width="220" height="220" />
+  </div>
+</a>
+<a class="shot" href="#e008" id="e008">
+  <h2><b>008</b> 洪水色差10</h2>
+  <div class="pair">
+    <img class="card" src="art/slip-edge100/e008.webp" alt="008" width="168" height="329" />
+    <img class="zoom" src="art/slip-edge100/z008.webp" alt="" width="220" height="220" />
+  </div>
+</a>
+<a class="shot" href="#e009" id="e009">
+  <h2><b>009</b> 洪水色差14</h2>
+  <div class="pair">
+    <img class="card" src="art/slip-edge100/e009.webp" alt="009" width="168" height="329" />
+    <img class="zoom" src="art/slip-edge100/z009.webp" alt="" width="220" height="220" />
+  </div>
+</a>
+<a class="shot" href="#e010" id="e010">
+  <h2><b>010</b> 洪水色差18</h2>
+  <div class="pair">
+    <img class="card" src="art/slip-edge100/e010.webp" alt="010" width="168" height="329" />
+    <img class="zoom" src="art/slip-edge100/z010.webp" alt="" width="220" height="220" />
+  </div>
+</a>
+<a class="shot" href="#e011" id="e011">
+  <h2><b>011</b> 洪水色差22</h2>
+  <div class="pair">
+    <img class="card" src="art/slip-edge100/e011.webp" alt="011" width="168" height="329" />
+    <img class="zoom" src="art/slip-edge100/z011.webp" alt="" width="220" height="220" />
+  </div>
+</a>
+<a class="shot" href="#e012" id="e012">
+  <h2><b>012</b> 洪水内收1</h2>
+  <div class="pair">
+    <img class="card" src="art/slip-edge100/e012.webp" alt="012" width="168" height="329" />
+    <img class="zoom" src="art/slip-edge100/z012.webp" alt="" width="220" height="220" />
+  </div>
+</a>
+<a class="shot" href="#e013" id="e013">
+  <h2><b>013</b> 洪水内收2</h2>
+  <div class="pair">
+    <img class="card" src="art/slip-edge100/e013.webp" alt="013" width="168" height="329" />
+    <img class="zoom" src="art/slip-edge100/z013.webp" alt="" width="220" height="220" />
+  </div>
+</a>
+<a class="shot" href="#e014" id="e014">
+  <h2><b>014</b> 洪水内收3</h2>
+  <div class="pair">
+    <img class="card" src="art/slip-edge100/e014.webp" alt="014" width="168" height="329" />
+    <img class="zoom" src="art/slip-edge100/z014.webp" alt="" width="220" height="220" />
+  </div>
+</a>
+<a class="shot" href="#e015" id="e015">
+  <h2><b>015</b> 洪水内收4</h2>
+  <div class="pair">
+    <img class="card" src="art/slip-edge100/e015.webp" alt="015" width="168" height="329" />
+    <img class="zoom" src="art/slip-edge100/z015.webp" alt="" width="220" height="220" />
+  </div>
+</a>
+<a class="shot" href="#e016" id="e016">
+  <h2><b>016</b> 洪水贴红2</h2>
+  <div class="pair">
+    <img class="card" src="art/slip-edge100/e016.webp" alt="016" width="168" height="329" />
+    <img class="zoom" src="art/slip-edge100/z016.webp" alt="" width="220" height="220" />
+  </div>
+</a>
+<a class="shot" href="#e017" id="e017">
+  <h2><b>017</b> 洪水贴红4</h2>
+  <div class="pair">
+    <img class="card" src="art/slip-edge100/e017.webp" alt="017" width="168" height="329" />
+    <img class="zoom" src="art/slip-edge100/z017.webp" alt="" width="220" height="220" />
+  </div>
+</a>
+<a class="shot" href="#e018" id="e018">
+  <h2><b>018</b> 洪水贴红6</h2>
+  <div class="pair">
+    <img class="card" src="art/slip-edge100/e018.webp" alt="018" width="168" height="329" />
+    <img class="zoom" src="art/slip-edge100/z018.webp" alt="" width="220" height="220" />
+  </div>
+</a>
+<a class="shot" href="#e019" id="e019">
+  <h2><b>019</b> 洪水贴红8</h2>
+  <div class="pair">
+    <img class="card" src="art/slip-edge100/e019.webp" alt="019" width="168" height="329" />
+    <img class="zoom" src="art/slip-edge100/z019.webp" alt="" width="220" height="220" />
+  </div>
+</a>
+<a class="shot" href="#e020" id="e020">
+  <h2><b>020</b> 红框扩0硬切</h2>
+  <div class="pair">
+    <img class="card" src="art/slip-edge100/e020.webp" alt="020" width="168" height="329" />
+    <img class="zoom" src="art/slip-edge100/z020.webp" alt="" width="220" height="220" />
+  </div>
+</a>
+<a class="shot" href="#e021" id="e021">
+  <h2><b>021</b> 红框扩1硬切</h2>
+  <div class="pair">
+    <img class="card" src="art/slip-edge100/e021.webp" alt="021" width="168" height="329" />
+    <img class="zoom" src="art/slip-edge100/z021.webp" alt="" width="220" height="220" />
+  </div>
+</a>
+<a class="shot" href="#e022" id="e022">
+  <h2><b>022</b> 红框扩2硬切</h2>
+  <div class="pair">
+    <img class="card" src="art/slip-edge100/e022.webp" alt="022" width="168" height="329" />
+    <img class="zoom" src="art/slip-edge100/z022.webp" alt="" width="220" height="220" />
+  </div>
+</a>
+<a class="shot" href="#e023" id="e023">
+  <h2><b>023</b> 红框扩3硬切</h2>
+  <div class="pair">
+    <img class="card" src="art/slip-edge100/e023.webp" alt="023" width="168" height="329" />
+    <img class="zoom" src="art/slip-edge100/z023.webp" alt="" width="220" height="220" />
+  </div>
+</a>
+<a class="shot" href="#e024" id="e024">
+  <h2><b>024</b> 红框纸边-1</h2>
+  <div class="pair">
+    <img class="card" src="art/slip-edge100/e024.webp" alt="024" width="168" height="329" />
+    <img class="zoom" src="art/slip-edge100/z024.webp" alt="" width="220" height="220" />
+  </div>
+</a>
+<a class="shot" href="#e025" id="e025">
+  <h2><b>025</b> 红框纸边+0</h2>
+  <div class="pair">
+    <img class="card" src="art/slip-edge100/e025.webp" alt="025" width="168" height="329" />
+    <img class="zoom" src="art/slip-edge100/z025.webp" alt="" width="220" height="220" />
+  </div>
+</a>
+<a class="shot" href="#e026" id="e026">
+  <h2><b>026</b> 红框纸边+1</h2>
+  <div class="pair">
+    <img class="card" src="art/slip-edge100/e026.webp" alt="026" width="168" height="329" />
+    <img class="zoom" src="art/slip-edge100/z026.webp" alt="" width="220" height="220" />
+  </div>
+</a>
+<a class="shot" href="#e027" id="e027">
+  <h2><b>027</b> 红框纸边+2</h2>
+  <div class="pair">
+    <img class="card" src="art/slip-edge100/e027.webp" alt="027" width="168" height="329" />
+    <img class="zoom" src="art/slip-edge100/z027.webp" alt="" width="220" height="220" />
+  </div>
+</a>
+<a class="shot" href="#e028" id="e028">
+  <h2><b>028</b> 红框距变0.6</h2>
+  <div class="pair">
+    <img class="card" src="art/slip-edge100/e028.webp" alt="028" width="168" height="329" />
+    <img class="zoom" src="art/slip-edge100/z028.webp" alt="" width="220" height="220" />
+  </div>
+</a>
+<a class="shot" href="#e029" id="e029">
+  <h2><b>029</b> 红框距变1</h2>
+  <div class="pair">
+    <img class="card" src="art/slip-edge100/e029.webp" alt="029" width="168" height="329" />
+    <img class="zoom" src="art/slip-edge100/z029.webp" alt="" width="220" height="220" />
+  </div>
+</a>
+<a class="shot" href="#e030" id="e030">
+  <h2><b>030</b> 红框距变1.4</h2>
+  <div class="pair">
+    <img class="card" src="art/slip-edge100/e030.webp" alt="030" width="168" height="329" />
+    <img class="zoom" src="art/slip-edge100/z030.webp" alt="" width="220" height="220" />
+  </div>
+</a>
+<a class="shot" href="#e031" id="e031">
+  <h2><b>031</b> 红框距变2</h2>
+  <div class="pair">
+    <img class="card" src="art/slip-edge100/e031.webp" alt="031" width="168" height="329" />
+    <img class="zoom" src="art/slip-edge100/z031.webp" alt="" width="220" height="220" />
+  </div>
+</a>
+<a class="shot" href="#e032" id="e032">
+  <h2><b>032</b> 2倍超采模糊0.4</h2>
+  <div class="pair">
+    <img class="card" src="art/slip-edge100/e032.webp" alt="032" width="168" height="329" />
+    <img class="zoom" src="art/slip-edge100/z032.webp" alt="" width="220" height="220" />
+  </div>
+</a>
+<a class="shot" href="#e033" id="e033">
+  <h2><b>033</b> 2倍超采模糊0.8</h2>
+  <div class="pair">
+    <img class="card" src="art/slip-edge100/e033.webp" alt="033" width="168" height="329" />
+    <img class="zoom" src="art/slip-edge100/z033.webp" alt="" width="220" height="220" />
+  </div>
+</a>
+<a class="shot" href="#e034" id="e034">
+  <h2><b>034</b> 3倍超采模糊0.5</h2>
+  <div class="pair">
+    <img class="card" src="art/slip-edge100/e034.webp" alt="034" width="168" height="329" />
+    <img class="zoom" src="art/slip-edge100/z034.webp" alt="" width="220" height="220" />
+  </div>
+</a>
+<a class="shot" href="#e035" id="e035">
+  <h2><b>035</b> 3倍超采模糊0.9</h2>
+  <div class="pair">
+    <img class="card" src="art/slip-edge100/e035.webp" alt="035" width="168" height="329" />
+    <img class="zoom" src="art/slip-edge100/z035.webp" alt="" width="220" height="220" />
+  </div>
+</a>
+<a class="shot" href="#e036" id="e036">
+  <h2><b>036</b> 3倍超采模糊1.3</h2>
+  <div class="pair">
+    <img class="card" src="art/slip-edge100/e036.webp" alt="036" width="168" height="329" />
+    <img class="zoom" src="art/slip-edge100/z036.webp" alt="" width="220" height="220" />
+  </div>
+</a>
+<a class="shot" href="#e037" id="e037">
+  <h2><b>037</b> 4倍超采模糊0.6</h2>
+  <div class="pair">
+    <img class="card" src="art/slip-edge100/e037.webp" alt="037" width="168" height="329" />
+    <img class="zoom" src="art/slip-edge100/z037.webp" alt="" width="220" height="220" />
+  </div>
+</a>
+<a class="shot" href="#e038" id="e038">
+  <h2><b>038</b> 4倍超采模糊1</h2>
+  <div class="pair">
+    <img class="card" src="art/slip-edge100/e038.webp" alt="038" width="168" height="329" />
+    <img class="zoom" src="art/slip-edge100/z038.webp" alt="" width="220" height="220" />
+  </div>
+</a>
+<a class="shot" href="#e039" id="e039">
+  <h2><b>039</b> 4倍超采模糊1.4</h2>
+  <div class="pair">
+    <img class="card" src="art/slip-edge100/e039.webp" alt="039" width="168" height="329" />
+    <img class="zoom" src="art/slip-edge100/z039.webp" alt="" width="220" height="220" />
+  </div>
+</a>
+<a class="shot" href="#e040" id="e040">
+  <h2><b>040</b> 3倍超采软0.5</h2>
+  <div class="pair">
+    <img class="card" src="art/slip-edge100/e040.webp" alt="040" width="168" height="329" />
+    <img class="zoom" src="art/slip-edge100/z040.webp" alt="" width="220" height="220" />
+  </div>
+</a>
+<a class="shot" href="#e041" id="e041">
+  <h2><b>041</b> 3倍超采软0.9</h2>
+  <div class="pair">
+    <img class="card" src="art/slip-edge100/e041.webp" alt="041" width="168" height="329" />
+    <img class="zoom" src="art/slip-edge100/z041.webp" alt="" width="220" height="220" />
+  </div>
+</a>
+<a class="shot" href="#e042" id="e042">
+  <h2><b>042</b> 3倍超采软1.2</h2>
+  <div class="pair">
+    <img class="card" src="art/slip-edge100/e042.webp" alt="042" width="168" height="329" />
+    <img class="zoom" src="art/slip-edge100/z042.webp" alt="" width="220" height="220" />
+  </div>
+</a>
+<a class="shot" href="#e043" id="e043">
+  <h2><b>043</b> 4倍超采软0.7</h2>
+  <div class="pair">
+    <img class="card" src="art/slip-edge100/e043.webp" alt="043" width="168" height="329" />
+    <img class="zoom" src="art/slip-edge100/z043.webp" alt="" width="220" height="220" />
+  </div>
+</a>
+<a class="shot" href="#e044" id="e044">
+  <h2><b>044</b> 4倍超采软1.1</h2>
+  <div class="pair">
+    <img class="card" src="art/slip-edge100/e044.webp" alt="044" width="168" height="329" />
+    <img class="zoom" src="art/slip-edge100/z044.webp" alt="" width="220" height="220" />
+  </div>
+</a>
+<a class="shot" href="#e045" id="e045">
+  <h2><b>045</b> 红框收0+3倍0.7</h2>
+  <div class="pair">
+    <img class="card" src="art/slip-edge100/e045.webp" alt="045" width="168" height="329" />
+    <img class="zoom" src="art/slip-edge100/z045.webp" alt="" width="220" height="220" />
+  </div>
+</a>
+<a class="shot" href="#e046" id="e046">
+  <h2><b>046</b> 红框收1+3倍0.7</h2>
+  <div class="pair">
+    <img class="card" src="art/slip-edge100/e046.webp" alt="046" width="168" height="329" />
+    <img class="zoom" src="art/slip-edge100/z046.webp" alt="" width="220" height="220" />
+  </div>
+</a>
+<a class="shot" href="#e047" id="e047">
+  <h2><b>047</b> 红框收2+3倍0.8</h2>
+  <div class="pair">
+    <img class="card" src="art/slip-edge100/e047.webp" alt="047" width="168" height="329" />
+    <img class="zoom" src="art/slip-edge100/z047.webp" alt="" width="220" height="220" />
+  </div>
+</a>
+<a class="shot" href="#e048" id="e048">
+  <h2><b>048</b> 红框收0+4倍0.8</h2>
+  <div class="pair">
+    <img class="card" src="art/slip-edge100/e048.webp" alt="048" width="168" height="329" />
+    <img class="zoom" src="art/slip-edge100/z048.webp" alt="" width="220" height="220" />
+  </div>
+</a>
+<a class="shot" href="#e049" id="e049">
+  <h2><b>049</b> 红框收1+4倍0.9</h2>
+  <div class="pair">
+    <img class="card" src="art/slip-edge100/e049.webp" alt="049" width="168" height="329" />
+    <img class="zoom" src="art/slip-edge100/z049.webp" alt="" width="220" height="220" />
+  </div>
+</a>
+<a class="shot" href="#e050" id="e050">
+  <h2><b>050</b> 红框收1+3倍1.1</h2>
+  <div class="pair">
+    <img class="card" src="art/slip-edge100/e050.webp" alt="050" width="168" height="329" />
+    <img class="zoom" src="art/slip-edge100/z050.webp" alt="" width="220" height="220" />
+  </div>
+</a>
+<a class="shot" href="#e051" id="e051">
+  <h2><b>051</b> 红框收1+4倍1.2</h2>
+  <div class="pair">
+    <img class="card" src="art/slip-edge100/e051.webp" alt="051" width="168" height="329" />
+    <img class="zoom" src="art/slip-edge100/z051.webp" alt="" width="220" height="220" />
+  </div>
+</a>
+<a class="shot" href="#e052" id="e052">
+  <h2><b>052</b> 红框收2+4倍1</h2>
+  <div class="pair">
+    <img class="card" src="art/slip-edge100/e052.webp" alt="052" width="168" height="329" />
+    <img class="zoom" src="art/slip-edge100/z052.webp" alt="" width="220" height="220" />
+  </div>
+</a>
+<a class="shot" href="#e053" id="e053">
+  <h2><b>053</b> 交叠+3倍</h2>
+  <div class="pair">
+    <img class="card" src="art/slip-edge100/e053.webp" alt="053" width="168" height="329" />
+    <img class="zoom" src="art/slip-edge100/z053.webp" alt="" width="220" height="220" />
+  </div>
+</a>
+<a class="shot" href="#e054" id="e054">
+  <h2><b>054</b> 交叠收1+4倍</h2>
+  <div class="pair">
+    <img class="card" src="art/slip-edge100/e054.webp" alt="054" width="168" height="329" />
+    <img class="zoom" src="art/slip-edge100/z054.webp" alt="" width="220" height="220" />
+  </div>
+</a>
+<a class="shot" href="#e055" id="e055">
+  <h2><b>055</b> 精修扩1纸0收0 3×0.6</h2>
+  <div class="pair">
+    <img class="card" src="art/slip-edge100/e055.webp" alt="055" width="168" height="329" />
+    <img class="zoom" src="art/slip-edge100/z055.webp" alt="" width="220" height="220" />
+  </div>
+</a>
+<a class="shot" href="#e056" id="e056">
+  <h2><b>056</b> 精修扩1纸0收0 3×1</h2>
+  <div class="pair">
+    <img class="card" src="art/slip-edge100/e056.webp" alt="056" width="168" height="329" />
+    <img class="zoom" src="art/slip-edge100/z056.webp" alt="" width="220" height="220" />
+  </div>
+</a>
+<a class="shot" href="#e057" id="e057">
+  <h2><b>057</b> 精修扩1纸0收0 4×0.8</h2>
+  <div class="pair">
+    <img class="card" src="art/slip-edge100/e057.webp" alt="057" width="168" height="329" />
+    <img class="zoom" src="art/slip-edge100/z057.webp" alt="" width="220" height="220" />
+  </div>
+</a>
+<a class="shot" href="#e058" id="e058">
+  <h2><b>058</b> 精修扩1纸0收0 4×1.2</h2>
+  <div class="pair">
+    <img class="card" src="art/slip-edge100/e058.webp" alt="058" width="168" height="329" />
+    <img class="zoom" src="art/slip-edge100/z058.webp" alt="" width="220" height="220" />
+  </div>
+</a>
+<a class="shot" href="#e059" id="e059">
+  <h2><b>059</b> 精修扩1纸0收1 3×0.6</h2>
+  <div class="pair">
+    <img class="card" src="art/slip-edge100/e059.webp" alt="059" width="168" height="329" />
+    <img class="zoom" src="art/slip-edge100/z059.webp" alt="" width="220" height="220" />
+  </div>
+</a>
+<a class="shot" href="#e060" id="e060">
+  <h2><b>060</b> 精修扩1纸0收1 3×1</h2>
+  <div class="pair">
+    <img class="card" src="art/slip-edge100/e060.webp" alt="060" width="168" height="329" />
+    <img class="zoom" src="art/slip-edge100/z060.webp" alt="" width="220" height="220" />
+  </div>
+</a>
+<a class="shot" href="#e061" id="e061">
+  <h2><b>061</b> 精修扩1纸0收1 4×0.8</h2>
+  <div class="pair">
+    <img class="card" src="art/slip-edge100/e061.webp" alt="061" width="168" height="329" />
+    <img class="zoom" src="art/slip-edge100/z061.webp" alt="" width="220" height="220" />
+  </div>
+</a>
+<a class="shot" href="#e062" id="e062">
+  <h2><b>062</b> 精修扩1纸0收1 4×1.2</h2>
+  <div class="pair">
+    <img class="card" src="art/slip-edge100/e062.webp" alt="062" width="168" height="329" />
+    <img class="zoom" src="art/slip-edge100/z062.webp" alt="" width="220" height="220" />
+  </div>
+</a>
+<a class="shot" href="#e063" id="e063">
+  <h2><b>063</b> 精修扩1纸1收0 3×0.6</h2>
+  <div class="pair">
+    <img class="card" src="art/slip-edge100/e063.webp" alt="063" width="168" height="329" />
+    <img class="zoom" src="art/slip-edge100/z063.webp" alt="" width="220" height="220" />
+  </div>
+</a>
+<a class="shot" href="#e064" id="e064">
+  <h2><b>064</b> 精修扩1纸1收0 3×1</h2>
+  <div class="pair">
+    <img class="card" src="art/slip-edge100/e064.webp" alt="064" width="168" height="329" />
+    <img class="zoom" src="art/slip-edge100/z064.webp" alt="" width="220" height="220" />
+  </div>
+</a>
+<a class="shot" href="#e065" id="e065">
+  <h2><b>065</b> 精修扩1纸1收0 4×0.8</h2>
+  <div class="pair">
+    <img class="card" src="art/slip-edge100/e065.webp" alt="065" width="168" height="329" />
+    <img class="zoom" src="art/slip-edge100/z065.webp" alt="" width="220" height="220" />
+  </div>
+</a>
+<a class="shot" href="#e066" id="e066">
+  <h2><b>066</b> 精修扩1纸1收0 4×1.2</h2>
+  <div class="pair">
+    <img class="card" src="art/slip-edge100/e066.webp" alt="066" width="168" height="329" />
+    <img class="zoom" src="art/slip-edge100/z066.webp" alt="" width="220" height="220" />
+  </div>
+</a>
+<a class="shot" href="#e067" id="e067">
+  <h2><b>067</b> 精修扩1纸1收1 3×0.6</h2>
+  <div class="pair">
+    <img class="card" src="art/slip-edge100/e067.webp" alt="067" width="168" height="329" />
+    <img class="zoom" src="art/slip-edge100/z067.webp" alt="" width="220" height="220" />
+  </div>
+</a>
+<a class="shot" href="#e068" id="e068">
+  <h2><b>068</b> 精修扩1纸1收1 3×1</h2>
+  <div class="pair">
+    <img class="card" src="art/slip-edge100/e068.webp" alt="068" width="168" height="329" />
+    <img class="zoom" src="art/slip-edge100/z068.webp" alt="" width="220" height="220" />
+  </div>
+</a>
+<a class="shot" href="#e069" id="e069">
+  <h2><b>069</b> 精修扩1纸1收1 4×0.8</h2>
+  <div class="pair">
+    <img class="card" src="art/slip-edge100/e069.webp" alt="069" width="168" height="329" />
+    <img class="zoom" src="art/slip-edge100/z069.webp" alt="" width="220" height="220" />
+  </div>
+</a>
+<a class="shot" href="#e070" id="e070">
+  <h2><b>070</b> 精修扩1纸1收1 4×1.2</h2>
+  <div class="pair">
+    <img class="card" src="art/slip-edge100/e070.webp" alt="070" width="168" height="329" />
+    <img class="zoom" src="art/slip-edge100/z070.webp" alt="" width="220" height="220" />
+  </div>
+</a>
+<a class="shot" href="#e071" id="e071">
+  <h2><b>071</b> 精修扩1纸2收0 3×0.6</h2>
+  <div class="pair">
+    <img class="card" src="art/slip-edge100/e071.webp" alt="071" width="168" height="329" />
+    <img class="zoom" src="art/slip-edge100/z071.webp" alt="" width="220" height="220" />
+  </div>
+</a>
+<a class="shot" href="#e072" id="e072">
+  <h2><b>072</b> 精修扩1纸2收0 3×1</h2>
+  <div class="pair">
+    <img class="card" src="art/slip-edge100/e072.webp" alt="072" width="168" height="329" />
+    <img class="zoom" src="art/slip-edge100/z072.webp" alt="" width="220" height="220" />
+  </div>
+</a>
+<a class="shot" href="#e073" id="e073">
+  <h2><b>073</b> 精修扩1纸2收0 4×0.8</h2>
+  <div class="pair">
+    <img class="card" src="art/slip-edge100/e073.webp" alt="073" width="168" height="329" />
+    <img class="zoom" src="art/slip-edge100/z073.webp" alt="" width="220" height="220" />
+  </div>
+</a>
+<a class="shot" href="#e074" id="e074">
+  <h2><b>074</b> 精修扩1纸2收0 4×1.2</h2>
+  <div class="pair">
+    <img class="card" src="art/slip-edge100/e074.webp" alt="074" width="168" height="329" />
+    <img class="zoom" src="art/slip-edge100/z074.webp" alt="" width="220" height="220" />
+  </div>
+</a>
+<a class="shot" href="#e075" id="e075">
+  <h2><b>075</b> 精修扩1纸2收1 3×0.6</h2>
+  <div class="pair">
+    <img class="card" src="art/slip-edge100/e075.webp" alt="075" width="168" height="329" />
+    <img class="zoom" src="art/slip-edge100/z075.webp" alt="" width="220" height="220" />
+  </div>
+</a>
+<a class="shot" href="#e076" id="e076">
+  <h2><b>076</b> 精修扩1纸2收1 3×1</h2>
+  <div class="pair">
+    <img class="card" src="art/slip-edge100/e076.webp" alt="076" width="168" height="329" />
+    <img class="zoom" src="art/slip-edge100/z076.webp" alt="" width="220" height="220" />
+  </div>
+</a>
+<a class="shot" href="#e077" id="e077">
+  <h2><b>077</b> 精修扩1纸2收1 4×0.8</h2>
+  <div class="pair">
+    <img class="card" src="art/slip-edge100/e077.webp" alt="077" width="168" height="329" />
+    <img class="zoom" src="art/slip-edge100/z077.webp" alt="" width="220" height="220" />
+  </div>
+</a>
+<a class="shot" href="#e078" id="e078">
+  <h2><b>078</b> 精修扩1纸2收1 4×1.2</h2>
+  <div class="pair">
+    <img class="card" src="art/slip-edge100/e078.webp" alt="078" width="168" height="329" />
+    <img class="zoom" src="art/slip-edge100/z078.webp" alt="" width="220" height="220" />
+  </div>
+</a>
+<a class="shot" href="#e079" id="e079">
+  <h2><b>079</b> 精修扩2纸0收0 3×0.6</h2>
+  <div class="pair">
+    <img class="card" src="art/slip-edge100/e079.webp" alt="079" width="168" height="329" />
+    <img class="zoom" src="art/slip-edge100/z079.webp" alt="" width="220" height="220" />
+  </div>
+</a>
+<a class="shot" href="#e080" id="e080">
+  <h2><b>080</b> 精修扩2纸0收0 3×1</h2>
+  <div class="pair">
+    <img class="card" src="art/slip-edge100/e080.webp" alt="080" width="168" height="329" />
+    <img class="zoom" src="art/slip-edge100/z080.webp" alt="" width="220" height="220" />
+  </div>
+</a>
+<a class="shot" href="#e081" id="e081">
+  <h2><b>081</b> 精修扩2纸0收0 4×0.8</h2>
+  <div class="pair">
+    <img class="card" src="art/slip-edge100/e081.webp" alt="081" width="168" height="329" />
+    <img class="zoom" src="art/slip-edge100/z081.webp" alt="" width="220" height="220" />
+  </div>
+</a>
+<a class="shot" href="#e082" id="e082">
+  <h2><b>082</b> 精修扩2纸0收0 4×1.2</h2>
+  <div class="pair">
+    <img class="card" src="art/slip-edge100/e082.webp" alt="082" width="168" height="329" />
+    <img class="zoom" src="art/slip-edge100/z082.webp" alt="" width="220" height="220" />
+  </div>
+</a>
+<a class="shot" href="#e083" id="e083">
+  <h2><b>083</b> 精修扩2纸0收1 3×0.6</h2>
+  <div class="pair">
+    <img class="card" src="art/slip-edge100/e083.webp" alt="083" width="168" height="329" />
+    <img class="zoom" src="art/slip-edge100/z083.webp" alt="" width="220" height="220" />
+  </div>
+</a>
+<a class="shot" href="#e084" id="e084">
+  <h2><b>084</b> 精修扩2纸0收1 3×1</h2>
+  <div class="pair">
+    <img class="card" src="art/slip-edge100/e084.webp" alt="084" width="168" height="329" />
+    <img class="zoom" src="art/slip-edge100/z084.webp" alt="" width="220" height="220" />
+  </div>
+</a>
+<a class="shot" href="#e085" id="e085">
+  <h2><b>085</b> 精修扩2纸0收1 4×0.8</h2>
+  <div class="pair">
+    <img class="card" src="art/slip-edge100/e085.webp" alt="085" width="168" height="329" />
+    <img class="zoom" src="art/slip-edge100/z085.webp" alt="" width="220" height="220" />
+  </div>
+</a>
+<a class="shot" href="#e086" id="e086">
+  <h2><b>086</b> 精修扩2纸0收1 4×1.2</h2>
+  <div class="pair">
+    <img class="card" src="art/slip-edge100/e086.webp" alt="086" width="168" height="329" />
+    <img class="zoom" src="art/slip-edge100/z086.webp" alt="" width="220" height="220" />
+  </div>
+</a>
+<a class="shot" href="#e087" id="e087">
+  <h2><b>087</b> 精修扩2纸1收0 3×0.6</h2>
+  <div class="pair">
+    <img class="card" src="art/slip-edge100/e087.webp" alt="087" width="168" height="329" />
+    <img class="zoom" src="art/slip-edge100/z087.webp" alt="" width="220" height="220" />
+  </div>
+</a>
+<a class="shot" href="#e088" id="e088">
+  <h2><b>088</b> 精修扩2纸1收0 3×1</h2>
+  <div class="pair">
+    <img class="card" src="art/slip-edge100/e088.webp" alt="088" width="168" height="329" />
+    <img class="zoom" src="art/slip-edge100/z088.webp" alt="" width="220" height="220" />
+  </div>
+</a>
+<a class="shot" href="#e089" id="e089">
+  <h2><b>089</b> 精修扩2纸1收0 4×0.8</h2>
+  <div class="pair">
+    <img class="card" src="art/slip-edge100/e089.webp" alt="089" width="168" height="329" />
+    <img class="zoom" src="art/slip-edge100/z089.webp" alt="" width="220" height="220" />
+  </div>
+</a>
+<a class="shot" href="#e090" id="e090">
+  <h2><b>090</b> 精修扩2纸1收0 4×1.2</h2>
+  <div class="pair">
+    <img class="card" src="art/slip-edge100/e090.webp" alt="090" width="168" height="329" />
+    <img class="zoom" src="art/slip-edge100/z090.webp" alt="" width="220" height="220" />
+  </div>
+</a>
+<a class="shot" href="#e091" id="e091">
+  <h2><b>091</b> 精修扩2纸1收1 3×0.6</h2>
+  <div class="pair">
+    <img class="card" src="art/slip-edge100/e091.webp" alt="091" width="168" height="329" />
+    <img class="zoom" src="art/slip-edge100/z091.webp" alt="" width="220" height="220" />
+  </div>
+</a>
+<a class="shot" href="#e092" id="e092">
+  <h2><b>092</b> 精修扩2纸1收1 3×1</h2>
+  <div class="pair">
+    <img class="card" src="art/slip-edge100/e092.webp" alt="092" width="168" height="329" />
+    <img class="zoom" src="art/slip-edge100/z092.webp" alt="" width="220" height="220" />
+  </div>
+</a>
+<a class="shot" href="#e093" id="e093">
+  <h2><b>093</b> 精修扩2纸1收1 4×0.8</h2>
+  <div class="pair">
+    <img class="card" src="art/slip-edge100/e093.webp" alt="093" width="168" height="329" />
+    <img class="zoom" src="art/slip-edge100/z093.webp" alt="" width="220" height="220" />
+  </div>
+</a>
+<a class="shot" href="#e094" id="e094">
+  <h2><b>094</b> 精修扩2纸1收1 4×1.2</h2>
+  <div class="pair">
+    <img class="card" src="art/slip-edge100/e094.webp" alt="094" width="168" height="329" />
+    <img class="zoom" src="art/slip-edge100/z094.webp" alt="" width="220" height="220" />
+  </div>
+</a>
+<a class="shot" href="#e095" id="e095">
+  <h2><b>095</b> 精修扩2纸2收0 3×0.6</h2>
+  <div class="pair">
+    <img class="card" src="art/slip-edge100/e095.webp" alt="095" width="168" height="329" />
+    <img class="zoom" src="art/slip-edge100/z095.webp" alt="" width="220" height="220" />
+  </div>
+</a>
+<a class="shot" href="#e096" id="e096">
+  <h2><b>096</b> 精修扩2纸2收0 3×1</h2>
+  <div class="pair">
+    <img class="card" src="art/slip-edge100/e096.webp" alt="096" width="168" height="329" />
+    <img class="zoom" src="art/slip-edge100/z096.webp" alt="" width="220" height="220" />
+  </div>
+</a>
+<a class="shot" href="#e097" id="e097">
+  <h2><b>097</b> 精修扩2纸2收0 4×0.8</h2>
+  <div class="pair">
+    <img class="card" src="art/slip-edge100/e097.webp" alt="097" width="168" height="329" />
+    <img class="zoom" src="art/slip-edge100/z097.webp" alt="" width="220" height="220" />
+  </div>
+</a>
+<a class="shot" href="#e098" id="e098">
+  <h2><b>098</b> 精修扩2纸2收0 4×1.2</h2>
+  <div class="pair">
+    <img class="card" src="art/slip-edge100/e098.webp" alt="098" width="168" height="329" />
+    <img class="zoom" src="art/slip-edge100/z098.webp" alt="" width="220" height="220" />
+  </div>
+</a>
+<a class="shot" href="#e099" id="e099">
+  <h2><b>099</b> 精修扩2纸2收1 3×0.6</h2>
+  <div class="pair">
+    <img class="card" src="art/slip-edge100/e099.webp" alt="099" width="168" height="329" />
+    <img class="zoom" src="art/slip-edge100/z099.webp" alt="" width="220" height="220" />
+  </div>
+</a>
+<a class="shot" href="#e100" id="e100">
+  <h2><b>100</b> 精修扩2纸2收1 3×1</h2>
+  <div class="pair">
+    <img class="card" src="art/slip-edge100/e100.webp" alt="100" width="168" height="329" />
+    <img class="zoom" src="art/slip-edge100/z100.webp" alt="" width="220" height="220" />
+  </div>
+</a>
+</div>
+<script>
+document.querySelectorAll(".tools button").forEach(function (btn) {
+  btn.addEventListener("click", function () {
+    document.body.classList.remove("bg-green", "bg-check");
+    if (btn.dataset.bg === "green") document.body.classList.add("bg-green");
+    if (btn.dataset.bg === "check") document.body.classList.add("bg-check");
+    document.querySelectorAll(".tools button").forEach(function (b) { b.classList.toggle("on", b === btn); });
+  });
+});
+</script>
+</body>
+</html>
