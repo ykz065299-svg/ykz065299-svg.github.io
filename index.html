@@ -10,12 +10,12 @@
     <meta property="og:site_name" content="看山今日一签" />
     <meta property="og:title" content="看山今日一签" />
     <meta property="og:description" content="摇签入山，一签直达知乎热榜今日山门题。" />
-    <meta property="og:image" content="https://ykz065299-svg.github.io/cover.jpg?v=397" />
+    <meta property="og:image" content="https://ykz065299-svg.github.io/cover.jpg?v=398" />
     <meta property="og:url" content="https://ykz065299-svg.github.io/" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="看山今日一签" />
     <meta name="twitter:description" content="摇签入山，一签直达知乎热榜今日山门题。" />
-    <meta name="twitter:image" content="https://ykz065299-svg.github.io/cover.jpg?v=397" />
+    <meta name="twitter:image" content="https://ykz065299-svg.github.io/cover.jpg?v=398" />
     <!-- 线上静态页若需上报到自建服务，取消注释并填 collect 地址 -->
     <!-- <meta name="kanshan-track-endpoint" content="https://你的域名/api/track" /> -->
     <!-- 封面预加载改由下方脚本按机型只拉一张 -->
@@ -85,12 +85,16 @@ body:not(.ritual-visible) .page2-bg {
 }
 .page1-bg {
   top: 0;
-  background-image: url("cover.jpg?v=397");
+  background-image: url("cover.jpg?v=398");
   background-position: center center;
 }
 @media (orientation: portrait) {
-  .page1-bg {
-    background-image: url("cover-mobile.jpg?v=397");
+  .page-bg.page1-bg {
+    background-image: url("cover-mobile.jpg?v=398");
+    /* 手机比 9:16 更瘦；cover 会左右裁掉签筒。竖图已改成筒+看山整组，contain 完整放下 */
+    background-size: contain;
+    background-position: center 42%;
+    background-color: #1a120c;
   }
 }
 .page-seam {
@@ -1258,7 +1262,7 @@ body.ritual-assets-ready .page2-bg {
         var link = document.createElement("link");
         link.rel = "preload";
         link.as = "image";
-        link.href = portrait ? "cover-mobile.jpg?v=397" : "cover.jpg?v=397";
+        link.href = portrait ? "cover-mobile.jpg?v=398" : "cover.jpg?v=398";
         document.head.appendChild(link);
       })();
     </script>
@@ -1361,6 +1365,6 @@ body.ritual-assets-ready .page2-bg {
       </section>
     </main>
 
-    <script src="boot.js?v=397" defer></script>
+    <script src="boot.js?v=398" defer></script>
   </body>
 </html>

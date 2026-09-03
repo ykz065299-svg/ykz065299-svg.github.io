@@ -1,6 +1,6 @@
 /* v300 — 音效网络优先；避免大 wav 被坏缓存卡死无声 */
-const CACHE = "kanshan-v397";
-const SHELL = ["./cover-mobile.jpg?v=397", "./cover.jpg?v=397"];
+const CACHE = "kanshan-v398";
+const SHELL = ["./cover-mobile.jpg?v=398", "./cover.jpg?v=398"];
 
 self.addEventListener("install", (e) => {
   e.waitUntil(
