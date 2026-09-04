@@ -251,6 +251,9 @@ body.ritual-assets-ready .page2-bg {
   display: flex;
   flex-direction: column;
 }
+.page[hidden] {
+  display: none !important;
+}
 
 .page-cover {
   justify-content: flex-end;
@@ -869,6 +872,7 @@ body.ritual-assets-ready .page2-bg {
   transition: none !important;
 }
 .slip-scroll.measuring .slip-paper,
+.slip-scroll.measuring .slip-read-layer,
 .slip-scroll.measuring .slip-actions {
   opacity: 1 !important;
   transition: none !important;
@@ -914,6 +918,12 @@ body.ritual-assets-ready .page2-bg {
   flex-direction: column;
   gap: 12px;
 }
+.slip-scroll.has-art {
+  width: min(300px, 78vw, calc(58dvh * 1085 / 1450));
+}
+.slip-scroll.has-art .scroll-inner {
+  gap: 18px;
+}
 
 .slip-paper {
   --slip-red: #8a2c1c;
@@ -934,7 +944,7 @@ body.ritual-assets-ready .page2-bg {
   filter: drop-shadow(0 16px 28px rgba(0,0,0,.36));
   overflow: visible;
   opacity: 0;
-  transition: opacity .32s ease;
+  transition: opacity .32s ease, transform .45s ease;
 }
 
 .slip-frame,
@@ -1045,69 +1055,232 @@ body.ritual-assets-ready .page2-bg {
   color: var(--slip-ink);
 }
 
-.slip-unlock {
-  position: absolute;
-  z-index: 1;
-  appearance: none;
-  left: 5.76%;
+.slip-card-art {
+  display: none;
+  width: 100%;
+  height: auto;
+  vertical-align: top;
+}
+.slip-paper.is-hosted {
+  aspect-ratio: 1085 / 1450;
+  background: none;
+  transition: opacity .32s ease, transform .45s ease;
+}
+.slip-paper.is-hosted .slip-card-art {
+  display: block;
+}
+.slip-paper.is-hosted .slip-no,
+.slip-paper.is-hosted .slip-name,
+.slip-paper.is-hosted .slip-badge,
+.slip-paper.is-hosted .slip-verse {
+  display: none;
+}
+.slip-paper.is-hosted .slip-seal {
+  display: inline-flex;
+  top: 62.6%;
+  left: 63%;
+  width: 9.6%;
+  height: 16.8%;
+  font-size: 6.8cqw;
+  letter-spacing: .05em;
+  font-weight: 700;
+  color: #fff8e8;
+  background: #9c241c;
+  box-shadow: inset 0 0 0 1.6px rgba(247, 239, 228, .92);
+  -webkit-font-smoothing: antialiased;
+}
+.slip-read-layer {
+  position: relative;
+  z-index: 2;
+  width: 78%;
+  margin: 2px auto 0;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  top: 71.77%;
-  width: 88.08%;
-  height: 20.81%;
+  gap: 10px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity .32s ease, max-height .28s ease, margin .28s ease;
+}
+.slip-read-hint {
   margin: 0;
-  padding: 1% 2%;
-  border: none;
-  border-radius: 0;
-  background: transparent;
-  box-shadow: none;
-  color: var(--slip-ink);
-  font-family: var(--slip-font);
-  font-size: 4.6cqw;
-  line-height: 1.58;
-  letter-spacing: .03em;
+  padding: 0 2px;
+  color: #fff3d2;
+  font-family: "PingFang SC", "Hiragino Sans GB", "Noto Sans SC", sans-serif;
+  font-size: 12px;
+  letter-spacing: .1em;
+  line-height: 1.4;
   text-align: center;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, .55);
+}
+.slip-read-btn {
+  pointer-events: auto;
+  appearance: none;
+  -webkit-appearance: none;
+  position: relative;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 48px;
+  padding: 10px 16px;
+  border: 1.5px solid #e6bb70;
+  border-radius: 5px;
+  color: #fff3d2;
+  font-family: "Songti SC", "STSong", "SimSun", "Noto Serif SC", serif;
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: .28em;
+  text-indent: .28em;
+  line-height: 1;
+  cursor: pointer;
+  background:
+    linear-gradient(180deg, rgba(255, 243, 210, .22), transparent 42%),
+    linear-gradient(90deg, #842016 0%, #b63c27 48%, #842016 100%);
+  box-shadow:
+    0 0 0 2px #6b1c14,
+    0 0 0 3px #e6bb70,
+    inset 0 1px 0 rgba(255, 243, 210, .35),
+    inset 0 -10px 14px rgba(50, 10, 8, .22),
+    0 8px 16px rgba(90, 22, 16, .32);
+}
+.slip-read-btn::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(110deg, transparent 30%, rgba(255, 243, 210, .28) 48%, transparent 66%);
+  transform: translateX(-120%);
+  pointer-events: none;
+}
+.slip-read-arrow {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-right: 1.6px solid #e6bb70;
+  border-top: 1.6px solid #e6bb70;
+  transform: rotate(45deg);
+  margin-left: 1px;
+}
+.slip-read-btn:active {
+  transform: translateY(1px) scale(.985);
+  box-shadow:
+    0 0 0 2px #6b1c14,
+    0 0 0 3px #e6bb70,
+    inset 0 2px 6px rgba(40, 8, 6, .35);
+}
+.slip-read-btn:focus {
+  outline: none;
+}
+.slip-read-btn:focus-visible {
+  outline: 2px solid #e6bb70;
+  outline-offset: 3px;
+}
+.slip-scroll.is-read .slip-paper {
+  transform: translateY(-12px);
+}
+.slip-scroll.revealed:not(.is-read) .slip-read-layer {
+  opacity: 1;
+}
+.slip-scroll.is-read .slip-read-layer {
+  opacity: 0;
+  pointer-events: none;
+  max-height: 0;
+  gap: 0;
+  margin: 0;
+  overflow: hidden;
+}
+.slip-read-btn:disabled {
+  cursor: default;
+}
+.slip-meaning {
+  overflow: hidden;
+  max-height: 0;
+  opacity: 0;
+  margin: 0;
+  padding: 0 8px;
+  color: #f4efe4;
+  text-align: center;
+  pointer-events: none;
+  transition: max-height .45s ease, opacity .35s ease, margin .35s ease;
+}
+.slip-scroll.is-read .slip-meaning {
+  max-height: 420px;
+  opacity: 1;
+  margin: 6px 0 10px;
+  padding: 12px 12px 14px;
+  pointer-events: auto;
+  background: rgba(16, 10, 6, .46);
+  border-radius: 10px;
+}
+.slip-meaning-kicker {
+  margin: 0 0 10px;
+  color: #f0c27a;
+  font-size: 1.02rem;
+  letter-spacing: .28em;
+  text-indent: .28em;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, .55);
+}
+.slip-meaning-text {
+  margin: 0;
+  color: #fff8ec;
+  font-family: "Songti SC", "STSong", "Noto Serif SC", serif;
+  font-size: 1.12rem;
+  line-height: 1.8;
+  letter-spacing: .04em;
+  text-shadow: 0 1px 10px rgba(0, 0, 0, .6);
+}
+.slip-ai-btn {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  margin: 0;
+  padding: 12px 16px;
+  border: 1px solid rgba(230, 187, 112, .7);
+  border-radius: 999px;
+  background: transparent;
+  color: #f0c27a;
+  font-family: inherit;
+  font-size: 1rem;
+  letter-spacing: .12em;
   cursor: pointer;
 }
-.slip-unlock::before {
-  display: none;
+@keyframes slipReadBreath {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.025); }
 }
-.slip-unlock-copy {
-  display: block;
-  max-width: 94%;
+@keyframes slipReadSheen {
+  0%, 55% { transform: translateX(-120%); }
+  100% { transform: translateX(120%); }
 }
-.slip-unlock-cta {
-  display: block;
-  margin: 1px 0;
-  font-weight: 400;
-  color: var(--slip-ink);
-}
-.slip-unlock-cta em {
-  font-style: normal;
-  font-weight: 700;
-}
-.slip-unlock-cta i {
-  font-style: normal;
-  color: var(--slip-red);
-  font-weight: 700;
-}
-.slip-unlock-hint {
-  display: block;
+@media (prefers-reduced-motion: no-preference) {
+  .slip-scroll.revealed:not(.is-read) .slip-read-btn {
+    animation: slipReadBreath 2s ease-in-out infinite;
+  }
+  .slip-scroll.revealed:not(.is-read) .slip-read-btn::after {
+    animation: slipReadSheen 2s ease-in-out infinite;
+  }
 }
 
 .slip-actions {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 12px;
   align-items: stretch;
   flex: 0 0 auto;
   opacity: 0;
+  margin-top: 2px;
   transition: opacity .32s ease;
 }
+.slip-scroll.has-art .slip-actions {
+  gap: 14px;
+}
 .slip-scroll.revealed .slip-paper,
-.slip-scroll.revealed .slip-actions {
+.slip-scroll.revealed .slip-actions,
+.slip-scroll.is-read .slip-meaning {
   opacity: 1;
 }
 
@@ -1122,18 +1295,104 @@ body.ritual-assets-ready .page2-bg {
   text-align: center;
 }
 .again {
-  color: #f4efe4;
-  background: rgba(18, 14, 10, .42);
-  border: 1px solid rgba(244, 239, 228, .28);
+  color: rgba(244, 239, 228, .72);
+  background: none;
+  border: none;
+  padding: 4px 8px;
+  font-size: .88rem;
+  letter-spacing: .16em;
+  text-decoration: underline;
+  text-underline-offset: 4px;
 }
 .again:hover {
-  background: rgba(18, 14, 10, .55);
+  background: none;
+  color: #fff8ec;
 }
 .share-thoughts {
   color: #1a1208;
   background: linear-gradient(180deg, #f6e4b4, #e4bc62);
   border: none;
   box-shadow: 0 4px 12px rgba(120,80,20,.22);
+}
+.share-backup {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(10, 7, 5, .72);
+}
+.share-backup[hidden] { display: none !important; }
+.share-backup-card {
+  width: min(420px, 100%);
+  max-height: min(88dvh, 720px);
+  overflow: auto;
+  padding: 22px 18px 18px;
+  border-radius: 16px;
+  background: #1c1612;
+  color: #f4eee6;
+  text-align: center;
+  box-shadow: 0 18px 40px rgba(0,0,0,.4);
+}
+.share-backup-kicker {
+  margin: 0 0 12px;
+  color: #e6bb70;
+  letter-spacing: .28em;
+  text-indent: .28em;
+}
+.share-backup-card img {
+  display: block;
+  width: min(220px, 64%);
+  height: auto;
+  margin: 0 auto 14px;
+  border-radius: 6px;
+}
+.share-backup-hint {
+  margin: 0 0 10px;
+  color: rgba(244, 238, 230, .78);
+  font-size: .86rem;
+  line-height: 1.6;
+}
+.share-backup-text {
+  margin: 0 0 14px;
+  padding: 10px 12px;
+  text-align: left;
+  white-space: pre-wrap;
+  color: #fff8ec;
+  background: rgba(0,0,0,.28);
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: .88rem;
+  line-height: 1.65;
+}
+.share-backup-card button {
+  appearance: none;
+  width: 100%;
+  margin-top: 8px;
+  padding: 11px 12px;
+  border-radius: 999px;
+  font-family: inherit;
+  font-size: .95rem;
+  letter-spacing: .12em;
+  cursor: pointer;
+}
+.share-backup-card .share-go {
+  color: #1a1208;
+  background: linear-gradient(180deg, #f6e4b4, #e4bc62);
+  border: none;
+}
+.share-backup-card .share-copy,
+.share-backup-card .share-dl {
+  color: #f4efe4;
+  background: rgba(18, 14, 10, .42);
+  border: 1px solid rgba(244, 239, 228, .28);
+}
+.share-backup-card .share-cancel {
+  color: rgba(244, 238, 230, .7);
+  background: transparent;
+  border: none;
 }
 
 .draw-btn {
@@ -1204,6 +1463,9 @@ body.ritual-assets-ready .page2-bg {
   .scroll-cue { backdrop-filter: none; }
   .slip-scroll {
     width: min(244px, 76vw, calc(68dvh * 508 / 994));
+  }
+  .slip-scroll.has-art {
+    width: min(286px, 82vw, calc(54dvh * 1085 / 1450));
   }
   .slip-paper {
     min-height: 0;
@@ -1331,21 +1593,29 @@ body.ritual-assets-ready .page2-bg {
           <div class="scroll-glow" aria-hidden="true"></div>
           <div class="scroll-body">
             <div class="scroll-inner">
-              <div class="slip-paper">
+              <div class="slip-paper" id="slipPaper">
+                <img class="slip-card-art" id="slipCardArt" alt="" hidden decoding="async" />
                 <h2 class="slip-no" id="slipNo"></h2>
                 <p class="slip-name" id="topicTitle"></p>
                 <span class="slip-seal" id="slipGrade"></span>
                 <span class="slip-badge" id="verseBadge">签文</span>
                 <p class="slip-verse" id="oracleText"></p>
-                <button type="button" class="slip-unlock" id="unlockBtn">
-                  <span class="slip-unlock-copy" id="unlockCopy">这一签只说到这里，别人的故事或许还有下文。</span>
-                  <span class="slip-unlock-cta">点击查看「<em>内容发现</em>」模块 <i aria-hidden="true">›</i></span>
-                  <span class="slip-unlock-hint">即可解锁你的签</span>
+              </div>
+              <div class="slip-read-layer" id="slipReadLayer">
+                <p class="slip-read-hint">签已落定 · 点击查看签解</p>
+                <button type="button" class="slip-read-btn" id="readBtn">
+                  <span>为我解签</span>
+                  <i class="slip-read-arrow" aria-hidden="true"></i>
                 </button>
               </div>
+              <div class="slip-meaning" id="slipMeaning" hidden>
+                <p class="slip-meaning-kicker">签解</p>
+                <p class="slip-meaning-text" id="slipMeaningText"></p>
+              </div>
               <div class="slip-actions">
-                <button type="button" class="again" id="againBtn">再来一签</button>
+                <button type="button" class="slip-ai-btn" id="aiSearchBtn">去知乎 AI 解签</button>
                 <button type="button" class="share-thoughts" id="shareBtn">分享到想法</button>
+                <button type="button" class="again" id="againBtn">再来一签</button>
                 <p class="ritual-disclaimer">本活动为传统文化趣味玩法，内容仅供娱乐参考，不构成任何运势预测或现实指导</p>
               </div>
             </div>
@@ -1365,6 +1635,18 @@ body.ritual-assets-ready .page2-bg {
       </section>
     </main>
 
-    <script src="boot.js?v=398" defer></script>
+    <div class="share-backup" id="shareBackup" hidden>
+      <div class="share-backup-card">
+        <p class="share-backup-kicker">分享到想法</p>
+        <img id="shareBackupArt" alt="今日一签" hidden />
+        <p class="share-backup-hint" id="shareBackupHint">电脑上请先复制文案、下载签卡，再到知乎首页发想法。</p>
+        <pre class="share-backup-text" id="shareBackupText"></pre>
+        <button type="button" class="share-copy" id="shareCopyBtn">复制文案</button>
+        <button type="button" class="share-dl" id="shareDownloadBtn">下载签卡</button>
+        <button type="button" class="share-go" id="shareGoZhihuBtn">去知乎发想法</button>
+        <button type="button" class="share-cancel" id="shareBackupClose">取消</button>
+      </div>
+    </div>
+    <script src="boot.js?v=404" defer></script>
   </body>
 </html>

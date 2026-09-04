@@ -1,5 +1,5 @@
 /* v300 — 音效网络优先；避免大 wav 被坏缓存卡死无声 */
-const CACHE = "kanshan-v398";
+const CACHE = "kanshan-v404";
 const SHELL = ["./cover-mobile.jpg?v=398", "./cover.jpg?v=398"];
 
 self.addEventListener("install", (e) => {
@@ -34,6 +34,7 @@ function networkFirstDoc(url) {
     p.includes("boot.js") ||
     p.includes("hot-cache") ||
     p.includes("hot-seed") ||
+    p.includes("slip-cards") ||
     p.endsWith(".html") ||
     p === "/"
   );

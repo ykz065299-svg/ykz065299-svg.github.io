@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>出签间距 · 100 版</title>
+<style>
+:root { --song: "Songti SC","STSong","SimSun","Noto Serif SC",serif; }
+* { box-sizing: border-box; }
+html, body { margin: 0; background: #14110e; color: #f4eee6; font-family: var(--song); }
+body { padding: 22px 14px 90px; }
+.intro { max-width: 1280px; margin: 0 auto 18px; }
+.intro h1 { margin: 0 0 8px; font-size: 1.4rem; letter-spacing: .14em; }
+.intro p { margin: 0 0 8px; color: #c9b8a4; font-size: .95rem; line-height: 1.7; max-width: 52em; }
+.tools { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+.tools button, .tools a {
+  appearance: none; border: 1px solid rgba(243,235,224,.24); background: rgba(0,0,0,.28);
+  color: #f3ebe0; padding: 6px 12px; border-radius: 999px; cursor: pointer;
+  font: inherit; font-size: .78rem; letter-spacing: .08em; text-decoration: none;
+}
+.tools button.on { background: #8a2c1c; border-color: #8a2c1c; }
+.wall {
+  max-width: 1280px; margin: 0 auto;
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 18px 12px;
+}
+.shot { text-decoration: none; color: inherit; display: flex; flex-direction: column; gap: 8px; cursor: pointer; }
+.shot h2 { margin: 0; font-size: .78rem; font-weight: 500; letter-spacing: .06em; color: rgba(243,235,224,.78); }
+.shot h2 b { font-weight: 700; color: #f0c27a; margin-right: 6px; }
+.shot.is-now h2 b { color: #7dcea0; }
+.shot.is-old h2 b { color: #e07a6a; }
+.phone {
+  width: 100%; aspect-ratio: 390 / 760;
+  border-radius: 10px; overflow: hidden; position: relative;
+  background:
+    radial-gradient(ellipse 80% 46% at 50% 18%, rgba(90,62,28,.28), transparent 70%),
+    linear-gradient(180deg, #3a2a1c 0%, #1a140f 70%);
+}
+.stage {
+  position: absolute; inset: 6% 8% 8%;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+}
+.stack { width: var(--card); max-width: 100%; display: flex; flex-direction: column; align-items: stretch; gap: var(--stack); }
+.paper { position: relative; width: 100%; line-height: 0; filter: drop-shadow(0 8px 14px rgba(0,0,0,.36)); }
+.paper img { width: 100%; height: auto; display: block; }
+.layer { display: flex; flex-direction: column; align-items: center; gap: var(--hint-gap); width: var(--layer-w); }
+.layer.on {
+  position: absolute; left: 50%; bottom: var(--bottom); transform: translateX(-50%); z-index: 2;
+}
+.layer.flow { position: relative; margin: 0 auto; }
+.hint {
+  margin: 0; text-align: center; line-height: 1.35; letter-spacing: .06em;
+  font-family: "PingFang SC","Hiragino Sans GB","Noto Sans SC",sans-serif;
+  font-size: var(--hint-px);
+}
+.hint.on-card { color: #5a2f24; text-shadow: 0 1px 0 rgba(255,248,232,.7); }
+.hint.off-card { color: #fff3d2; text-shadow: 0 1px 6px rgba(0,0,0,.55); }
+.btn {
+  width: 100%; min-height: var(--btn-h); padding: 0 8px;
+  display: flex; align-items: center; justify-content: center; gap: 5px;
+  border: 1px solid #e6bb70; border-radius: 4px; color: #fff3d2;
+  font-size: calc(var(--btn-h) * .34); font-weight: 600; letter-spacing: .18em;
+  background: linear-gradient(90deg, #842016 0%, #b63c27 48%, #842016 100%);
+  box-shadow: 0 0 0 1.5px #6b1c14, 0 0 0 2.5px #e6bb70, 0 4px 8px rgba(90,22,16,.32);
+}
+.arrow { width: 5px; height: 5px; border-right: 1.3px solid #e6bb70; border-top: 1.3px solid #e6bb70; transform: rotate(45deg); }
+.actions { display: flex; flex-direction: column; gap: var(--act); width: 100%; }
+.pill {
+  width: 100%; border-radius: 999px; padding: 7px 8px; text-align: center;
+  font-size: 10px; letter-spacing: .12em;
+}
+.pill.again { color: #f4efe4; background: rgba(20,14,10,.42); border: 1px solid rgba(244,239,228,.28); }
+.pill.share {
+  color: #5a2f18;
+  background: linear-gradient(180deg, #f0d08a, #d4a24a);
+  border: 1px solid #e6bb70;
+}
+.shot:target .phone, .shot.open .phone { outline: 2px solid #e4bc62; }
+.lightbox {
+  display: none; position: fixed; inset: 0; z-index: 20;
+  background: rgba(8,6,4,.78); align-items: center; justify-content: center; padding: 24px;
+}
+.lightbox.show { display: flex; }
+.lightbox .big { width: min(390px, 92vw); }
+.lightbox .big .phone { aspect-ratio: 390 / 844; }
+.lightbox h3 { margin: 0 0 10px; text-align: center; letter-spacing: .12em; }
+.cap { margin: 0; font-size: .72rem; color: #9a8570; line-height: 1.45; }
+</style>
+</head>
+<body>
+<div class="intro">
+  <h1>出签间距 · 100 版</h1>
+  <p>对照你说的「太拥挤了」：提示压住诗/印、红钮贴签卡底边、和「再来一签」几乎没缝。文案不变，按钮不画进 PNG。点格子看大图，记住编号告诉我接哪一版。</p>
+  <p><b style="color:#e07a6a">001</b> 是你截图那版（压在卡上）。<b style="color:#7dcea0">002</b> 是现在主流程（解签层在卡外）。003 起按「抬离底边 / 拉开缝 / 卡大一点 / 提示与按钮拆开」扫。</p>
+  <div class="tools">
+    <button type="button" data-f="all" class="on">全部</button>
+    <button type="button" data-f="on">压在卡上</button>
+    <button type="button" data-f="below">整层在外</button>
+    <button type="button" data-f="split-hint">提示在外</button>
+    <button type="button" data-f="split-btn">按钮在外</button>
+    <a href="/?v=402&slip=5">回主流程预览</a>
+  </div>
+</div>
+<div class="wall" id="wall"></div>
+<div class="lightbox" id="box">
+  <div>
+    <h3 id="boxTitle"></h3>
+    <div class="big" id="boxBody"></div>
+  </div>
+</div>
+<script>
+const CARD = "art/slip-read-studio.jpg?v=402";
+const V = [{"name": "原挤压卡", "place": "on", "card": 244, "bottom": 8, "layerW": 70, "hintGap": 7, "stackGap": 12, "actGap": 8, "btnH": 48, "hintPx": 11, "note": "你截图那版", "id": "001"}, {"name": "现行卡外", "place": "below", "card": 300, "bottom": 8, "layerW": 78, "hintGap": 10, "stackGap": 18, "actGap": 14, "btnH": 48, "hintPx": 12, "note": "现在主流程 v401", "id": "002"}, {"name": "原位略抬", "place": "on", "card": 244, "bottom": 10, "layerW": 70, "hintGap": 8, "stackGap": 12, "actGap": 8, "btnH": 48, "hintPx": 11, "note": "", "id": "003"}, {"name": "原位再抬", "place": "on", "card": 244, "bottom": 12, "layerW": 68, "hintGap": 10, "stackGap": 14, "actGap": 10, "btnH": 46, "hintPx": 11, "note": "", "id": "004"}, {"name": "原位贴边", "place": "on", "card": 244, "bottom": 5.5, "layerW": 70, "hintGap": 7, "stackGap": 12, "actGap": 8, "btnH": 48, "hintPx": 11, "note": "", "id": "005"}, {"name": "窄卡疏缝", "place": "on", "card": 244, "bottom": 9, "layerW": 66, "hintGap": 12, "stackGap": 16, "actGap": 12, "btnH": 46, "hintPx": 10, "note": "", "id": "006"}, {"name": "窄卡小钮", "place": "on", "card": 244, "bottom": 10, "layerW": 62, "hintGap": 10, "stackGap": 14, "actGap": 10, "btnH": 42, "hintPx": 10, "note": "", "id": "007"}, {"name": "窄卡宽钮", "place": "on", "card": 244, "bottom": 8, "layerW": 78, "hintGap": 8, "stackGap": 12, "actGap": 8, "btnH": 48, "hintPx": 11, "note": "", "id": "008"}, {"name": "提示更淡", "place": "on", "card": 244, "bottom": 9, "layerW": 66, "hintGap": 14, "stackGap": 14, "actGap": 10, "btnH": 44, "hintPx": 9, "note": "", "id": "009"}, {"name": "提示加空", "place": "on", "card": 244, "bottom": 11, "layerW": 64, "hintGap": 16, "stackGap": 16, "actGap": 12, "btnH": 44, "hintPx": 10, "note": "", "id": "010"}, {"name": "窄卡底6缝6", "place": "on", "card": 244, "bottom": 6, "layerW": 68, "hintGap": 6, "stackGap": 14, "actGap": 10, "btnH": 46, "hintPx": 10, "note": "", "id": "011"}, {"name": "窄卡底6缝10", "place": "on", "card": 244, "bottom": 6, "layerW": 68, "hintGap": 10, "stackGap": 14, "actGap": 10, "btnH": 46, "hintPx": 10, "note": "", "id": "012"}, {"name": "窄卡底6缝14", "place": "on", "card": 244, "bottom": 6, "layerW": 68, "hintGap": 14, "stackGap": 14, "actGap": 10, "btnH": 46, "hintPx": 10, "note": "", "id": "013"}, {"name": "窄卡底8缝8", "place": "on", "card": 244, "bottom": 8, "layerW": 68, "hintGap": 8, "stackGap": 14, "actGap": 10, "btnH": 46, "hintPx": 10, "note": "", "id": "014"}, {"name": "窄卡底8缝12", "place": "on", "card": 244, "bottom": 8, "layerW": 68, "hintGap": 12, "stackGap": 14, "actGap": 10, "btnH": 46, "hintPx": 10, "note": "", "id": "015"}, {"name": "窄卡底8缝16", "place": "on", "card": 244, "bottom": 8, "layerW": 68, "hintGap": 16, "stackGap": 14, "actGap": 10, "btnH": 46, "hintPx": 10, "note": "", "id": "016"}, {"name": "窄卡底10缝8", "place": "on", "card": 244, "bottom": 10, "layerW": 68, "hintGap": 8, "stackGap": 14, "actGap": 10, "btnH": 46, "hintPx": 10, "note": "", "id": "017"}, {"name": "窄卡底10缝12", "place": "on", "card": 244, "bottom": 10, "layerW": 68, "hintGap": 12, "stackGap": 14, "actGap": 10, "btnH": 46, "hintPx": 10, "note": "", "id": "018"}, {"name": "窄卡底10缝16", "place": "on", "card": 244, "bottom": 10, "layerW": 68, "hintGap": 16, "stackGap": 14, "actGap": 10, "btnH": 46, "hintPx": 10, "note": "", "id": "019"}, {"name": "窄卡底12缝8", "place": "on", "card": 244, "bottom": 12, "layerW": 68, "hintGap": 8, "stackGap": 14, "actGap": 10, "btnH": 46, "hintPx": 10, "note": "", "id": "020"}, {"name": "窄卡底12缝12", "place": "on", "card": 244, "bottom": 12, "layerW": 68, "hintGap": 12, "stackGap": 14, "actGap": 10, "btnH": 46, "hintPx": 10, "note": "", "id": "021"}, {"name": "窄卡底12缝16", "place": "on", "card": 244, "bottom": 12, "layerW": 68, "hintGap": 16, "stackGap": 14, "actGap": 10, "btnH": 46, "hintPx": 10, "note": "", "id": "022"}, {"name": "窄卡底14缝10", "place": "on", "card": 244, "bottom": 14, "layerW": 68, "hintGap": 10, "stackGap": 14, "actGap": 10, "btnH": 46, "hintPx": 10, "note": "", "id": "023"}, {"name": "窄卡底14缝14", "place": "on", "card": 244, "bottom": 14, "layerW": 68, "hintGap": 14, "stackGap": 14, "actGap": 10, "btnH": 46, "hintPx": 10, "note": "", "id": "024"}, {"name": "窄卡底16缝12", "place": "on", "card": 244, "bottom": 16, "layerW": 68, "hintGap": 12, "stackGap": 14, "actGap": 10, "btnH": 46, "hintPx": 10, "note": "", "id": "025"}, {"name": "中卡贴底", "place": "on", "card": 268, "bottom": 8, "layerW": 66, "hintGap": 10, "stackGap": 16, "actGap": 10, "btnH": 46, "hintPx": 11, "note": "", "id": "026"}, {"name": "中卡中缝", "place": "on", "card": 268, "bottom": 10, "layerW": 66, "hintGap": 12, "stackGap": 18, "actGap": 12, "btnH": 46, "hintPx": 11, "note": "", "id": "027"}, {"name": "中卡上抬", "place": "on", "card": 268, "bottom": 12, "layerW": 64, "hintGap": 12, "stackGap": 20, "actGap": 12, "btnH": 44, "hintPx": 10, "note": "", "id": "028"}, {"name": "宽卡贴底", "place": "on", "card": 286, "bottom": 8, "layerW": 66, "hintGap": 10, "stackGap": 16, "actGap": 12, "btnH": 48, "hintPx": 11, "note": "", "id": "029"}, {"name": "宽卡中缝", "place": "on", "card": 286, "bottom": 10, "layerW": 68, "hintGap": 12, "stackGap": 18, "actGap": 14, "btnH": 48, "hintPx": 11, "note": "", "id": "030"}, {"name": "宽卡上抬", "place": "on", "card": 286, "bottom": 12, "layerW": 64, "hintGap": 14, "stackGap": 20, "actGap": 14, "btnH": 46, "hintPx": 10, "note": "", "id": "031"}, {"name": "大卡贴底", "place": "on", "card": 300, "bottom": 8, "layerW": 66, "hintGap": 10, "stackGap": 16, "actGap": 12, "btnH": 48, "hintPx": 11, "note": "", "id": "032"}, {"name": "大卡中缝", "place": "on", "card": 300, "bottom": 10, "layerW": 68, "hintGap": 12, "stackGap": 20, "actGap": 14, "btnH": 48, "hintPx": 11, "note": "", "id": "033"}, {"name": "大卡上抬", "place": "on", "card": 300, "bottom": 12, "layerW": 64, "hintGap": 14, "stackGap": 22, "actGap": 14, "btnH": 46, "hintPx": 10, "note": "", "id": "034"}, {"name": "更大中缝", "place": "on", "card": 312, "bottom": 9, "layerW": 66, "hintGap": 12, "stackGap": 20, "actGap": 14, "btnH": 48, "hintPx": 11, "note": "", "id": "035"}, {"name": "更大疏朗", "place": "on", "card": 312, "bottom": 11, "layerW": 62, "hintGap": 14, "stackGap": 24, "actGap": 16, "btnH": 46, "hintPx": 10, "note": "", "id": "036"}, {"name": "大卡窄钮", "place": "on", "card": 300, "bottom": 9, "layerW": 60, "hintGap": 12, "stackGap": 18, "actGap": 12, "btnH": 44, "hintPx": 10, "note": "", "id": "037"}, {"name": "宽卡细钮", "place": "on", "card": 286, "bottom": 11, "layerW": 58, "hintGap": 14, "stackGap": 20, "actGap": 14, "btnH": 42, "hintPx": 10, "note": "", "id": "038"}, {"name": "大卡回落", "place": "on", "card": 300, "bottom": 13, "layerW": 70, "hintGap": 10, "stackGap": 16, "actGap": 12, "btnH": 48, "hintPx": 11, "note": "", "id": "039"}, {"name": "宽卡近边", "place": "on", "card": 286, "bottom": 7, "layerW": 72, "hintGap": 8, "stackGap": 14, "actGap": 10, "btnH": 48, "hintPx": 11, "note": "", "id": "040"}, {"name": "窄卡外置", "place": "below", "card": 244, "bottom": 8, "layerW": 70, "hintGap": 8, "stackGap": 14, "actGap": 10, "btnH": 48, "hintPx": 12, "note": "", "id": "041"}, {"name": "窄卡外疏", "place": "below", "card": 244, "bottom": 8, "layerW": 78, "hintGap": 10, "stackGap": 16, "actGap": 12, "btnH": 48, "hintPx": 12, "note": "", "id": "042"}, {"name": "中卡外置", "place": "below", "card": 268, "bottom": 8, "layerW": 78, "hintGap": 10, "stackGap": 18, "actGap": 12, "btnH": 48, "hintPx": 12, "note": "", "id": "043"}, {"name": "宽卡外置", "place": "below", "card": 286, "bottom": 8, "layerW": 78, "hintGap": 10, "stackGap": 18, "actGap": 14, "btnH": 48, "hintPx": 12, "note": "", "id": "044"}, {"name": "大卡外置", "place": "below", "card": 300, "bottom": 8, "layerW": 78, "hintGap": 10, "stackGap": 18, "actGap": 14, "btnH": 48, "hintPx": 12, "note": "", "id": "045"}, {"name": "外置紧缝", "place": "below", "card": 300, "bottom": 8, "layerW": 78, "hintGap": 8, "stackGap": 14, "actGap": 12, "btnH": 48, "hintPx": 12, "note": "", "id": "046"}, {"name": "外置中疏", "place": "below", "card": 300, "bottom": 8, "layerW": 78, "hintGap": 12, "stackGap": 22, "actGap": 14, "btnH": 48, "hintPx": 12, "note": "", "id": "047"}, {"name": "外置大疏", "place": "below", "card": 300, "bottom": 8, "layerW": 78, "hintGap": 14, "stackGap": 26, "actGap": 16, "btnH": 46, "hintPx": 12, "note": "", "id": "048"}, {"name": "外置极疏", "place": "below", "card": 300, "bottom": 8, "layerW": 78, "hintGap": 16, "stackGap": 30, "actGap": 18, "btnH": 44, "hintPx": 12, "note": "", "id": "049"}, {"name": "更大外置", "place": "below", "card": 312, "bottom": 8, "layerW": 74, "hintGap": 12, "stackGap": 24, "actGap": 16, "btnH": 48, "hintPx": 12, "note": "", "id": "050"}, {"name": "宽卡外宽", "place": "below", "card": 286, "bottom": 8, "layerW": 82, "hintGap": 10, "stackGap": 20, "actGap": 14, "btnH": 48, "hintPx": 12, "note": "", "id": "051"}, {"name": "中卡外宽", "place": "below", "card": 268, "bottom": 8, "layerW": 86, "hintGap": 12, "stackGap": 22, "actGap": 14, "btnH": 46, "hintPx": 12, "note": "", "id": "052"}, {"name": "外置窄钮", "place": "below", "card": 300, "bottom": 8, "layerW": 70, "hintGap": 12, "stackGap": 20, "actGap": 16, "btnH": 48, "hintPx": 12, "note": "", "id": "053"}, {"name": "外置细钮", "place": "below", "card": 300, "bottom": 8, "layerW": 64, "hintGap": 10, "stackGap": 18, "actGap": 14, "btnH": 44, "hintPx": 11, "note": "", "id": "054"}, {"name": "外置钮紧", "place": "below", "card": 300, "bottom": 8, "layerW": 78, "hintGap": 10, "stackGap": 18, "actGap": 10, "btnH": 48, "hintPx": 12, "note": "", "id": "055"}, {"name": "外置钮疏", "place": "below", "card": 300, "bottom": 8, "layerW": 78, "hintGap": 10, "stackGap": 18, "actGap": 18, "btnH": 48, "hintPx": 12, "note": "", "id": "056"}, {"name": "提近栈疏", "place": "below", "card": 300, "bottom": 8, "layerW": 78, "hintGap": 6, "stackGap": 20, "actGap": 14, "btnH": 48, "hintPx": 12, "note": "", "id": "057"}, {"name": "提疏栈中", "place": "below", "card": 300, "bottom": 8, "layerW": 78, "hintGap": 16, "stackGap": 16, "actGap": 14, "btnH": 48, "hintPx": 12, "note": "", "id": "058"}, {"name": "宽卡极疏", "place": "below", "card": 286, "bottom": 8, "layerW": 78, "hintGap": 12, "stackGap": 28, "actGap": 16, "btnH": 44, "hintPx": 12, "note": "", "id": "059"}, {"name": "窄卡外疏二", "place": "below", "card": 244, "bottom": 8, "layerW": 78, "hintGap": 12, "stackGap": 24, "actGap": 16, "btnH": 44, "hintPx": 11, "note": "", "id": "060"}, {"name": "分提窄卡", "place": "split-hint", "card": 244, "bottom": 8, "layerW": 70, "hintGap": 10, "stackGap": 14, "actGap": 10, "btnH": 48, "hintPx": 12, "note": "", "id": "061"}, {"name": "分提中卡", "place": "split-hint", "card": 268, "bottom": 9, "layerW": 66, "hintGap": 10, "stackGap": 16, "actGap": 12, "btnH": 46, "hintPx": 12, "note": "", "id": "062"}, {"name": "分提宽卡", "place": "split-hint", "card": 286, "bottom": 8, "layerW": 70, "hintGap": 10, "stackGap": 18, "actGap": 14, "btnH": 48, "hintPx": 12, "note": "", "id": "063"}, {"name": "分提大卡", "place": "split-hint", "card": 300, "bottom": 8, "layerW": 66, "hintGap": 10, "stackGap": 20, "actGap": 14, "btnH": 48, "hintPx": 12, "note": "", "id": "064"}, {"name": "分提上抬", "place": "split-hint", "card": 300, "bottom": 10, "layerW": 64, "hintGap": 10, "stackGap": 22, "actGap": 16, "btnH": 46, "hintPx": 12, "note": "", "id": "065"}, {"name": "分提再抬", "place": "split-hint", "card": 300, "bottom": 12, "layerW": 62, "hintGap": 10, "stackGap": 24, "actGap": 16, "btnH": 44, "hintPx": 12, "note": "", "id": "066"}, {"name": "分提近边", "place": "split-hint", "card": 286, "bottom": 7, "layerW": 72, "hintGap": 10, "stackGap": 18, "actGap": 12, "btnH": 48, "hintPx": 12, "note": "", "id": "067"}, {"name": "分提更大", "place": "split-hint", "card": 312, "bottom": 9, "layerW": 68, "hintGap": 10, "stackGap": 20, "actGap": 14, "btnH": 48, "hintPx": 12, "note": "", "id": "068"}, {"name": "分提紧栈", "place": "split-hint", "card": 300, "bottom": 8, "layerW": 70, "hintGap": 10, "stackGap": 16, "actGap": 10, "btnH": 48, "hintPx": 12, "note": "", "id": "069"}, {"name": "分提细钮", "place": "split-hint", "card": 300, "bottom": 11, "layerW": 60, "hintGap": 10, "stackGap": 26, "actGap": 16, "btnH": 42, "hintPx": 12, "note": "", "id": "070"}, {"name": "分提中疏", "place": "split-hint", "card": 268, "bottom": 10, "layerW": 66, "hintGap": 10, "stackGap": 20, "actGap": 14, "btnH": 46, "hintPx": 12, "note": "", "id": "071"}, {"name": "分提贴底", "place": "split-hint", "card": 286, "bottom": 6, "layerW": 74, "hintGap": 10, "stackGap": 14, "actGap": 10, "btnH": 48, "hintPx": 12, "note": "", "id": "072"}, {"name": "分提高空", "place": "split-hint", "card": 300, "bottom": 14, "layerW": 58, "hintGap": 10, "stackGap": 22, "actGap": 14, "btnH": 44, "hintPx": 12, "note": "", "id": "073"}, {"name": "分提窄疏", "place": "split-hint", "card": 244, "bottom": 10, "layerW": 68, "hintGap": 10, "stackGap": 18, "actGap": 12, "btnH": 44, "hintPx": 11, "note": "", "id": "074"}, {"name": "分提极疏", "place": "split-hint", "card": 312, "bottom": 8, "layerW": 66, "hintGap": 10, "stackGap": 28, "actGap": 18, "btnH": 46, "hintPx": 12, "note": "", "id": "075"}, {"name": "分钮窄卡", "place": "split-btn", "card": 244, "bottom": 10, "layerW": 70, "hintGap": 10, "stackGap": 16, "actGap": 12, "btnH": 48, "hintPx": 11, "note": "", "id": "076"}, {"name": "分钮中卡", "place": "split-btn", "card": 268, "bottom": 12, "layerW": 66, "hintGap": 10, "stackGap": 18, "actGap": 12, "btnH": 46, "hintPx": 11, "note": "", "id": "077"}, {"name": "分钮宽卡", "place": "split-btn", "card": 286, "bottom": 10, "layerW": 64, "hintGap": 10, "stackGap": 18, "actGap": 14, "btnH": 48, "hintPx": 11, "note": "", "id": "078"}, {"name": "分钮大卡", "place": "split-btn", "card": 300, "bottom": 8, "layerW": 68, "hintGap": 10, "stackGap": 20, "actGap": 14, "btnH": 48, "hintPx": 11, "note": "", "id": "079"}, {"name": "分钮上抬", "place": "split-btn", "card": 300, "bottom": 12, "layerW": 62, "hintGap": 10, "stackGap": 22, "actGap": 16, "btnH": 46, "hintPx": 10, "note": "", "id": "080"}, {"name": "分钮再抬", "place": "split-btn", "card": 300, "bottom": 14, "layerW": 60, "hintGap": 10, "stackGap": 24, "actGap": 16, "btnH": 44, "hintPx": 10, "note": "", "id": "081"}, {"name": "分钮宽中", "place": "split-btn", "card": 286, "bottom": 11, "layerW": 66, "hintGap": 10, "stackGap": 20, "actGap": 14, "btnH": 48, "hintPx": 11, "note": "", "id": "082"}, {"name": "分钮更大", "place": "split-btn", "card": 312, "bottom": 10, "layerW": 64, "hintGap": 10, "stackGap": 22, "actGap": 16, "btnH": 48, "hintPx": 11, "note": "", "id": "083"}, {"name": "分钮紧栈", "place": "split-btn", "card": 300, "bottom": 9, "layerW": 70, "hintGap": 10, "stackGap": 16, "actGap": 12, "btnH": 48, "hintPx": 11, "note": "", "id": "084"}, {"name": "分钮中疏", "place": "split-btn", "card": 268, "bottom": 13, "layerW": 64, "hintGap": 10, "stackGap": 20, "actGap": 14, "btnH": 44, "hintPx": 10, "note": "", "id": "085"}, {"name": "分钮贴文", "place": "split-btn", "card": 244, "bottom": 8, "layerW": 72, "hintGap": 10, "stackGap": 14, "actGap": 10, "btnH": 48, "hintPx": 11, "note": "", "id": "086"}, {"name": "分钮细高", "place": "split-btn", "card": 300, "bottom": 15, "layerW": 58, "hintGap": 10, "stackGap": 26, "actGap": 16, "btnH": 42, "hintPx": 10, "note": "", "id": "087"}, {"name": "分钮近边", "place": "split-btn", "card": 286, "bottom": 7, "layerW": 74, "hintGap": 10, "stackGap": 18, "actGap": 12, "btnH": 48, "hintPx": 11, "note": "", "id": "088"}, {"name": "分钮极疏", "place": "split-btn", "card": 300, "bottom": 12, "layerW": 66, "hintGap": 10, "stackGap": 28, "actGap": 18, "btnH": 46, "hintPx": 10, "note": "", "id": "089"}, {"name": "分钮大疏", "place": "split-btn", "card": 312, "bottom": 11, "layerW": 62, "hintGap": 10, "stackGap": 24, "actGap": 14, "btnH": 44, "hintPx": 10, "note": "", "id": "090"}, {"name": "疏朗卡外", "place": "below", "card": 300, "bottom": 8, "layerW": 78, "hintGap": 14, "stackGap": 28, "actGap": 16, "btnH": 46, "hintPx": 12, "note": "卡外大留白", "id": "091"}, {"name": "疏朗分钮", "place": "split-btn", "card": 300, "bottom": 12, "layerW": 64, "hintGap": 10, "stackGap": 24, "actGap": 16, "btnH": 46, "hintPx": 10, "note": "提示在卡上、按钮在外", "id": "092"}, {"name": "疏朗分提", "place": "split-hint", "card": 300, "bottom": 10, "layerW": 66, "hintGap": 10, "stackGap": 24, "actGap": 16, "btnH": 46, "hintPx": 12, "note": "按钮在卡上、提示在外", "id": "093"}, {"name": "中卡高抬", "place": "on", "card": 300, "bottom": 14, "layerW": 62, "hintGap": 14, "stackGap": 22, "actGap": 14, "btnH": 44, "hintPx": 10, "note": "", "id": "094"}, {"name": "中卡中空", "place": "on", "card": 286, "bottom": 11, "layerW": 64, "hintGap": 12, "stackGap": 20, "actGap": 14, "btnH": 46, "hintPx": 10, "note": "", "id": "095"}, {"name": "宽卡外置二", "place": "below", "card": 312, "bottom": 8, "layerW": 74, "hintGap": 12, "stackGap": 26, "actGap": 16, "btnH": 48, "hintPx": 12, "note": "", "id": "096"}, {"name": "窄卡外置三", "place": "below", "card": 244, "bottom": 8, "layerW": 78, "hintGap": 12, "stackGap": 22, "actGap": 14, "btnH": 44, "hintPx": 11, "note": "", "id": "097"}, {"name": "大钮疏缝", "place": "below", "card": 300, "bottom": 8, "layerW": 82, "hintGap": 12, "stackGap": 22, "actGap": 16, "btnH": 52, "hintPx": 12, "note": "", "id": "098"}, {"name": "小钮留白", "place": "below", "card": 300, "bottom": 8, "layerW": 64, "hintGap": 14, "stackGap": 26, "actGap": 16, "btnH": 40, "hintPx": 11, "note": "", "id": "099"}, {"name": "综合疏朗", "place": "split-hint", "card": 300, "bottom": 9, "layerW": 68, "hintGap": 10, "stackGap": 22, "actGap": 16, "btnH": 46, "hintPx": 12, "note": "综合：大卡、钮离底边、提示在外", "id": "100"}];
+const placeLabel = {on:"压卡上", below:"整层外", "split-hint":"提示外", "split-btn":"按钮外"};
+
+function mock(v, scaleHint) {
+  const stack = document.createElement("div");
+  stack.className = "stack";
+  const s = scaleHint || 0.55;
+  stack.style.width = (v.card * s) + "px";
+  stack.style.maxWidth = "100%";
+  stack.style.setProperty("--bottom", v.bottom + "%");
+  stack.style.setProperty("--layer-w", v.layerW + "%");
+  stack.style.setProperty("--hint-gap", Math.max(4, v.hintGap * s) + "px");
+  stack.style.setProperty("--stack", Math.max(4, v.stackGap * s) + "px");
+  stack.style.setProperty("--act", Math.max(4, v.actGap * s) + "px");
+  stack.style.setProperty("--btn-h", Math.max(22, v.btnH * s) + "px");
+  stack.style.setProperty("--hint-px", Math.max(7, v.hintPx * s) + "px");
+
+  const paper = document.createElement("div");
+  paper.className = "paper";
+  paper.innerHTML = `<img src="${CARD}" alt="" width="420" height="561" />`;
+
+  const hintOn = `<p class="hint on-card">签已落定 · 点击查看签解</p>`;
+  const hintOff = `<p class="hint off-card">签已落定 · 点击查看签解</p>`;
+  const btn = `<button type="button" class="btn"><span>为我解签</span><i class="arrow"></i></button>`;
+
+  if (v.place === "on") {
+    const layer = document.createElement("div");
+    layer.className = "layer on";
+    layer.innerHTML = hintOn + btn;
+    paper.appendChild(layer);
+    stack.append(paper, actions());
+  } else if (v.place === "below") {
+    const layer = document.createElement("div");
+    layer.className = "layer flow";
+    layer.innerHTML = hintOff + btn;
+    stack.append(paper, layer, actions());
+  } else if (v.place === "split-hint") {
+    const layer = document.createElement("div");
+    layer.className = "layer on";
+    layer.innerHTML = btn;
+    paper.appendChild(layer);
+    const hint = document.createElement("div");
+    hint.innerHTML = hintOff;
+    stack.append(paper, hint, actions());
+  } else {
+    const layer = document.createElement("div");
+    layer.className = "layer on";
+    layer.innerHTML = hintOn;
+    paper.appendChild(layer);
+    const out = document.createElement("div");
+    out.className = "layer flow";
+    out.innerHTML = btn;
+    stack.append(paper, out, actions());
+  }
+  return stack;
+}
+function actions() {
+  const el = document.createElement("div");
+  el.className = "actions";
+  el.innerHTML = `<div class="pill again">再来一签</div><div class="pill share">分享到想法</div>`;
+  return el;
+}
+function phoneWrap(v, scale) {
+  const phone = document.createElement("div");
+  phone.className = "phone";
+  const stage = document.createElement("div");
+  stage.className = "stage";
+  const stack = mock(v, scale);
+  stage.appendChild(stack);
+  phone.appendChild(stage);
+  return phone;
+}
+
+const wall = document.getElementById("wall");
+const box = document.getElementById("box");
+const boxTitle = document.getElementById("boxTitle");
+const boxBody = document.getElementById("boxBody");
+
+V.forEach((v) => {
+  const a = document.createElement("a");
+  a.className = "shot";
+  a.id = "r" + v.id;
+  a.href = "#r" + v.id;
+  a.dataset.place = v.place;
+  if (v.id === "001") a.classList.add("is-old");
+  if (v.id === "002") a.classList.add("is-now");
+  a.innerHTML = `<h2><b>${v.id}</b>${v.name} · ${placeLabel[v.place]}</h2>`;
+  a.appendChild(phoneWrap(v, 0.55));
+  const cap = document.createElement("p");
+  cap.className = "cap";
+  cap.textContent = v.note || `卡${v.card} 底${v.bottom}% 缝${v.hintGap}/${v.stackGap}/${v.actGap} 钮${v.btnH}`;
+  a.appendChild(cap);
+  a.addEventListener("click", (e) => {
+    e.preventDefault();
+    history.replaceState(null, "", "#r" + v.id);
+    boxTitle.textContent = v.id + "  " + v.name + "  ·  " + (v.note || placeLabel[v.place]);
+    boxBody.replaceChildren(phoneWrap(v, 1));
+    box.classList.add("show");
+  });
+  wall.appendChild(a);
+});
+
+box.addEventListener("click", () => box.classList.remove("show"));
+document.querySelectorAll(".tools button").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".tools button").forEach((b) => b.classList.remove("on"));
+    btn.classList.add("on");
+    const f = btn.dataset.f;
+    wall.querySelectorAll(".shot").forEach((el) => {
+      el.style.display = (f === "all" || el.dataset.place === f) ? "" : "none";
+    });
+  });
+});
+</script>
+</body>
+</html>
