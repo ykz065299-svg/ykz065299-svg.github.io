@@ -1283,6 +1283,11 @@ body.ritual-assets-ready .page2-bg {
 .slip-scroll.is-read .slip-meaning {
   opacity: 1;
 }
+.slip-scroll:not(.is-read) .slip-ai-btn,
+.slip-scroll:not(.is-read) .share-thoughts,
+.slip-scroll:not(.is-read) .again {
+  display: none;
+}
 
 .again, .share-thoughts {
   font-family: inherit;
@@ -1647,6 +1652,6 @@ body.ritual-assets-ready .page2-bg {
         <button type="button" class="share-cancel" id="shareBackupClose">取消</button>
       </div>
     </div>
-    <script src="boot.js?v=404" defer></script>
+    <script src="boot.js?v=406" defer></script>
   </body>
 </html>

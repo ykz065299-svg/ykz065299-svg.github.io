@@ -405,6 +405,34 @@ function displayCardSrc(slip) {
   return "";
 }
 
+function clearHostedCard() {
+  slipPaper?.classList.remove("is-hosted");
+  fortuneCard?.classList.remove("has-art");
+  if (!slipCardArt) return;
+  slipCardArt.onload = null;
+  slipCardArt.onerror = null;
+  slipCardArt.removeAttribute("src");
+  slipCardArt.hidden = true;
+  slipCardArt.alt = "";
+}
+
+function showHostedCard(url, name) {
+  if (!slipCardArt || !url) {
+    clearHostedCard();
+    return;
+  }
+  slipCardArt.onload = () => {
+    slipPaper?.classList.add("is-hosted");
+    fortuneCard?.classList.add("has-art");
+    slipCardArt.hidden = false;
+  };
+  slipCardArt.onerror = () => {
+    clearHostedCard();
+  };
+  slipCardArt.alt = name || "今日一签";
+  slipCardArt.src = url;
+}
+
 async function loadSlipCards() {
   try {
     const r = await fetch("data/slip-cards.json", { cache: "no-store" });
@@ -688,12 +716,7 @@ function clearSlip() {
   if (slipNo) slipNo.textContent = "";
   if (oracleText) oracleText.replaceChildren();
   if (topicTitle) topicTitle.textContent = "";
-  if (slipPaper) slipPaper.classList.remove("is-hosted");
-  if (slipCardArt) {
-    slipCardArt.removeAttribute("src");
-    slipCardArt.hidden = true;
-    slipCardArt.alt = "";
-  }
+  clearHostedCard();
   if (slipMeaningText) slipMeaningText.textContent = "";
   if (slipMeaning) slipMeaning.hidden = true;
   if (readBtn) readBtn.disabled = false;
@@ -725,19 +748,8 @@ function fillSlip(data) {
   if (slipMeaning) slipMeaning.hidden = true;
   if (readBtn) readBtn.disabled = false;
   const cardUrl = displayCardSrc(s);
-  if (slipPaper) slipPaper.classList.toggle("is-hosted", Boolean(cardUrl));
-  if (fortuneCard) fortuneCard.classList.toggle("has-art", Boolean(cardUrl));
-  if (slipCardArt) {
-    if (cardUrl) {
-      slipCardArt.src = cardUrl;
-      slipCardArt.hidden = false;
-      slipCardArt.alt = s.name || "今日一签";
-    } else {
-      slipCardArt.removeAttribute("src");
-      slipCardArt.hidden = true;
-      slipCardArt.alt = "";
-    }
-  }
+  if (cardUrl) showHostedCard(cardUrl, s.name);
+  else clearHostedCard();
   lastDraw = data;
 }
 
@@ -1267,7 +1279,7 @@ resetIdleCopy();
 
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("sw.js?v=404").catch(() => {});
+    navigator.serviceWorker.register("sw.js?v=406").catch(() => {});
   });
 }
 
