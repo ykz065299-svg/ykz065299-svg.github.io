@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>出签布局 · 500 版</title>
+<style>
+:root { --song: "Songti SC","STSong","SimSun","Noto Serif SC",serif; }
+* { box-sizing: border-box; }
+html, body { margin: 0; background: #14110e; color: #f4eee6; font-family: var(--song); }
+body { padding: 22px 14px 90px; }
+.intro { max-width: 1400px; margin: 0 auto 18px; }
+.intro h1 { margin: 0 0 8px; font-size: 1.35rem; letter-spacing: .12em; }
+.intro p { margin: 0 0 8px; color: #c9b8a4; font-size: .92rem; line-height: 1.65; max-width: 58em; }
+.wall { max-width: 1400px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(168px, 1fr)); gap: 14px 10px; }
+.shot { color: inherit; text-decoration: none; cursor: pointer; }
+.shot h2 { margin: 0 0 6px; font-size: .72rem; font-weight: 500; color: rgba(243,235,224,.72); }
+.shot h2 b { color: #f0c27a; margin-right: 4px; }
+.phone {
+  width: 100%; aspect-ratio: 390 / 760; border-radius: 10px; overflow: hidden; position: relative;
+  background:
+    url("art/layers/layer-bg-empty.png?v=318") center / cover no-repeat,
+    #1a140f;
+}
+.stack { position: absolute; left: 50%; display: flex; flex-direction: column; align-items: stretch; }
+.paper { width: 100%; line-height: 0; filter: drop-shadow(0 8px 14px rgba(0,0,0,.36)); }
+.paper img { width: 100%; height: auto; display: block; }
+.hint { margin: 0; color: #fff3d2; font-size: 8px; letter-spacing: .06em; text-align: center; text-shadow: 0 1px 6px #000; }
+.red {
+  width: 100%; min-height: 22px; display: flex; align-items: center; justify-content: center;
+  border: 1px solid #e6bb70; color: #fff3d2; font-size: 10px; letter-spacing: .08em;
+  background: linear-gradient(90deg,#842016,#b63c27,#842016);
+}
+.meaning { margin: 0; color: #fff8ec; text-align: center; }
+.meaning b { display: block; color: #f0c27a; letter-spacing: .18em; }
+.meaning p { margin: 0; }
+.ai { width: 100%; border: 1px solid rgba(230,187,112,.7); color: #f0c27a; background: transparent; text-align: center; }
+.share { width: 100%; color: #1a1208; background: linear-gradient(180deg,#f6e4b4,#e4bc62); text-align: center; }
+.again { width: 100%; color: rgba(244,239,228,.78); text-align: center; text-decoration: underline; background: none; border: none; }
+.cap { margin: 4px 0 0; font-size: .66rem; color: #9a8570; line-height: 1.4; }
+.lightbox { display: none; position: fixed; inset: 0; z-index: 20; background: rgba(8,6,4,.82); align-items: center; justify-content: center; padding: 24px; }
+.lightbox.show { display: flex; flex-direction: column; }
+.lightbox .big { width: min(390px, 92vw); }
+.lightbox .big .phone { aspect-ratio: 390 / 844; }
+.lightbox h3 { margin: 0 0 10px; text-align: center; letter-spacing: .1em; }
+</style>
+</head>
+<body>
+<div class="intro">
+  <h1>出签布局 · 500 版</h1>
+  <p>看山、签卡原图没改。只改卡多大、签解放哪、要不要黑底气泡、按钮怎么排。主流程当前接的是无罩印 + 签解无底（对照墙里偏「干净」的一档）。点编号放大，选定后告诉我编号。</p>
+</div>
+<div class="wall" id="wall"></div>
+<div class="lightbox" id="box"><h3 id="boxTitle"></h3><div class="big" id="boxBig"></div></div>
+<script>
+const MEANING = ["无底字", "浅底", "深气泡", "金线隔", "宣纸条"];
+const BTN = ["先解后链", "双钮+链", "只链", "横排", "红钮收底"];
+const POS = ["中心", "偏上", "贴顶", "靠下"];
+const CARD = [240, 260, 280, 300, 320];
+const READ = [0, 1];
+const NAMES = ["现行脏印", "去罩干净", "卡大居中", "签解无底", "宣纸签解", "按钮收束", "贴顶长卷", "海报感"];
+
+function variant(i) {
+  const n = i - 1;
+  return {
+    id: String(i).padStart(3, "0"),
+    card: CARD[n % 5],
+    meaning: MEANING[Math.floor(n / 5) % 5],
+    btn: BTN[Math.floor(n / 25) % 5],
+    pos: POS[Math.floor(n / 125) % 4],
+    read: READ[Math.floor(n / 500) % 2] || (i % 3 === 0 ? 1 : 0),
+    name: NAMES[i % NAMES.length]
+  };
+}
+
+function render(v) {
+  const top = v.pos === "贴顶" ? "6%" : v.pos === "偏上" ? "18%" : v.pos === "靠下" ? "28%" : "22%";
+  const w = Math.round(v.card * 0.42);
+  const meaningHtml = v.read ? meaningBlock(v) : `
+    <p class="hint">签已落定 · 点击查看签解</p>
+    <div class="red" style="border-radius:${v.btn==="红钮收底"?"3px":"5px"}">为我解签</div>`;
+  const actions = v.read ? actionBlock(v) : "";
+  return `<div class="phone"><div class="stack" style="top:${top};width:${w}px;transform:translateX(-50%);gap:${v.meaning==="深气泡"?"10px":"8px"}">
+    <div class="paper"><img src="art/slip-cards/${encodeURIComponent("49_不系轻舟.png")}" alt=""></div>
+    ${meaningHtml}${actions}
+  </div></div>`;
+}
+
+function meaningBlock(v) {
+  const styles = {
+    "无底字": "background:none;padding:0 2px;",
+    "浅底": "background:rgba(20,12,8,.28);padding:7px 8px;border-radius:8px;",
+    "深气泡": "background:rgba(10,7,5,.56);padding:8px 10px;border-radius:12px;",
+    "金线隔": "background:none;padding:8px 2px 2px;border-top:1px solid rgba(230,187,112,.45);",
+    "宣纸条": "background:rgba(246,228,188,.16);padding:8px 10px;border-radius:4px;"
+  };
+  return `<div class="meaning" style="${styles[v.meaning]}"><b style="font-size:9px">签解</b><p style="font-size:8px;line-height:1.45">外界总有声音和变化。不必每一次浪起，都跟着改变自己的方向。</p></div>`;
+}
+
+function actionBlock(v) {
+  if (v.btn === "只链") return `<div class="again" style="font-size:8px;padding:3px">再来一签</div>`;
+  if (v.btn === "横排") return `<div style="display:flex;gap:5px"><div class="ai" style="font-size:8px;padding:5px;border-radius:999px">AI 解签</div><div class="share" style="font-size:8px;padding:5px;border-radius:999px">分享</div></div><div class="again" style="font-size:8px;padding:3px">再来一签</div>`;
+  if (v.btn === "红钮收底") return `<div class="red" style="border-radius:3px;font-size:9px;min-height:20px">去知乎 AI 解签</div><div class="again" style="font-size:8px;padding:3px">再来一签</div>`;
+  return `<div class="ai" style="font-size:8px;padding:5px;border-radius:999px">去知乎 AI 解签</div><div class="share" style="font-size:8px;padding:5px;border-radius:999px">分享到想法</div><div class="again" style="font-size:8px;padding:3px">再来一签</div>`;
+}
+
+const wall = document.getElementById("wall");
+const frag = document.createDocumentFragment();
+for (let i = 1; i <= 500; i++) {
+  const v = variant(i);
+  const a = document.createElement("a");
+  a.className = "shot";
+  a.href = "#v" + v.id;
+  a.dataset.id = v.id;
+  a.innerHTML = `<h2><b>${v.id}</b>${v.name}</h2>${render(v)}<p class="cap">${v.card} · ${v.meaning} · ${v.btn} · ${v.pos}</p>`;
+  a.addEventListener("click", (e) => {
+    e.preventDefault();
+    document.getElementById("boxTitle").textContent = v.id + " " + v.name;
+    document.getElementById("boxBig").innerHTML = render(v);
+    document.getElementById("box").classList.add("show");
+  });
+  frag.appendChild(a);
+}
+wall.appendChild(frag);
+document.getElementById("box").addEventListener("click", () => document.getElementById("box").classList.remove("show"));
+</script>
+</body>
+</html>

@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>出签布局 · 10 优选</title>
+<style>
+:root { --song: "Songti SC","STSong","SimSun","Noto Serif SC",serif; }
+* { box-sizing: border-box; }
+html, body { margin: 0; background: #14110e; color: #f4eee6; font-family: var(--song); }
+body { padding: 22px 14px 80px; }
+.intro { max-width: 1100px; margin: 0 auto 20px; }
+.intro h1 { margin: 0 0 8px; font-size: 1.4rem; letter-spacing: .12em; }
+.intro p { margin: 0 0 8px; color: #c9b8a4; font-size: .95rem; line-height: 1.7; max-width: 46em; }
+.wall { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 22px 16px; }
+.shot { color: inherit; text-decoration: none; }
+.shot h2 { margin: 0 0 8px; font-size: .86rem; font-weight: 500; }
+.shot h2 b { color: #f0c27a; margin-right: 6px; letter-spacing: .08em; }
+.phone {
+  width: 100%; aspect-ratio: 390 / 844; border-radius: 12px; overflow: hidden; position: relative;
+  background: url("art/layers/layer-bg-empty.png?v=318") center / cover no-repeat, #1a140f;
+  box-shadow: 0 12px 28px rgba(0,0,0,.35);
+}
+.stack { position: absolute; left: 50%; display: flex; flex-direction: column; align-items: stretch; }
+.paper { width: 100%; line-height: 0; filter: drop-shadow(0 8px 14px rgba(0,0,0,.36)); }
+.paper img { width: 100%; height: auto; display: block; }
+.hint { margin: 0; color: #fff3d2; font-size: 10px; letter-spacing: .06em; text-align: center; text-shadow: 0 1px 6px #000; }
+.red {
+  width: 100%; min-height: 28px; display: flex; align-items: center; justify-content: center;
+  border: 1px solid #e6bb70; color: #fff3d2; font-size: 12px; letter-spacing: .1em;
+  background: linear-gradient(90deg,#842016,#b63c27,#842016);
+}
+.meaning { margin: 0; color: #fff8ec; text-align: center; }
+.meaning b { display: block; color: #f0c27a; letter-spacing: .2em; }
+.meaning p { margin: 0; }
+.ai { width: 100%; border: 1px solid rgba(230,187,112,.7); color: #f0c27a; background: transparent; text-align: center; }
+.share { width: 100%; color: #1a1208; background: linear-gradient(180deg,#f6e4b4,#e4bc62); text-align: center; }
+.again { width: 100%; color: rgba(244,239,228,.78); text-align: center; text-decoration: underline; background: none; border: none; }
+.cap { margin: 8px 0 0; font-size: .78rem; color: #9a8570; line-height: 1.5; }
+</style>
+</head>
+<body>
+<div class="intro">
+  <h1>出签布局 · 从 500 里挑的 10 版</h1>
+  <p>筛掉了深色大气泡、卡太小、解签压看山的组合。这 10 个都是卡偏大、位置偏上、签解尽量干净。点编号告诉我，我接到主流程。</p>
+</div>
+<div class="wall" id="wall"></div>
+<script>
+const MEANING = ["无底字", "浅底", "深气泡", "金线隔", "宣纸条"];
+const BTN = ["先解后链", "双钮+链", "只链", "横排", "红钮收底"];
+const POS = ["中心", "偏上", "贴顶", "靠下"];
+const CARD = [240, 260, 280, 300, 320];
+const PICK = [129, 130, 144, 154, 159, 204, 254, 269, 279, 329];
+const WHY = {
+  129: "解签后 · 无底字 · 偏上 · 卡 300",
+  130: "未解 · 大卡 320 · 只留为我解签",
+  144: "解签后 · 金线隔开 · 偏上",
+  154: "未解 · 卡 300 · 偏上",
+  159: "解签后 · 浅底 · 双钮+再来一签",
+  204: "解签后 · 无底字 · AI/分享横排",
+  254: "未解 · 贴顶大卡",
+  269: "未解 · 贴顶 · 金线档",
+  279: "解签后 · 贴顶 · 双钮不压山",
+  329: "未解 · 贴顶 · 横排预览"
+};
+
+function variant(i) {
+  const n = i - 1;
+  return {
+    id: String(i).padStart(3, "0"),
+    card: CARD[n % 5],
+    meaning: MEANING[Math.floor(n / 5) % 5],
+    btn: BTN[Math.floor(n / 25) % 5],
+    pos: POS[Math.floor(n / 125) % 4],
+    read: i % 3 === 0 ? 1 : 0
+  };
+}
+function render(v) {
+  const top = v.pos === "贴顶" ? "6%" : v.pos === "偏上" ? "14%" : v.pos === "靠下" ? "28%" : "20%";
+  const w = Math.round(v.card * 0.52);
+  const meaningHtml = v.read ? meaningBlock(v) : `
+    <p class="hint">签已落定 · 点击查看签解</p>
+    <div class="red" style="border-radius:5px">为我解签</div>`;
+  const actions = v.read ? actionBlock(v) : "";
+  return `<div class="phone"><div class="stack" style="top:${top};width:${w}px;transform:translateX(-50%);gap:8px">
+    <div class="paper"><img src="art/slip-cards/${encodeURIComponent("49_不系轻舟.png")}" alt=""></div>
+    ${meaningHtml}${actions}
+  </div></div>`;
+}
+function meaningBlock(v) {
+  const styles = {
+    "无底字": "background:none;padding:0 2px;",
+    "浅底": "background:rgba(20,12,8,.28);padding:8px 9px;border-radius:8px;",
+    "深气泡": "background:rgba(10,7,5,.56);padding:8px 10px;border-radius:12px;",
+    "金线隔": "background:none;padding:8px 2px 2px;border-top:1px solid rgba(230,187,112,.45);",
+    "宣纸条": "background:rgba(246,228,188,.16);padding:8px 10px;border-radius:4px;"
+  };
+  return `<div class="meaning" style="${styles[v.meaning]}"><b style="font-size:11px">签解</b><p style="font-size:10px;line-height:1.55">外界总有声音和变化。不必每一次浪起，都跟着改变自己的方向。</p></div>`;
+}
+function actionBlock(v) {
+  if (v.btn === "只链") return `<div class="again" style="font-size:10px;padding:4px">再来一签</div>`;
+  if (v.btn === "横排") return `<div style="display:flex;gap:6px"><div class="ai" style="font-size:10px;padding:7px;border-radius:999px">AI 解签</div><div class="share" style="font-size:10px;padding:7px;border-radius:999px">分享</div></div><div class="again" style="font-size:10px;padding:4px">再来一签</div>`;
+  if (v.btn === "红钮收底") return `<div class="red" style="border-radius:4px;font-size:11px">去知乎 AI 解签</div><div class="again" style="font-size:10px;padding:4px">再来一签</div>`;
+  return `<div class="ai" style="font-size:11px;padding:7px;border-radius:999px">去知乎 AI 解签</div><div class="share" style="font-size:11px;padding:7px;border-radius:999px">分享到想法</div><div class="again" style="font-size:10px;padding:4px">再来一签</div>`;
+}
+const wall = document.getElementById("wall");
+PICK.forEach((i) => {
+  const v = variant(i);
+  const el = document.createElement("div");
+  el.className = "shot";
+  el.innerHTML = `<h2><b>${v.id}</b></h2>${render(v)}<p class="cap">${WHY[i]}</p>`;
+  wall.appendChild(el);
+});
+</script>
+</body>
+</html>

@@ -377,6 +377,7 @@ let ritualAssetsReady = false;
 let lastDraw = null;
 let interpretBusy = false;
 let SLIP_CARDS = { cards: [] };
+const LOCAL_CARD_PREVIEW = new URLSearchParams(window.location.search).get("localCards") === "1";
 
 function isZhihuCdn(url) {
   if (!url || typeof url !== "string") return false;
@@ -398,15 +399,17 @@ function hostedCardUrl(slip) {
 }
 
 function displayCardSrc(slip) {
+  const card = cardById(slip?.no);
+  if (LOCAL_CARD_PREVIEW && card?.file) return "art/slip-cards/" + encodeURIComponent(card.file);
   const hosted = hostedCardUrl(slip);
   if (hosted) return hosted;
-  const card = cardById(slip?.no);
   if (card?.file) return "art/slip-cards/" + encodeURIComponent(card.file);
   return "";
 }
 
 function clearHostedCard() {
   slipPaper?.classList.remove("is-hosted");
+  slipPaper?.classList.remove("local-card-preview");
   fortuneCard?.classList.remove("has-art");
   if (!slipCardArt) return;
   slipCardArt.onload = null;
@@ -423,6 +426,7 @@ function showHostedCard(url, name) {
   }
   slipCardArt.onload = () => {
     slipPaper?.classList.add("is-hosted");
+    slipPaper?.classList.toggle("local-card-preview", LOCAL_CARD_PREVIEW);
     fortuneCard?.classList.add("has-art");
     slipCardArt.hidden = false;
   };
@@ -1221,6 +1225,8 @@ function openSlipMeaning() {
   if (slipMeaning) slipMeaning.hidden = false;
   fortuneCard?.classList.add("is-read");
   if (readBtn) readBtn.disabled = true;
+  window.scrollTo(0, 0);
+  pageRitual?.scrollIntoView({ block: "start" });
   window.setTimeout(() => {
     interpretBusy = false;
   }, 520);
@@ -1279,7 +1285,7 @@ resetIdleCopy();
 
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("sw.js?v=406").catch(() => {});
+    navigator.serviceWorker.register("sw.js?v=418").catch(() => {});
   });
 }
 
@@ -1740,4 +1746,3 @@ if ("serviceWorker" in navigator) {
 
   resetRitualVisual();
 })();
-

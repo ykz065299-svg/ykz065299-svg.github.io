@@ -10,12 +10,12 @@
     <meta property="og:site_name" content="看山今日一签" />
     <meta property="og:title" content="看山今日一签" />
     <meta property="og:description" content="摇签入山，一签直达知乎热榜今日山门题。" />
-    <meta property="og:image" content="https://ykz065299-svg.github.io/cover.jpg?v=398" />
+    <meta property="og:image" content="https://ykz065299-svg.github.io/cover.jpg?v=411" />
     <meta property="og:url" content="https://ykz065299-svg.github.io/" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="看山今日一签" />
     <meta name="twitter:description" content="摇签入山，一签直达知乎热榜今日山门题。" />
-    <meta name="twitter:image" content="https://ykz065299-svg.github.io/cover.jpg?v=398" />
+    <meta name="twitter:image" content="https://ykz065299-svg.github.io/cover.jpg?v=411" />
     <!-- 线上静态页若需上报到自建服务，取消注释并填 collect 地址 -->
     <!-- <meta name="kanshan-track-endpoint" content="https://你的域名/api/track" /> -->
     <!-- 封面预加载改由下方脚本按机型只拉一张 -->
@@ -49,6 +49,8 @@
 
 html, body {
   margin: 0;
+  width: 100%;
+  min-width: 100%;
   min-height: 100%;
   color: var(--ink);
   font-family: var(--body);
@@ -66,7 +68,8 @@ body:not(.ritual-visible) .page2-bg {
 .world-bg {
   position: absolute;
   inset: 0 auto auto 0;
-  width: 100%;
+  width: 100vw;
+  min-width: 100%;
   height: 200vh;
   height: 200dvh;
   z-index: 0;
@@ -77,6 +80,8 @@ body:not(.ritual-visible) .page2-bg {
   position: absolute;
   left: 0;
   right: 0;
+  width: 100vw;
+  min-width: 100%;
   height: 100vh;
   height: 100dvh;
   background-color: #070b16;
@@ -85,16 +90,18 @@ body:not(.ritual-visible) .page2-bg {
 }
 .page1-bg {
   top: 0;
-  background-image: url("cover.jpg?v=398");
+  background-image: url("cover.jpg?v=411");
   background-position: center center;
+  background-size: cover;
 }
-@media (orientation: portrait) {
+/* 只在真正偏瘦的手机竖屏保留整张竖版封面；方屏/平板不套 contain。 */
+@media (max-aspect-ratio: 3/4) {
   .page-bg.page1-bg {
-    background-image: url("cover-mobile.jpg?v=398");
-    /* 手机比 9:16 更瘦；cover 会左右裁掉签筒。竖图已改成筒+看山整组，contain 完整放下 */
+    background-image: url("cover-mobile.jpg?v=411");
+    /* 竖版海报已是 9:16；手机更瘦时 cover 会左右裁筒。contain 放下整张 */
     background-size: contain;
-    background-position: center 42%;
-    background-color: #1a120c;
+    background-position: center center;
+    background-color: #1c140c;
   }
 }
 .page-seam {
@@ -246,6 +253,8 @@ body.ritual-assets-ready .page2-bg {
 
 .page {
   position: relative;
+  width: 100%;
+  min-width: 100%;
   min-height: 100vh;
   min-height: 100dvh;
   display: flex;
@@ -919,10 +928,13 @@ body.ritual-assets-ready .page2-bg {
   gap: 12px;
 }
 .slip-scroll.has-art {
-  width: min(300px, 78vw, calc(58dvh * 1085 / 1450));
+  width: min(320px, 86vw, calc(64dvh * 1085 / 1450));
 }
 .slip-scroll.has-art .scroll-inner {
   gap: 18px;
+}
+.slip-scroll.has-art.is-read .scroll-inner {
+  gap: 8px;
 }
 
 .slip-paper {
@@ -986,29 +998,36 @@ body.ritual-assets-ready .page2-bg {
 
 .slip-seal {
   position: absolute;
-  top: 54.88%;
-  left: 69.04%;
+  top: 51.6%;
+  left: 68.2%;
+  z-index: 3;
   writing-mode: vertical-rl;
   white-space: nowrap;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 15.61%;
-  height: 14.63%;
-  padding: 0;
-  border-radius: 999px;
-  background: #9c241c;
-  box-shadow: inset 0 0 0 1.5px rgba(247, 239, 228, .88);
-  color: #f7efe4;
+  width: 15.5%;
+  height: 25.2%;
+  padding: 0 0 .12em;
+  border: none;
+  border-radius: 0;
+  background-image:
+    url("art/slip-seal-oval.png?v=413"),
+    radial-gradient(ellipse 72% 42% at 50% 58%, #8f241c 70%, transparent 71%);
+  background-repeat: no-repeat;
+  background-position: center, center;
+  background-size: 100% 100%, 100% 100%;
+  box-shadow: none;
+  color: #f3e6d0;
   font-family: var(--slip-font);
-  font-size: 5.02cqw;
-  letter-spacing: .14em;
+  font-size: 5.5cqw;
+  letter-spacing: .2em;
   line-height: 1;
   font-weight: 700;
 }
 .slip-seal.calm,
 .slip-seal.free,
-.slip-seal.joy { background: #9c241c; }
+.slip-seal.joy { background-color: transparent; }
 
 .slip-badge {
   position: absolute;
@@ -1064,6 +1083,7 @@ body.ritual-assets-ready .page2-bg {
 .slip-paper.is-hosted {
   aspect-ratio: 1085 / 1450;
   background: none;
+  overflow: hidden;
   transition: opacity .32s ease, transform .45s ease;
 }
 .slip-paper.is-hosted .slip-card-art {
@@ -1077,17 +1097,9 @@ body.ritual-assets-ready .page2-bg {
 }
 .slip-paper.is-hosted .slip-seal {
   display: inline-flex;
-  top: 62.6%;
-  left: 63%;
-  width: 9.6%;
-  height: 16.8%;
-  font-size: 6.8cqw;
-  letter-spacing: .05em;
-  font-weight: 700;
-  color: #fff8e8;
-  background: #9c241c;
-  box-shadow: inset 0 0 0 1.6px rgba(247, 239, 228, .92);
-  -webkit-font-smoothing: antialiased;
+}
+.slip-paper.local-card-preview .slip-seal {
+  display: none;
 }
 .slip-read-layer {
   position: relative;
@@ -1177,8 +1189,38 @@ body.ritual-assets-ready .page2-bg {
   outline: 2px solid #e6bb70;
   outline-offset: 3px;
 }
+.slip-scroll.visible.revealed:not(.is-read) {
+  top: max(14%, env(safe-area-inset-top));
+  transform: translate3d(-50%, 0, 0) scale(1);
+}
+.slip-scroll.visible.revealed.is-read {
+  top: max(10px, env(safe-area-inset-top));
+  bottom: max(8px, env(safe-area-inset-bottom));
+  max-height: calc(100dvh - 18px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  transform: translate3d(-50%, 0, 0) scale(1);
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+.slip-scroll.has-art.is-read {
+  width: min(300px, 82vw, calc((100dvh - 320px) * 1085 / 1450));
+}
+body:has(.slip-scroll.is-read) {
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+.page-ritual.has-slip:has(.slip-scroll.is-read) .story-head {
+  visibility: hidden;
+  height: 0;
+  min-height: 0;
+  margin: 0;
+  overflow: hidden;
+}
+.page-ritual.has-slip:has(.slip-scroll.is-read) .ritual {
+  opacity: 0;
+  visibility: hidden;
+}
 .slip-scroll.is-read .slip-paper {
-  transform: translateY(-12px);
+  transform: none;
 }
 .slip-scroll.revealed:not(.is-read) .slip-read-layer {
   opacity: 1;
@@ -1208,11 +1250,90 @@ body.ritual-assets-ready .page2-bg {
 .slip-scroll.is-read .slip-meaning {
   max-height: 420px;
   opacity: 1;
-  margin: 6px 0 10px;
-  padding: 12px 12px 14px;
+  margin: 4px 0 6px;
+  padding: 0 4px;
   pointer-events: auto;
-  background: rgba(16, 10, 6, .46);
-  border-radius: 10px;
+  background: none;
+  border-radius: 0;
+}
+.slip-scroll.is-read .slip-meaning-kicker {
+  margin: 0 0 6px;
+  font-size: .95rem;
+}
+.slip-scroll.is-read .slip-meaning-text {
+  font-size: 1.02rem;
+  line-height: 1.62;
+}
+.slip-scroll.is-read .slip-actions {
+  gap: 8px;
+}
+.slip-scroll.is-read .slip-ai-btn,
+.slip-scroll.is-read .share-thoughts {
+  padding: 10px 16px;
+}
+.slip-scroll.is-read .ritual-disclaimer {
+  margin-top: 4px;
+}
+
+/* 大屏 / 方屏：签与签解组成一组，避免纵向被拉成断裂的三段。 */
+@media (min-width: 760px) and (min-height: 640px) {
+  .slip-scroll.visible.revealed.is-read {
+    top: 50%;
+    bottom: auto;
+    width: min(820px, 88vw);
+    max-height: calc(100dvh - 36px);
+    transform: translate3d(-50%, -50%, 0) scale(1);
+    overflow: visible;
+  }
+  .slip-scroll.has-art.is-read .scroll-inner {
+    display: grid;
+    grid-template-columns: minmax(300px, 40dvh) minmax(380px, 520px);
+    grid-template-areas:
+      "card meaning"
+      "card actions";
+    align-items: center;
+    justify-content: center;
+    column-gap: clamp(28px, 5vw, 64px);
+    row-gap: 10px;
+  }
+  .slip-scroll.has-art.is-read .slip-paper {
+    grid-area: card;
+    width: 100%;
+  }
+  .slip-scroll.has-art.is-read .slip-meaning {
+    grid-area: meaning;
+    width: 100%;
+    align-self: end;
+    margin: 0;
+    padding: 20px 26px;
+    background: #2a2118;
+    border: 1px solid #b9924e;
+    border-radius: 16px;
+    box-shadow: 0 10px 26px rgba(0, 0, 0, .26);
+  }
+  .slip-scroll.has-art.is-read .slip-actions {
+    grid-area: actions;
+    width: min(100%, 390px);
+    justify-self: center;
+    align-self: start;
+    margin: 0;
+  }
+  .slip-scroll.has-art.is-read .slip-meaning-text {
+    font-size: clamp(1rem, 1.7vw, 1.14rem);
+    line-height: 1.7;
+  }
+  .slip-scroll.has-art.is-read .slip-ai-btn {
+    background: #4a3317;
+    border-color: #e6bb70;
+    color: #fff1ce;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, .22);
+  }
+  .slip-scroll.has-art.is-read .ritual-disclaimer {
+    white-space: nowrap;
+    overflow: visible;
+    font-size: clamp(.62rem, .78vw, .76rem);
+    letter-spacing: 0;
+  }
 }
 .slip-meaning-kicker {
   margin: 0 0 10px;
@@ -1470,7 +1591,7 @@ body.ritual-assets-ready .page2-bg {
     width: min(244px, 76vw, calc(68dvh * 508 / 994));
   }
   .slip-scroll.has-art {
-    width: min(286px, 82vw, calc(54dvh * 1085 / 1450));
+    width: min(320px, 88vw, calc(62dvh * 1085 / 1450));
   }
   .slip-paper {
     min-height: 0;
@@ -1529,7 +1650,7 @@ body.ritual-assets-ready .page2-bg {
         var link = document.createElement("link");
         link.rel = "preload";
         link.as = "image";
-        link.href = portrait ? "cover-mobile.jpg?v=398" : "cover.jpg?v=398";
+        link.href = portrait ? "cover-mobile.jpg?v=411" : "cover.jpg?v=411";
         document.head.appendChild(link);
       })();
     </script>
@@ -1652,6 +1773,6 @@ body.ritual-assets-ready .page2-bg {
         <button type="button" class="share-cancel" id="shareBackupClose">取消</button>
       </div>
     </div>
-    <script src="boot.js?v=406" defer></script>
+    <script src="boot.js?v=418" defer></script>
   </body>
 </html>
