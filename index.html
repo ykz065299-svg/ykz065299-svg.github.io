@@ -10,12 +10,12 @@
     <meta property="og:site_name" content="看山今日一签" />
     <meta property="og:title" content="看山今日一签" />
     <meta property="og:description" content="摇签入山，一签直达知乎热榜今日山门题。" />
-    <meta property="og:image" content="https://ykz065299-svg.github.io/cover.jpg?v=411" />
+    <meta property="og:image" content="https://ykz065299-svg.github.io/cover-pc-v430.png" />
     <meta property="og:url" content="https://ykz065299-svg.github.io/" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="看山今日一签" />
     <meta name="twitter:description" content="摇签入山，一签直达知乎热榜今日山门题。" />
-    <meta name="twitter:image" content="https://ykz065299-svg.github.io/cover.jpg?v=411" />
+    <meta name="twitter:image" content="https://ykz065299-svg.github.io/cover-pc-v430.png" />
     <!-- 线上静态页若需上报到自建服务，取消注释并填 collect 地址 -->
     <meta name="kanshan-track-endpoint" content="https://mina123-m-d8gwl8n1r6daf2982.service.tcloudbase.com/kanshan-ops-api" />
     <!-- 封面预加载改由下方脚本按机型只拉一张 -->
@@ -90,14 +90,14 @@ body:not(.ritual-visible) .page2-bg {
 }
 .page1-bg {
   top: 0;
-  background-image: url("cover.jpg?v=411");
+  background-image: url("cover-pc-v430.png");
   background-position: center center;
   background-size: cover;
 }
 /* 只在真正偏瘦的手机竖屏保留整张竖版封面；方屏/平板不套 contain。 */
 @media (max-aspect-ratio: 3/4) {
   .page-bg.page1-bg {
-    background-image: url("cover-mobile.jpg?v=411");
+    background-image: url("cover-mobile-v430.png");
     /* 竖版海报已是 9:16；手机更瘦时 cover 会左右裁筒。contain 放下整张 */
     background-size: contain;
     background-position: center center;
@@ -1543,7 +1543,7 @@ body:has(.slip-scroll.is-read) {
         var link = document.createElement("link");
         link.rel = "preload";
         link.as = "image";
-        link.href = portrait ? "cover-mobile.jpg?v=411" : "cover.jpg?v=411";
+        link.href = portrait ? "cover-mobile-v430.png" : "cover-pc-v430.png";
         document.head.appendChild(link);
       })();
     </script>
@@ -1662,6 +1662,6 @@ body:has(.slip-scroll.is-read) {
       </div>
     </div>
     <script src="https://unpkg.zhimg.com/zhihu-hybrid" async></script>
-    <script src="boot.js?v=429" defer></script>
+    <script src="boot.js?v=430" defer></script>
   </body>
 </html>
