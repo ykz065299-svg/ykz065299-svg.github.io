@@ -376,7 +376,6 @@ const shareGoZhihuBtn = document.getElementById("shareGoZhihuBtn");
 const shareBackupClose = document.getElementById("shareBackupClose");
 const SHARE_TOPIC_NAME = "看山今日一签";
 const SHARE_TOPIC_ID = "5192613";
-const SHARE_TOPIC_URL = "https://www.zhihu.com/topic/2079175627807236692/hot";
 
 let busy = false;
 let audioOn = false;
@@ -924,15 +923,19 @@ function buildShareText(data) {
     "有些话，恰好会在需要的时候与你相逢。",
   ]
     .filter(Boolean)
-    .join("\n");
+    .join("\n\n");
 }
 
 function buildPinEditorUrl(options, inApp) {
+  const textHtml = String(options.text || "")
+    .split(/\n{2,}/)
+    .filter(Boolean)
+    .map((paragraph) => `<p>${escapeHtml(paragraph).replace(/\n/g, "<br>")}</p>`)
+    .join("");
   const content = {
-    html:
-      `<p>${escapeHtml(options.text)}</p>` +
-      `<p> <a class="hash_tag" data-topic-id="${escapeHtml(options.topicId)}">` +
-      `#${escapeHtml(options.topicName)}#</a> </p>`,
+    html: textHtml +
+      `<p><a class="hash_tag" data-topic-id="${escapeHtml(options.topicId)}">` +
+      `#${escapeHtml(options.topicName)}#</a></p>`,
     meta: {
       topic: { all: 0, data: {} },
       adActivityLink: { all: 0, data: {} },
@@ -1048,13 +1051,34 @@ function openShareBackup() {
 
 async function shareToThoughts() {
   if (!lastDraw) return;
+  const s = lastDraw.slip || {};
   window.KanshanTrack?.track?.("share_open", {
     kind: "thoughts",
-    slip_no: Number(lastDraw?.slip?.no) || 0,
-    slip_name: String(lastDraw?.slip?.name || "").slice(0, 40),
+    slip_no: Number(s.no) || 0,
+    slip_name: String(s.name || "").slice(0, 40),
   });
   if (!isPcShare()) {
-    window.location.href = SHARE_TOPIC_URL;
+    let imageUrl = hostedCardUrl(s);
+    if (!imageUrl) {
+      await loadSlipCards();
+      imageUrl = hostedCardUrl(s);
+    }
+    if (!imageUrl) {
+      setHint("签卡图片尚未就绪，请稍后再试");
+      return;
+    }
+    const card = cardById(s.no);
+    window.location.href = buildPinEditorUrl(
+      {
+        text: buildShareText(lastDraw),
+        topicName: SHARE_TOPIC_NAME,
+        topicId: SHARE_TOPIC_ID,
+        imageUrl,
+        imageWidth: Number(s.image_width || card?.width || 1085),
+        imageHeight: Number(s.image_height || card?.height || 1450),
+      },
+      inZhihuApp()
+    );
     return;
   }
   openShareBackup();
@@ -1300,7 +1324,7 @@ resetIdleCopy();
 
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("sw.js?v=427").catch(() => {});
+    navigator.serviceWorker.register("sw.js?v=428").catch(() => {});
   });
 }
 
