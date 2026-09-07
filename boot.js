@@ -377,7 +377,6 @@ const shareBackupClose = document.getElementById("shareBackupClose");
 const SHARE_TOPIC_NAME = "看山今日一签";
 const SHARE_TOPIC_ID = "5192613";
 const SHARE_TOPIC_URL = "https://www.zhihu.com/topic/2079175627807236692/hot";
-const CARD_ASSET_VERSION = "424";
 
 let busy = false;
 let audioOn = false;
@@ -385,7 +384,6 @@ let ritualAssetsReady = false;
 let lastDraw = null;
 let interpretBusy = false;
 let SLIP_CARDS = { cards: [] };
-const LOCAL_CARD_PREVIEW = new URLSearchParams(window.location.search).get("localCards") === "1";
 
 function isZhihuCdn(url) {
   if (!url || typeof url !== "string") return false;
@@ -407,16 +405,7 @@ function hostedCardUrl(slip) {
 }
 
 function displayCardSrc(slip) {
-  const card = cardById(slip?.no);
-  if (LOCAL_CARD_PREVIEW && card?.file) {
-    return "art/slip-cards/" + encodeURIComponent(card.file) + `?v=${CARD_ASSET_VERSION}`;
-  }
-  const hosted = hostedCardUrl(slip);
-  if (hosted) return hosted;
-  if (card?.file) {
-    return "art/slip-cards/" + encodeURIComponent(card.file) + `?v=${CARD_ASSET_VERSION}`;
-  }
-  return "";
+  return hostedCardUrl(slip);
 }
 
 function preloadCardImage(url) {
@@ -465,7 +454,7 @@ function showHostedCard(url, name) {
     if (activated) return;
     activated = true;
     slipPaper?.classList.add("is-hosted");
-    slipPaper?.classList.toggle("local-card-preview", LOCAL_CARD_PREVIEW);
+    slipPaper?.classList.remove("local-card-preview");
     fortuneCard?.classList.add("has-art");
     slipCardArt.hidden = false;
   };
@@ -1311,7 +1300,7 @@ resetIdleCopy();
 
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("sw.js?v=426").catch(() => {});
+    navigator.serviceWorker.register("sw.js?v=427").catch(() => {});
   });
 }
 
