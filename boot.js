@@ -214,13 +214,24 @@
 (() => {
   const LS_UID = "kanshan_uid";
   const LS_TOKEN = "kanshan_token";
-  const SS_PV = "kanshan_pv_sent";
-  const TOKEN_KEYS = ["token", "uid", "user_token", "utm_token", "zh_token"];
+  const TOKEN_KEYS = ["token", "user_token", "utm_token", "zh_token"];
+  const USER_ID_KEYS = ["user_id", "zhihu_id", "uid"];
 
   function readUrlToken() {
     try {
       const q = new URLSearchParams(location.search);
       for (const k of TOKEN_KEYS) {
+        const v = (q.get(k) || "").trim();
+        if (v) return v.slice(0, 128);
+      }
+    } catch (_) {}
+    return "";
+  }
+
+  function readUrlUserId() {
+    try {
+      const q = new URLSearchParams(location.search);
+      for (const k of USER_ID_KEYS) {
         const v = (q.get(k) || "").trim();
         if (v) return v.slice(0, 128);
       }
@@ -257,7 +268,7 @@
       const saved = localStorage.getItem(LS_TOKEN);
       if (saved) return saved.slice(0, 128);
     } catch (_) {}
-    return anonId();
+    return "";
   }
 
   function endpoint() {
@@ -282,10 +293,13 @@
   function track(event, props) {
     const payload = {
       event: String(event || "unknown").slice(0, 64),
-      token: resolveToken(),
+      visitor_id: anonId(),
+      user_id: readUrlUserId(),
+      user_token: resolveToken(),
       session: sessionId(),
       ts: Date.now(),
       path: location.pathname + location.search,
+      referrer: document.referrer || "",
       mobile: window.matchMedia("(max-width: 720px)").matches,
       ...(props || {}),
     };
@@ -307,10 +321,6 @@
   }
 
   function pageViewOnce() {
-    try {
-      if (sessionStorage.getItem(SS_PV)) return;
-      sessionStorage.setItem(SS_PV, "1");
-    } catch (_) {}
     track("page_view");
   }
 
@@ -344,7 +354,6 @@ const slipNo = document.getElementById("slipNo");
 const slipMotto = document.getElementById("slipMotto");
 const rankEl = document.getElementById("rank");
 const oracleText = document.getElementById("oracleText");
-const UNLOCK_FALLBACK = "这一签只说到这里，别人的故事或许还有下文。";
 const topicTitle = document.getElementById("topicTitle");
 const topicSummary = document.getElementById("topicSummary");
 const topicLink = document.getElementById("topicLink");
@@ -357,9 +366,6 @@ const slipCardArt = document.getElementById("slipCardArt");
 const tubeStage = document.getElementById("tubeStage");
 const shareBtn = document.getElementById("shareBtn");
 const readBtn = document.getElementById("readBtn");
-const aiSearchBtn = document.getElementById("aiSearchBtn");
-const slipMeaning = document.getElementById("slipMeaning");
-const slipMeaningText = document.getElementById("slipMeaningText");
 const shareBackup = document.getElementById("shareBackup");
 const shareBackupArt = document.getElementById("shareBackupArt");
 const shareBackupHint = document.getElementById("shareBackupHint");
@@ -369,7 +375,9 @@ const shareDownloadBtn = document.getElementById("shareDownloadBtn");
 const shareGoZhihuBtn = document.getElementById("shareGoZhihuBtn");
 const shareBackupClose = document.getElementById("shareBackupClose");
 const SHARE_TOPIC_NAME = "看山今日一签";
-const SHARE_TOPIC_ID = "unknown";
+const SHARE_TOPIC_ID = "5192613";
+const SHARE_TOPIC_URL = "https://www.zhihu.com/topic/2079175627807236692/hot";
+const CARD_ASSET_VERSION = "424";
 
 let busy = false;
 let audioOn = false;
@@ -400,11 +408,39 @@ function hostedCardUrl(slip) {
 
 function displayCardSrc(slip) {
   const card = cardById(slip?.no);
-  if (LOCAL_CARD_PREVIEW && card?.file) return "art/slip-cards/" + encodeURIComponent(card.file);
+  if (LOCAL_CARD_PREVIEW && card?.file) {
+    return "art/slip-cards/" + encodeURIComponent(card.file) + `?v=${CARD_ASSET_VERSION}`;
+  }
   const hosted = hostedCardUrl(slip);
   if (hosted) return hosted;
-  if (card?.file) return "art/slip-cards/" + encodeURIComponent(card.file);
+  if (card?.file) {
+    return "art/slip-cards/" + encodeURIComponent(card.file) + `?v=${CARD_ASSET_VERSION}`;
+  }
   return "";
+}
+
+function preloadCardImage(url) {
+  if (!url) return Promise.resolve(false);
+  return new Promise((resolve) => {
+    const image = new Image();
+    let settled = false;
+    const finish = (ok) => {
+      if (settled) return;
+      settled = true;
+      window.clearTimeout(timer);
+      resolve(ok);
+    };
+    const ready = () => {
+      const decoded = image.decode?.();
+      if (decoded?.then) decoded.then(() => finish(true)).catch(() => finish(true));
+      else finish(true);
+    };
+    image.onload = ready;
+    image.onerror = () => finish(false);
+    const timer = window.setTimeout(() => finish(false), 6000);
+    image.src = url;
+    if (image.complete && image.naturalWidth > 0) ready();
+  });
 }
 
 function clearHostedCard() {
@@ -424,17 +460,22 @@ function showHostedCard(url, name) {
     clearHostedCard();
     return;
   }
-  slipCardArt.onload = () => {
+  let activated = false;
+  const activate = () => {
+    if (activated) return;
+    activated = true;
     slipPaper?.classList.add("is-hosted");
     slipPaper?.classList.toggle("local-card-preview", LOCAL_CARD_PREVIEW);
     fortuneCard?.classList.add("has-art");
     slipCardArt.hidden = false;
   };
+  slipCardArt.onload = activate;
   slipCardArt.onerror = () => {
     clearHostedCard();
   };
   slipCardArt.alt = name || "今日一签";
   slipCardArt.src = url;
+  if (slipCardArt.complete && slipCardArt.naturalWidth > 0) activate();
 }
 
 async function loadSlipCards() {
@@ -721,8 +762,6 @@ function clearSlip() {
   if (oracleText) oracleText.replaceChildren();
   if (topicTitle) topicTitle.textContent = "";
   clearHostedCard();
-  if (slipMeaningText) slipMeaningText.textContent = "";
-  if (slipMeaning) slipMeaning.hidden = true;
   if (readBtn) readBtn.disabled = false;
   interpretBusy = false;
   lastDraw = null;
@@ -748,8 +787,6 @@ function fillSlip(data) {
       oracleText.appendChild(span);
     });
   }
-  if (slipMeaningText) slipMeaningText.textContent = s.meaning || "";
-  if (slipMeaning) slipMeaning.hidden = true;
   if (readBtn) readBtn.disabled = false;
   const cardUrl = displayCardSrc(s);
   if (cardUrl) showHostedCard(cardUrl, s.name);
@@ -822,12 +859,17 @@ async function draw() {
   await audioReady;
 
   const fetchPromise = fetchDraw().catch((err) => ({ __err: err }));
+  const cardImagePromise = fetchPromise.then((result) => {
+    if (result?.__err) return false;
+    return preloadCardImage(displayCardSrc(result?.slip));
+  });
 
   try {
     await window.KanshanScene.playShakeAndDraw((name) => setPhase(name));
     setPhase("待命");
     const data = await fetchPromise;
     if (data?.__err) throw data.__err;
+    await cardImagePromise;
     fillSlip(data);
     const slipH = prepareSlipSize();
     await window.KanshanScene.revealSlip((name) => setPhase(name), { height: slipH });
@@ -888,11 +930,9 @@ function buildShareText(data) {
   const s = data?.slip || {};
   const verse = String(data?.oracle || s.verse || "").trim();
   return [
-    "今日一签已落定。",
-    s.name ? `「${s.name}」` : "",
-    verse,
-    `#${SHARE_TOPIC_NAME}#`,
-    "——看山今日一签",
+    `我抽到了「${s.name || "今日一签"}」：`,
+    verse ? `「${verse}」` : "",
+    "有些话，恰好会在需要的时候与你相逢。",
   ]
     .filter(Boolean)
     .join("\n");
@@ -941,6 +981,7 @@ function openAiSearch() {
   const href = s.search || aiSearchUrl(slipSearchQuery(lastDraw));
   window.KanshanTrack?.track?.("interpret_click", {
     kind: "ai_search",
+    slip_no: Number(s.no) || 0,
     title: String(s.name || "").slice(0, 40),
   });
   if (inZhihuApp()) window.location.href = href;
@@ -953,7 +994,15 @@ async function copyShareText() {
     await navigator.clipboard.writeText(text);
     return true;
   } catch (_) {
-    return false;
+    const textarea = document.createElement("textarea");
+    textarea.value = text;
+    textarea.setAttribute("readonly", "");
+    textarea.style.cssText = "position:fixed;opacity:0;pointer-events:none;";
+    document.body.appendChild(textarea);
+    textarea.select();
+    const copied = document.execCommand("copy");
+    textarea.remove();
+    return copied;
   }
 }
 
@@ -1002,29 +1051,21 @@ function openShareBackup() {
   }
   if (shareBackupHint) {
     shareBackupHint.textContent = isPcShare()
-      ? "电脑上请先复制文案、下载签卡，再到知乎首页手动发想法。"
-      : "先复制文案、保存签卡，再到知乎发想法。";
+      ? "下载图片后，复制文案到知乎发想法，记得带上话题#看山今日一签。"
+      : "#看山今日一签 是知乎上的话题，点击即可前往话题页。";
   }
   shareBackup.hidden = false;
 }
 
 async function shareToThoughts() {
   if (!lastDraw) return;
-  const s = lastDraw.slip || {};
-  const imageUrl = hostedCardUrl(s);
-  window.KanshanTrack?.track?.("share_open", { kind: "thoughts" });
-  if (!isPcShare() && imageUrl) {
-    window.location.href = buildPinEditorUrl(
-      {
-        text: buildShareText(lastDraw),
-        topicName: SHARE_TOPIC_NAME,
-        topicId: SHARE_TOPIC_ID,
-        imageUrl,
-        imageWidth: Number(s.image_width || cardById(s.no)?.width || 1085),
-        imageHeight: Number(s.image_height || cardById(s.no)?.height || 1450),
-      },
-      inZhihuApp()
-    );
+  window.KanshanTrack?.track?.("share_open", {
+    kind: "thoughts",
+    slip_no: Number(lastDraw?.slip?.no) || 0,
+    slip_name: String(lastDraw?.slip?.name || "").slice(0, 40),
+  });
+  if (!isPcShare()) {
+    window.location.href = SHARE_TOPIC_URL;
     return;
   }
   openShareBackup();
@@ -1214,25 +1255,12 @@ async function shareToPin() {
 
 shareBtn?.addEventListener("click", openShareSheet);
 function openSlipMeaning() {
-  if (interpretBusy || !lastDraw || fortuneCard?.classList.contains("is-read")) return;
+  if (interpretBusy || !lastDraw) return;
   interpretBusy = true;
-  const s = lastDraw.slip || {};
-  window.KanshanTrack?.track?.("interpret_click", {
-    kind: "解签按钮点击",
-    title: String(s.name || "").slice(0, 40),
-  });
-  if (slipMeaningText) slipMeaningText.textContent = s.meaning || UNLOCK_FALLBACK;
-  if (slipMeaning) slipMeaning.hidden = false;
-  fortuneCard?.classList.add("is-read");
-  if (readBtn) readBtn.disabled = true;
-  window.scrollTo(0, 0);
-  pageRitual?.scrollIntoView({ block: "start" });
-  window.setTimeout(() => {
-    interpretBusy = false;
-  }, 520);
+  openAiSearch();
+  window.setTimeout(() => { interpretBusy = false; }, 320);
 }
 readBtn?.addEventListener("click", openSlipMeaning);
-aiSearchBtn?.addEventListener("click", openAiSearch);
 shareBackupClose?.addEventListener("click", closeShareBackup);
 shareBackup?.addEventListener("click", (e) => {
   if (e.target === shareBackup) closeShareBackup();
@@ -1246,11 +1274,8 @@ shareDownloadBtn?.addEventListener("click", async () => {
   setHint(ok ? "签卡已下载" : "已打开签卡，请另存图片");
 });
 shareGoZhihuBtn?.addEventListener("click", async () => {
-  await copyShareText();
-  await downloadSlipImage();
   window.open("https://www.zhihu.com/", "_blank", "noopener");
-  window.KanshanTrack?.track?.("share_open", { kind: "pc_home" });
-  setHint("文案已复制，签卡已下载，请到知乎首页发想法");
+  setHint("已打开知乎首页，发想法时记得带上 #看山今日一签");
 });
 
 setAudioUi();
@@ -1265,6 +1290,7 @@ resetIdleCopy();
     const pick = list.find((s) => Number(s.id) === id);
     if (!pick) return;
     const data = slipFromPool(pick, list.length);
+    await preloadCardImage(displayCardSrc(data.slip));
     ensureRitualAssets();
     document.body.classList.add("ritual-visible");
     document.getElementById("pageCover")?.setAttribute("hidden", "");
@@ -1285,7 +1311,7 @@ resetIdleCopy();
 
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("sw.js?v=419").catch(() => {});
+    navigator.serviceWorker.register("sw.js?v=426").catch(() => {});
   });
 }
 

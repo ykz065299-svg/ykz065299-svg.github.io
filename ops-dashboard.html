@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="robots" content="noindex,nofollow" />
+  <meta name="kanshan-ops-endpoint" content="https://mina123-m-d8gwl8n1r6daf2982.service.tcloudbase.com/kanshan-ops-api" />
+  <title>看山今日一签 · 运营看板</title>
+  <style>
+    :root{--ink:#2b2118;--muted:#7b6b5e;--paper:#fffaf0;--line:#e7d8c3;--gold:#b78335;--red:#9a3829;--green:#416f5a}
+    *{box-sizing:border-box}body{margin:0;background:#f4eee4;color:var(--ink);font-family:"PingFang SC","Microsoft YaHei",sans-serif}
+    .shell{width:min(1280px,calc(100% - 32px));margin:0 auto;padding:28px 0 52px}.head{display:flex;gap:18px;align-items:end;justify-content:space-between;margin-bottom:22px}
+    h1{margin:0;font:600 clamp(24px,3vw,38px) "Songti SC","STSong",serif;letter-spacing:.08em}.sub{margin:7px 0 0;color:var(--muted);font-size:13px}
+    .filters,.login{display:flex;gap:10px;align-items:end;flex-wrap:wrap}.field{display:grid;gap:5px;font-size:12px;color:var(--muted)}input,button,select{font:inherit}
+    input,select{height:38px;border:1px solid var(--line);border-radius:9px;background:#fff;padding:0 10px;color:var(--ink)}button{height:38px;border:0;border-radius:9px;padding:0 16px;background:var(--ink);color:white;cursor:pointer}
+    button.ghost{background:#fff;color:var(--ink);border:1px solid var(--line)}.notice{display:none;margin-bottom:14px;padding:11px 14px;border-radius:9px;background:#fff2d9;color:#784f18;font-size:13px}
+    .cards{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:14px}.card,.panel{background:var(--paper);border:1px solid var(--line);border-radius:15px;box-shadow:0 8px 24px rgba(74,47,19,.06)}
+    .card{padding:18px}.card h2{margin:0 0 12px;color:var(--muted);font-size:13px;font-weight:500}.nums{display:flex;gap:22px}.num strong{display:block;font-size:28px;font-family:Georgia,serif}.num span{color:var(--muted);font-size:11px}.grid{display:grid;grid-template-columns:1.25fr .75fr;gap:14px;margin-bottom:14px}.panel{padding:18px}.panel-head{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:14px}.panel h2{margin:0;font-size:16px}.legend{display:flex;gap:12px;color:var(--muted);font-size:11px}.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px}.chart{width:100%;height:270px;display:block;background:linear-gradient(#fff0 95%,rgba(123,107,94,.08) 95%);background-size:100% 25%}.empty{display:grid;place-items:center;height:270px;color:var(--muted);font-size:13px}
+    .table-wrap{overflow:auto;max-height:440px;border:1px solid var(--line);border-radius:10px}table{width:100%;border-collapse:collapse;min-width:1080px;background:#fff}th,td{padding:10px 12px;border-bottom:1px solid #eee6da;text-align:left;font-size:12px;white-space:nowrap}th{position:sticky;top:0;background:#f8f0e4;color:var(--muted);z-index:1}td.token{max-width:190px;overflow:hidden;text-overflow:ellipsis}.footer{display:flex;justify-content:space-between;align-items:center;margin-top:12px;color:var(--muted);font-size:12px}.hidden{display:none!important}
+    @media(max-width:900px){.head{align-items:start;flex-direction:column}.cards{grid-template-columns:repeat(2,1fr)}.grid{grid-template-columns:1fr}}
+    @media(max-width:520px){.shell{width:min(100% - 20px,1280px);padding-top:18px}.cards{grid-template-columns:1fr}.filters{width:100%}.field{flex:1}.field input{width:100%}}
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <div class="head">
+      <div><h1>看山今日一签 · 运营看板</h1><p class="sub">访问、抽签、AI 搜索与分享 · 时区 Asia/Shanghai</p></div>
+      <div class="login" id="loginBox"><label class="field">管理密钥<input id="adminKey" type="password" autocomplete="current-password" placeholder="仅保存在当前标签页" /></label><button id="connectBtn">进入看板</button></div>
+      <div class="filters hidden" id="filterBox"><label class="field">开始日期<input id="fromDate" type="date" /></label><label class="field">结束日期<input id="toDate" type="date" /></label><button class="ghost" data-days="1">今天</button><button class="ghost" data-days="7">近 7 天</button><button class="ghost" data-days="30">近 30 天</button><button id="refreshBtn">刷新</button></div>
+    </div>
+    <div class="notice" id="notice"></div>
+    <section class="cards" id="metricCards"></section>
+    <section class="grid">
+      <article class="panel"><div class="panel-head"><h2>抽签 PV / UV 趋势</h2><div class="legend"><span><i class="dot" style="background:#9a3829"></i>PV</span><span><i class="dot" style="background:#b78335"></i>UV</span></div></div><div id="dailyChart" class="empty">选择日期并进入看板</div></article>
+      <article class="panel"><div class="panel-head"><h2>24 小时抽签分布</h2><div class="legend"><span><i class="dot" style="background:#416f5a"></i>PV</span><span><i class="dot" style="background:#b78335"></i>UV</span></div></div><div id="hourlyChart" class="empty">选择日期并进入看板</div></article>
+    </section>
+    <section class="panel">
+      <div class="panel-head"><div><h2>用户事件明细</h2><p class="sub">用户 ID、分析 token、访问／抽签／AI 搜索／分享时间均按事件逐条保留</p></div><button class="ghost" id="downloadBtn">下载 CSV</button></div>
+      <div class="table-wrap"><table><thead><tr><th>时间</th><th>事件</th><th>用户 ID</th><th>用户 token</th><th>访客 ID</th><th>会话</th><th>端</th><th>签号</th><th>签名</th></tr></thead><tbody id="eventRows"><tr><td colspan="9">暂无数据</td></tr></tbody></table></div>
+      <div class="footer"><span id="eventTotal">0 条</span><span>页面展示最新 500 条，下载包含所选时间范围全部明细</span></div>
+    </section>
+  </main>
+  <script>
+  (()=>{
+    const $=s=>document.querySelector(s);const endpoint=new URLSearchParams(location.search).get("endpoint")||document.querySelector('meta[name="kanshan-ops-endpoint"]').content;
+    const names={page_view:"页面访问",draw_start:"开始抽签",ai_search_click:"AI 搜索",share_click:"分享点击"};let latestEvents=[];
+    function cnDate(d){return new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Shanghai",year:"numeric",month:"2-digit",day:"2-digit"}).format(d)}
+    function preset(days){const to=new Date(),from=new Date(to);from.setDate(from.getDate()-days+1);$("#fromDate").value=cnDate(from);$("#toDate").value=cnDate(to)}
+    function note(text){const el=$("#notice");el.textContent=text;el.style.display=text?"block":"none"}
+    async function api(op,extra={}){if(!endpoint)throw new Error("尚未配置 CloudBase 接口地址");const key=sessionStorage.getItem("kanshan_ops_key")||"";const res=await fetch(endpoint,{method:"POST",headers:{"Content-Type":"application/json","X-Kanshan-Admin-Key":key},body:JSON.stringify({op,admin_key:key,from:$("#fromDate").value,to:$("#toDate").value,...extra}),cache:"no-store"});if(res.status===401)throw new Error("管理密钥不正确");if(!res.ok)throw new Error("接口暂时不可用");return res.json()}
+    function metricMap(rows){return Object.fromEntries(rows.map(r=>[r.event_name,{pv:Number(r.pv)||0,uv:Number(r.uv)||0}]))}
+    function cards(rows){const m=metricMap(rows);$("#metricCards").innerHTML=["page_view","draw_start","ai_search_click","share_click"].map(k=>{const v=m[k]||{pv:0,uv:0};return `<article class="card"><h2>${names[k]}</h2><div class="nums"><div class="num"><strong>${v.pv.toLocaleString()}</strong><span>PV</span></div><div class="num"><strong>${v.uv.toLocaleString()}</strong><span>UV</span></div></div></article>`}).join("")}
+    function lineChart(el,labels,pv,uv,hourly=false){if(!labels.length){el.className="empty";el.textContent="当前时间范围暂无数据";return}const w=760,h=260,p={l:42,r:16,t:18,b:36},max=Math.max(1,...pv,...uv),x=i=>p.l+(w-p.l-p.r)*(labels.length===1 ? .5 : i/(labels.length-1)),y=v=>h-p.b-(h-p.t-p.b)*v/max;const points=a=>a.map((v,i)=>`${x(i)},${y(v)}`).join(" ");const ticks=[0,.25,.5,.75,1].map(t=>`<line x1="${p.l}" y1="${y(max*t)}" x2="${w-p.r}" y2="${y(max*t)}" stroke="#e8dccb"/><text x="${p.l-8}" y="${y(max*t)+4}" text-anchor="end" fill="#8b7969" font-size="10">${Math.round(max*t)}</text>`).join("");const step=hourly?3:Math.max(1,Math.ceil(labels.length/7));const xl=labels.map((v,i)=>i%step?"":`<text x="${x(i)}" y="${h-12}" text-anchor="middle" fill="#8b7969" font-size="10">${v}</text>`).join("");el.className="";el.innerHTML=`<svg class="chart" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none">${ticks}<polyline fill="none" stroke="${hourly?'#416f5a':'#9a3829'}" stroke-width="3" points="${points(pv)}"/><polyline fill="none" stroke="#b78335" stroke-width="3" points="${points(uv)}"/>${xl}</svg>`}
+    function daily(rows){const filtered=rows.filter(r=>r.event_name==="draw_start"),labels=[...new Set(filtered.map(r=>String(r.event_date).slice(0,10)))];const by=Object.fromEntries(filtered.map(r=>[String(r.event_date).slice(0,10),r]));lineChart($("#dailyChart"),labels,labels.map(k=>Number(by[k]?.pv)||0),labels.map(k=>Number(by[k]?.uv)||0))}
+    function hourly(rows){const by=Object.fromEntries(rows.filter(r=>r.event_name==="draw_start").map(r=>[Number(r.event_hour),r])),labels=Array.from({length:24},(_,i)=>String(i).padStart(2,"0"));lineChart($("#hourlyChart"),labels,labels.map((_,i)=>Number(by[i]?.pv)||0),labels.map((_,i)=>Number(by[i]?.uv)||0),true)}
+    const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+    function table(rows,total){latestEvents=rows;$("#eventRows").innerHTML=rows.length?rows.map(r=>`<tr><td>${esc(r.event_time)}</td><td>${esc(names[r.event_name]||r.event_name)}</td><td class="token" title="${esc(r.user_id)}">${esc(r.user_id||"—")}</td><td class="token" title="${esc(r.user_token)}">${esc(r.user_token||"—")}</td><td class="token" title="${esc(r.visitor_id)}">${esc(r.visitor_id)}</td><td>${esc(r.session_id)}</td><td>${esc(r.platform||"—")}</td><td>${esc(r.slip_no||"—")}</td><td>${esc(r.slip_name||"—")}</td></tr>`).join(""):'<tr><td colspan="9">暂无数据</td></tr>';$("#eventTotal").textContent=`共 ${Number(total||0).toLocaleString()} 条`}
+    async function load(){note("");try{const [s,d,h,e]=await Promise.all([api("summary"),api("daily"),api("hourly"),api("events",{page_size:500})]);cards(s.rows||[]);daily(d.rows||[]);hourly(h.rows||[]);table(e.rows||[],e.total)}catch(err){note(err.message||"加载失败")}}
+    $("#connectBtn").onclick=()=>{sessionStorage.setItem("kanshan_ops_key",$("#adminKey").value);$("#loginBox").classList.add("hidden");$("#filterBox").classList.remove("hidden");load()};$("#refreshBtn").onclick=load;document.querySelectorAll("[data-days]").forEach(b=>b.onclick=()=>{preset(Number(b.dataset.days));load()});
+    $("#downloadBtn").onclick=async()=>{note("");const btn=$("#downloadBtn"),old=btn.textContent;btn.disabled=true;btn.textContent="正在准备…";try{let page=1,all=[];while(true){const batch=await api("events",{page,page_size:500});all.push(...(batch.rows||[]));if(all.length>=Number(batch.total||0)||(batch.rows||[]).length<500)break;page++;if(page>200)throw new Error("明细过多，请缩小日期范围后下载")}const cols=["event_time","event_name","user_id","user_token","visitor_id","session_id","platform","page_path","slip_no","slip_name"],q=v=>`"${String(v??"").replaceAll('"','""')}"`,csv='\ufeff'+[cols.join(","),...all.map(r=>cols.map(c=>q(r[c])).join(","))].join("\n"),a=document.createElement("a");a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv;charset=utf-8"}));a.download=`kanshan-events-${$("#fromDate").value}-${$("#toDate").value}.csv`;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}catch(err){note(err.message||"下载失败")}finally{btn.disabled=false;btn.textContent=old}};
+    preset(7);cards([]);
+  })();
+  </script>
+</body>
+</html>
