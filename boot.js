@@ -210,34 +210,12 @@
   window.KanshanAudio = AudioEngine;
 })();
 
-/* v301 — 轻量埋点：访问 / 开始求签 + 用户 token */
+/* v429 — 业务埋点：device_id / run_id + 知乎 account/me 身份增强 */
 (() => {
   const LS_UID = "kanshan_uid";
-  const LS_TOKEN = "kanshan_token";
-  const TOKEN_KEYS = ["token", "user_token", "utm_token", "zh_token"];
-  const USER_ID_KEYS = ["user_id", "zhihu_id", "uid"];
-
-  function readUrlToken() {
-    try {
-      const q = new URLSearchParams(location.search);
-      for (const k of TOKEN_KEYS) {
-        const v = (q.get(k) || "").trim();
-        if (v) return v.slice(0, 128);
-      }
-    } catch (_) {}
-    return "";
-  }
-
-  function readUrlUserId() {
-    try {
-      const q = new URLSearchParams(location.search);
-      for (const k of USER_ID_KEYS) {
-        const v = (q.get(k) || "").trim();
-        if (v) return v.slice(0, 128);
-      }
-    } catch (_) {}
-    return "";
-  }
+  let zhihuIdentity = { id: "", urlToken: "", userType: "guest" };
+  let identitySettled = false;
+  const pendingEvents = [];
 
   function anonId() {
     let id = "";
@@ -254,21 +232,6 @@
       id = "anon_session";
     }
     return id;
-  }
-
-  function resolveToken() {
-    const fromUrl = readUrlToken();
-    if (fromUrl) {
-      try {
-        localStorage.setItem(LS_TOKEN, fromUrl);
-      } catch (_) {}
-      return fromUrl;
-    }
-    try {
-      const saved = localStorage.getItem(LS_TOKEN);
-      if (saved) return saved.slice(0, 128);
-    } catch (_) {}
-    return "";
   }
 
   function endpoint() {
@@ -290,12 +253,18 @@
     }
   }
 
-  function track(event, props) {
+  function sendTrack(event, props) {
     const payload = {
       event: String(event || "unknown").slice(0, 64),
+      device_id: anonId(),
+      run_id: sessionId(),
+      zhihu_user_id: zhihuIdentity.id,
+      url_token: zhihuIdentity.urlToken,
+      user_type: zhihuIdentity.userType,
+      // 兼容当前 CloudBase 表字段；值来自 account/me，不是登录凭证。
       visitor_id: anonId(),
-      user_id: readUrlUserId(),
-      user_token: resolveToken(),
+      user_id: zhihuIdentity.id,
+      user_token: zhihuIdentity.urlToken,
       session: sessionId(),
       ts: Date.now(),
       path: location.pathname + location.search,
@@ -320,12 +289,56 @@
     }).catch(() => {});
   }
 
+  function track(event, props) {
+    if (!identitySettled) {
+      pendingEvents.push([event, props]);
+      return;
+    }
+    sendTrack(event, props);
+  }
+
+  function settleIdentity(member) {
+    if (identitySettled) return;
+    if (member && member.user_type !== "guest") {
+      zhihuIdentity = {
+        id: String(member.id || "").slice(0, 128),
+        urlToken: String(member.url_token || "").slice(0, 128),
+        userType: String(member.user_type || "people").slice(0, 24),
+      };
+    }
+    identitySettled = true;
+    pendingEvents.splice(0).forEach(([event, props]) => sendTrack(event, props));
+  }
+
+  async function resolveZhihuIdentity() {
+    try {
+      const member = await Promise.race([
+        (async () => {
+          const started = Date.now();
+          while (typeof window.zhihuHybrid !== "function" && Date.now() - started < 2400) {
+            await new Promise((resolve) => setTimeout(resolve, 80));
+          }
+          if (typeof window.zhihuHybrid !== "function") return null;
+          return window.zhihuHybrid("account/me").dispatch();
+        })(),
+        new Promise((resolve) => setTimeout(() => resolve(null), 5000)),
+      ]);
+      settleIdentity(member && typeof member.id === "string" ? member : null);
+    } catch (_) {
+      settleIdentity(null);
+    }
+  }
+
+  window.addEventListener("pagehide", () => settleIdentity(null), { once: true });
+  resolveZhihuIdentity();
+
   function pageViewOnce() {
     track("page_view");
   }
 
   window.KanshanTrack = {
-    getToken: resolveToken,
+    getToken: () => zhihuIdentity.urlToken,
+    getIdentity: () => ({ ...zhihuIdentity, deviceId: anonId(), runId: sessionId() }),
     track,
     pageViewOnce,
     gameStart(kind) {
@@ -1324,7 +1337,7 @@ resetIdleCopy();
 
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("sw.js?v=428").catch(() => {});
+    navigator.serviceWorker.register("sw.js?v=429").catch(() => {});
   });
 }
 
