@@ -210,28 +210,52 @@
   window.KanshanAudio = AudioEngine;
 })();
 
-/* v429 — 业务埋点：device_id / run_id + 知乎 account/me 身份增强 */
+/* v431 — 业务埋点：身份异步增强 + 每轮 run_id + event_id 去重 */
 (() => {
-  const LS_UID = "kanshan_uid";
+  const LS_DEVICE_ID = "kanshan_uid";
+  const MAX_PENDING = 100;
+  const SAFE_PROP_KEYS = new Set([
+    "kind",
+    "slip_no",
+    "slip_name",
+    "title",
+    "query",
+    "source",
+    "error_code",
+  ]);
   let zhihuIdentity = { id: "", urlToken: "", userType: "guest" };
   let identitySettled = false;
+  let identityStatus = "pending";
+  let memoryDeviceId = "";
+  let currentRunId = makeId("run");
   const pendingEvents = [];
 
-  function anonId() {
-    let id = "";
+  // v301 曾把链接中的 token 存入本地；v431 不再信任或保留该值。
+  try {
+    localStorage.removeItem("kanshan_token");
+  } catch (_) {}
+
+  function makeId(prefix) {
     try {
-      id = localStorage.getItem(LS_UID) || "";
-      if (!id) {
-        id =
-          "anon_" +
-          Math.random().toString(36).slice(2, 10) +
-          Date.now().toString(36).slice(-4);
-        localStorage.setItem(LS_UID, id);
+      if (window.crypto?.randomUUID) return `${prefix}_${window.crypto.randomUUID()}`;
+    } catch (_) {}
+    return `${prefix}_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 12)}`;
+  }
+
+  function deviceId() {
+    if (memoryDeviceId) return memoryDeviceId;
+    try {
+      const stored = localStorage.getItem(LS_DEVICE_ID) || "";
+      if (/^[A-Za-z0-9_-]{8,128}$/.test(stored)) {
+        memoryDeviceId = stored;
+      } else {
+        memoryDeviceId = makeId("anon");
+        localStorage.setItem(LS_DEVICE_ID, memoryDeviceId);
       }
     } catch (_) {
-      id = "anon_session";
+      memoryDeviceId = makeId("anon_mem");
     }
-    return id;
+    return memoryDeviceId;
   }
 
   function endpoint() {
@@ -240,43 +264,77 @@
     return href.trim() || "/api/track";
   }
 
-  function sessionId() {
+  function safePath() {
     try {
-      let s = sessionStorage.getItem("kanshan_sid");
-      if (!s) {
-        s = "s_" + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
-        sessionStorage.setItem("kanshan_sid", s);
-      }
-      return s;
+      const url = new URL(location.href);
+      ["token", "user_token", "url_token", "access_token", "auth", "code", "session"].forEach(
+        (key) => url.searchParams.delete(key)
+      );
+      return (url.pathname + url.search).slice(0, 512);
     } catch (_) {
-      return "s_fallback";
+      return String(location.pathname || "/").slice(0, 512);
     }
   }
 
-  function sendTrack(event, props) {
+  function safeReferrer() {
+    if (!document.referrer) return "";
+    try {
+      const url = new URL(document.referrer);
+      return (url.origin + url.pathname).slice(0, 1024);
+    } catch (_) {
+      return "";
+    }
+  }
+
+  function platform() {
+    const ua = navigator.userAgent || "";
+    if (/ZhihuHybrid|Zhihu/i.test(ua)) return "zhihu_app";
+    return window.matchMedia("(max-width: 720px)").matches ? "mobile_web" : "pc_web";
+  }
+
+  function safeProps(props) {
+    const result = {};
+    Object.entries(props || {}).forEach(([key, value]) => {
+      if (!SAFE_PROP_KEYS.has(key)) return;
+      if (key === "slip_no") result[key] = Number.isFinite(Number(value)) ? Number(value) : 0;
+      else result[key] = String(value || "").slice(0, key === "query" ? 256 : 80);
+    });
+    return result;
+  }
+
+  function sendViaXhr(url, body) {
+    try {
+      const xhr = new XMLHttpRequest();
+      xhr.open("POST", url, true);
+      xhr.setRequestHeader("Content-Type", "application/json");
+      xhr.timeout = 5000;
+      xhr.send(body);
+    } catch (_) {}
+  }
+
+  function sendTrack(record) {
+    const props = safeProps(record.props);
+    const visitor = deviceId();
     const payload = {
-      event: String(event || "unknown").slice(0, 64),
-      device_id: anonId(),
-      run_id: sessionId(),
+      ...props,
+      event: record.event,
+      event_id: record.eventId,
+      ts: record.ts,
+      device_id: visitor,
+      run_id: record.runId,
       zhihu_user_id: zhihuIdentity.id,
       url_token: zhihuIdentity.urlToken,
       user_type: zhihuIdentity.userType,
-      // 兼容当前 CloudBase 表字段；值来自 account/me，不是登录凭证。
-      visitor_id: anonId(),
-      user_id: zhihuIdentity.id,
-      user_token: zhihuIdentity.urlToken,
-      session: sessionId(),
-      ts: Date.now(),
-      path: location.pathname + location.search,
-      referrer: document.referrer || "",
+      path: record.path,
+      referrer: record.referrer,
       mobile: window.matchMedia("(max-width: 720px)").matches,
-      ...(props || {}),
+      platform: platform(),
     };
     const url = endpoint();
     const body = JSON.stringify(payload);
     try {
       if (navigator.sendBeacon) {
-        const ok = navigator.sendBeacon(url, new Blob([body], { type: "application/json" }));
+        const ok = navigator.sendBeacon(url, new Blob([body], { type: "text/plain;charset=UTF-8" }));
         if (ok) return;
       }
     } catch (_) {}
@@ -286,15 +344,29 @@
       body,
       keepalive: true,
       cache: "no-store",
-    }).catch(() => {});
+    })
+      .then((res) => {
+        if (!res.ok && res.status >= 500) sendViaXhr(url, body);
+      })
+      .catch(() => sendViaXhr(url, body));
   }
 
   function track(event, props) {
+    const record = {
+      event: String(event || "unknown").slice(0, 64),
+      eventId: makeId("evt"),
+      ts: Date.now(),
+      runId: currentRunId,
+      path: safePath(),
+      referrer: safeReferrer(),
+      props: safeProps(props),
+    };
     if (!identitySettled) {
-      pendingEvents.push([event, props]);
+      if (pendingEvents.length >= MAX_PENDING) pendingEvents.shift();
+      pendingEvents.push(record);
       return;
     }
-    sendTrack(event, props);
+    sendTrack(record);
   }
 
   function settleIdentity(member) {
@@ -305,9 +377,12 @@
         urlToken: String(member.url_token || "").slice(0, 128),
         userType: String(member.user_type || "people").slice(0, 24),
       };
+      identityStatus = zhihuIdentity.urlToken ? "identified" : "member_without_url_token";
+    } else {
+      identityStatus = member?.user_type === "guest" ? "guest" : "unavailable";
     }
     identitySettled = true;
-    pendingEvents.splice(0).forEach(([event, props]) => sendTrack(event, props));
+    pendingEvents.splice(0).forEach(sendTrack);
   }
 
   async function resolveZhihuIdentity() {
@@ -323,7 +398,7 @@
         })(),
         new Promise((resolve) => setTimeout(() => resolve(null), 5000)),
       ]);
-      settleIdentity(member && typeof member.id === "string" ? member : null);
+      settleIdentity(member && typeof member === "object" ? member : null);
     } catch (_) {
       settleIdentity(null);
     }
@@ -336,15 +411,37 @@
     track("page_view");
   }
 
+  function startNewRun() {
+    currentRunId = makeId("run");
+    return currentRunId;
+  }
+
+  function debugStatus() {
+    return {
+      identityStatus,
+      userType: zhihuIdentity.userType,
+      hasZhihuUserId: Boolean(zhihuIdentity.id),
+      hasUrlToken: Boolean(zhihuIdentity.urlToken),
+      deviceIdReady: Boolean(deviceId()),
+      runId: currentRunId,
+      queuedEvents: pendingEvents.length,
+      sdkAvailable: typeof window.zhihuHybrid === "function",
+    };
+  }
+
   window.KanshanTrack = {
-    getToken: () => zhihuIdentity.urlToken,
-    getIdentity: () => ({ ...zhihuIdentity, deviceId: anonId(), runId: sessionId() }),
     track,
     pageViewOnce,
+    startNewRun,
     gameStart(kind) {
       track("game_start", { kind: kind || "draw" });
     },
   };
+
+  if (new URLSearchParams(location.search).get("debug") === "1") {
+    // 诊断只暴露状态，不暴露知乎 ID / url_token 实值。
+    window.KanshanDebug = { status: debugStatus };
+  }
 
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", pageViewOnce);
@@ -848,15 +945,18 @@ async function draw() {
   if (busy) return;
   setBusy(true);
   const isAgain = pageRitual?.classList.contains("has-slip");
+  if (isAgain) window.KanshanTrack?.startNewRun?.();
   window.KanshanTrack?.gameStart(isAgain ? "again" : "draw");
   // 先解锁音频（仍在点击手势内），再做收签等 await
   const audioReady = unlockAudioSync();
-  clearSlip();
   ensureRitualAssets();
   await retractSlipIfNeeded();
+  // 旧图床签卡完全隐藏后再清理 DOM，避免短暂露出 HTML 备用签面。
+  clearSlip();
   window.KanshanScene?.resetRitualVisual?.();
   resetIdleCopy();
-  pageRitual?.scrollIntoView({ behavior: "smooth", block: "start" });
+  // “再来一签”已经处在结果页，不再强制页面对齐，避免视口小幅上滑。
+  if (!isAgain) pageRitual?.scrollIntoView({ behavior: "smooth", block: "start" });
   await audioReady;
 
   const fetchPromise = fetchDraw().catch((err) => ({ __err: err }));
@@ -875,11 +975,21 @@ async function draw() {
     const slipH = prepareSlipSize();
     await window.KanshanScene.revealSlip((name) => setPhase(name), { height: slipH });
     settleDoneCopy(data);
+    window.KanshanTrack?.track?.("draw_success", {
+      kind: isAgain ? "again" : "draw",
+      source: data?.source || "local_pool",
+      slip_no: Number(data?.slip?.no) || 0,
+      slip_name: String(data?.slip?.name || "").slice(0, 40),
+    });
   } catch (err) {
     window.KanshanScene?.resetRitualVisual?.();
     clearSlip();
     resetIdleCopy();
     const msg = String(err?.message || err || "");
+    window.KanshanTrack?.track?.("draw_error", {
+      kind: isAgain ? "again" : "draw",
+      error_code: /rate limit/i.test(msg) ? "rate_limit" : "draw_failed",
+    });
     setHint(/rate limit/i.test(msg) ? "山门拥挤，请稍候再求" : `求签未果：${msg}`);
   } finally {
     setBusy(false);
@@ -988,6 +1098,7 @@ function openAiSearch() {
     kind: "ai_search",
     slip_no: Number(s.no) || 0,
     title: String(s.name || "").slice(0, 40),
+    query: slipSearchQuery(lastDraw),
   });
   if (inZhihuApp()) window.location.href = href;
   else window.open(href, "_blank", "noopener");
@@ -1337,7 +1448,7 @@ resetIdleCopy();
 
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("sw.js?v=430").catch(() => {});
+    navigator.serviceWorker.register("sw.js?v=432").catch(() => {});
   });
 }
 
