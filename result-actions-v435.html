@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>看山今日一签 · 结果按钮六版</title>
+  <style>
+    * { box-sizing: border-box; }
+    :root { color-scheme: dark; }
+    html { background: #17110c; }
+    body {
+      min-height: 100vh;
+      margin: 0;
+      color: #fff8e9;
+      font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+      background:
+        linear-gradient(rgba(20, 14, 9, .2), rgba(20, 14, 9, .42)),
+        url("art/layers/layer-bg-empty.png?v=318") center / cover fixed;
+    }
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 14px 22px;
+      background: rgba(25, 17, 11, .9);
+      border-bottom: 1px solid rgba(225, 184, 100, .3);
+      backdrop-filter: blur(14px);
+    }
+    h1 { margin: 0; font: 600 19px "Songti SC", "STSong", serif; letter-spacing: .12em; }
+    header p { margin: 4px 0 0; color: #d9c6a5; font-size: 12px; }
+    nav { display: flex; gap: 7px; }
+    nav a {
+      min-width: 32px;
+      padding: 6px 10px;
+      color: #f7e5c1;
+      text-align: center;
+      text-decoration: none;
+      border: 1px solid rgba(230, 187, 105, .44);
+      border-radius: 999px;
+      font-size: 12px;
+    }
+    main {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(320px, 1fr));
+      gap: 18px;
+      width: min(1260px, calc(100% - 28px));
+      margin: 0 auto;
+      padding: 22px 0 44px;
+    }
+    .version {
+      position: relative;
+      overflow: hidden;
+      padding: 16px 10px 20px;
+      text-align: center;
+      background: rgba(32, 23, 16, .42);
+      border: 1px solid rgba(236, 198, 126, .34);
+      border-radius: 18px;
+      box-shadow: 0 16px 46px rgba(0, 0, 0, .24);
+    }
+    .version h2 { margin: 1px 0 4px; font: 600 17px "Songti SC", "STSong", serif; letter-spacing: .12em; }
+    .desc { margin: 0 0 12px; color: #d8c6a7; font-size: 12px; }
+    .tag {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      padding: 4px 8px;
+      color: #fff2d4;
+      background: #913126;
+      border-radius: 999px;
+      font: 600 11px "Songti SC", serif;
+    }
+    .stage { display: flex; flex-direction: column; align-items: center; }
+    .card {
+      position: relative;
+      width: min(310px, 88vw);
+      aspect-ratio: 1085 / 1450;
+      container-type: inline-size;
+      filter: drop-shadow(0 13px 25px rgba(0, 0, 0, .34));
+    }
+    .card > img { display: block; width: 100%; height: 100%; object-fit: contain; }
+    .read-block {
+      position: absolute;
+      left: 50%;
+      bottom: 4.2%;
+      width: 50%;
+      display: grid;
+      gap: 4px;
+      transform: translateX(-50%);
+    }
+    .hint {
+      margin: 0;
+      color: #6d2d23;
+      font: 600 2.8cqw "Songti SC", "STSong", serif;
+      letter-spacing: .07em;
+      white-space: nowrap;
+    }
+    .read {
+      height: 8.8cqw;
+      color: #fff1ce;
+      background: linear-gradient(180deg, rgba(255, 244, 211, .2), transparent 42%), linear-gradient(90deg, #812117, #b83d29 50%, #812117);
+      border: 1.5px solid #e6bb70;
+      border-radius: 5px;
+      box-shadow: 0 0 0 2px #6b1c14, 0 0 0 3px #e6bb70, 0 7px 14px rgba(80, 18, 12, .3);
+      font: 600 3.8cqw "Songti SC", "STSong", serif;
+      letter-spacing: .22em;
+    }
+    .read i {
+      display: inline-block;
+      width: 7px;
+      height: 7px;
+      margin-left: 8px;
+      border-top: 1.5px solid #e8bc6a;
+      border-right: 1.5px solid #e8bc6a;
+      transform: rotate(45deg);
+    }
+    .actions {
+      width: 50%;
+      display: grid;
+      gap: 10px;
+      margin-top: 14px;
+    }
+    .action {
+      width: 100%;
+      height: 43px;
+      padding: 0 12px;
+      cursor: pointer;
+      font: 500 14px "Songti SC", "STSong", serif;
+      letter-spacing: .1em;
+      transition: transform .18s ease, filter .18s ease;
+    }
+    .action:active { transform: scale(.98); }
+    .a .action {
+      color: #6f2c20;
+      background: linear-gradient(180deg, rgba(255, 249, 229, .96), rgba(237, 211, 159, .96));
+      border: 1px solid rgba(140, 65, 43, .78);
+      border-radius: 9px;
+      box-shadow: inset 0 0 0 2px rgba(255, 248, 221, .62), 0 5px 13px rgba(57, 35, 16, .23);
+    }
+    .b .action {
+      color: #ffecc2;
+      background: linear-gradient(180deg, #9f3426, #762016);
+      border: 1px solid #deb15f;
+      border-radius: 7px;
+      box-shadow: inset 0 1px 0 rgba(255, 238, 194, .2), 0 4px 11px rgba(62, 13, 9, .28);
+    }
+    .c .action {
+      color: #fff1d1;
+      background: rgba(48, 31, 20, .68);
+      border: 1px solid rgba(231, 186, 98, .82);
+      border-radius: 999px;
+      box-shadow: inset 0 0 0 1px rgba(255, 245, 214, .08), 0 4px 13px rgba(0, 0, 0, .22);
+      backdrop-filter: blur(7px);
+    }
+    .d .action {
+      color: #60271e;
+      background: linear-gradient(180deg, #f8e9bd, #e3bd6f);
+      border: 0;
+      border-radius: 13px;
+      box-shadow: 0 2px 0 #a56231, 0 6px 13px rgba(55, 31, 12, .2);
+    }
+    .d .action:first-child::after,
+    .e .action:first-child::after {
+      content: "›";
+      margin-left: 9px;
+      color: #9b4b31;
+      font-size: 18px;
+      line-height: 0;
+    }
+    .e .action {
+      position: relative;
+      color: #6a281f;
+      background: rgba(255, 242, 206, .91);
+      border: 1px solid rgba(122, 48, 34, .7);
+      border-radius: 4px;
+      box-shadow: inset 0 0 0 3px rgba(255, 248, 224, .65), 0 4px 12px rgba(51, 28, 12, .2);
+    }
+    .f .action {
+      color: #422218;
+      background: linear-gradient(90deg, rgba(229, 186, 99, .82), rgba(255, 239, 195, .95), rgba(229, 186, 99, .82));
+      border: 1px solid rgba(255, 239, 193, .8);
+      border-radius: 999px;
+      box-shadow: 0 0 0 1px rgba(102, 54, 27, .48), 0 5px 14px rgba(43, 27, 12, .22);
+    }
+    .legal { width: 88%; margin: 12px auto 0; color: rgba(255, 247, 230, .74); font-size: 9px; line-height: 1.45; }
+    @media (max-width: 1080px) {
+      main { grid-template-columns: repeat(2, minmax(300px, 1fr)); }
+    }
+    @media (max-width: 700px) {
+      header { padding: 12px 14px; }
+      header p, nav { display: none; }
+      main { grid-template-columns: 1fr; width: min(430px, calc(100% - 20px)); padding-top: 12px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div><h1>结果操作按钮 · 六版对照</h1><p>三按钮等长；仅比较按钮的形状、材质与层级。</p></div>
+    <nav><a href="#a">甲</a><a href="#b">乙</a><a href="#c">丙</a><a href="#d">丁</a><a href="#e">戊</a><a href="#f">己</a></nav>
+  </header>
+  <main>
+    <section class="version a" id="a"><span class="tag">推荐</span><h2>甲 · 宣纸窄匾</h2><p class="desc">收起大胶囊，细朱边与签卡最协调。</p><div class="stage"><div class="card"><img src="art/slip-cards/01_灯火长明.png" alt="灯火长明"><div class="read-block"><p class="hint">签已落定 · 点击为我解签</p><button class="read">为我解签<i></i></button></div></div><div class="actions"><button class="action">分享到想法</button><button class="action">再来一签</button></div><p class="legal">本活动为传统文化趣味玩法，内容仅供娱乐参考，不构成任何运势预测或现实指导</p></div></section>
+    <section class="version b" id="b"><h2>乙 · 朱红次按钮</h2><p class="desc">沿用主按钮朱红，但降低高光与厚重感。</p><div class="stage"><div class="card"><img src="art/slip-cards/01_灯火长明.png" alt="灯火长明"><div class="read-block"><p class="hint">签已落定 · 点击为我解签</p><button class="read">为我解签<i></i></button></div></div><div class="actions"><button class="action">分享到想法</button><button class="action">再来一签</button></div><p class="legal">本活动为传统文化趣味玩法，内容仅供娱乐参考，不构成任何运势预测或现实指导</p></div></section>
+    <section class="version c" id="c"><h2>丙 · 山景透金</h2><p class="desc">保留背景呼吸感，适合更轻的操作层级。</p><div class="stage"><div class="card"><img src="art/slip-cards/01_灯火长明.png" alt="灯火长明"><div class="read-block"><p class="hint">签已落定 · 点击为我解签</p><button class="read">为我解签<i></i></button></div></div><div class="actions"><button class="action">分享到想法</button><button class="action">再来一签</button></div><p class="legal">本活动为传统文化趣味玩法，内容仅供娱乐参考，不构成任何运势预测或现实指导</p></div></section>
+    <section class="version d" id="d"><h2>丁 · 温润金笺</h2><p class="desc">保留金色，但改成克制的小圆角牌。</p><div class="stage"><div class="card"><img src="art/slip-cards/01_灯火长明.png" alt="灯火长明"><div class="read-block"><p class="hint">签已落定 · 点击为我解签</p><button class="read">为我解签<i></i></button></div></div><div class="actions"><button class="action">分享到想法</button><button class="action">再来一签</button></div><p class="legal">本活动为传统文化趣味玩法，内容仅供娱乐参考，不构成任何运势预测或现实指导</p></div></section>
+    <section class="version e" id="e"><h2>戊 · 书签方印</h2><p class="desc">方正、安静，呼应签卡的朱线框。</p><div class="stage"><div class="card"><img src="art/slip-cards/01_灯火长明.png" alt="灯火长明"><div class="read-block"><p class="hint">签已落定 · 点击为我解签</p><button class="read">为我解签<i></i></button></div></div><div class="actions"><button class="action">分享到想法</button><button class="action">再来一签</button></div><p class="legal">本活动为传统文化趣味玩法，内容仅供娱乐参考，不构成任何运势预测或现实指导</p></div></section>
+    <section class="version f" id="f"><h2>己 · 轻金细胶囊</h2><p class="desc">如果仍想保留圆润感，用更细、更轻的金色。</p><div class="stage"><div class="card"><img src="art/slip-cards/01_灯火长明.png" alt="灯火长明"><div class="read-block"><p class="hint">签已落定 · 点击为我解签</p><button class="read">为我解签<i></i></button></div></div><div class="actions"><button class="action">分享到想法</button><button class="action">再来一签</button></div><p class="legal">本活动为传统文化趣味玩法，内容仅供娱乐参考，不构成任何运势预测或现实指导</p></div></section>
+  </main>
+</body>
+</html>

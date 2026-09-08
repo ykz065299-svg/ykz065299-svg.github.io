@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>看山今日一签 · 丙款单行六版</title>
+  <style>
+    * { box-sizing: border-box; }
+    html { background: #17110c; }
+    body {
+      min-height: 100vh;
+      margin: 0;
+      color: #fff8e9;
+      font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+      background: linear-gradient(rgba(17,12,8,.12),rgba(17,12,8,.42)), url("art/layers/layer-bg-empty.png?v=318") center / cover fixed;
+    }
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 22px;
+      background: rgba(25,17,11,.91);
+      border-bottom: 1px solid rgba(225,184,100,.3);
+      backdrop-filter: blur(14px);
+    }
+    h1 { margin: 0; font: 600 19px "Songti SC","STSong",serif; letter-spacing: .12em; }
+    header p { margin: 4px 0 0; color: #d9c6a5; font-size: 12px; }
+    nav { display: flex; gap: 7px; }
+    nav a { min-width: 32px; padding: 6px 10px; color: #f7e5c1; text-align: center; text-decoration: none; border: 1px solid rgba(230,187,105,.44); border-radius: 999px; font-size: 12px; }
+    main { display: grid; grid-template-columns: repeat(3,minmax(320px,1fr)); gap: 18px; width: min(1260px,calc(100% - 28px)); margin: 0 auto; padding: 22px 0 44px; }
+    .version { position: relative; overflow: hidden; padding: 16px 10px 20px; text-align: center; background: rgba(31,23,16,.43); border: 1px solid rgba(236,198,126,.34); border-radius: 18px; box-shadow: 0 16px 46px rgba(0,0,0,.24); }
+    .version h2 { margin: 1px 0 4px; font: 600 17px "Songti SC","STSong",serif; letter-spacing: .12em; }
+    .desc { margin: 0 0 12px; color: #d8c6a7; font-size: 12px; }
+    .tag { position: absolute; top: 12px; left: 12px; padding: 4px 8px; color: #fff2d4; background: #913126; border-radius: 999px; font: 600 11px "Songti SC",serif; }
+    .stage { width: min(310px,88vw); display: flex; flex-direction: column; align-items: center; }
+    .card { position: relative; width: 100%; aspect-ratio: 1085/1450; container-type: inline-size; filter: drop-shadow(0 13px 25px rgba(0,0,0,.34)); }
+    .card > img { display: block; width: 100%; height: 100%; object-fit: contain; }
+    .read-block { position: absolute; left: 50%; bottom: 4.2%; width: 50%; display: grid; gap: 4px; transform: translateX(-50%); }
+    .hint { margin: 0; color: #6d2d23; font: 600 2.8cqw "Songti SC","STSong",serif; letter-spacing: .07em; white-space: nowrap; }
+    .read { height: 8.8cqw; color: #fff1ce; background: linear-gradient(180deg,rgba(255,244,211,.2),transparent 42%),linear-gradient(90deg,#812117,#b83d29 50%,#812117); border: 1.5px solid #e6bb70; border-radius: 5px; box-shadow: 0 0 0 2px #6b1c14,0 0 0 3px #e6bb70,0 7px 14px rgba(80,18,12,.3); font: 600 3.8cqw "Songti SC","STSong",serif; letter-spacing: .22em; }
+    .read i { display: inline-block; width: 7px; height: 7px; margin-left: 8px; border-top: 1.5px solid #e8bc6a; border-right: 1.5px solid #e8bc6a; transform: rotate(45deg); }
+    .actions { width: var(--row-w); display: grid; grid-template-columns: 1fr 1fr; gap: var(--gap); margin-top: 14px; }
+    .action { width: 100%; height: var(--h); padding: 0 8px; color: #fff1d1; background: rgba(48,31,20,var(--alpha)); border: 1px solid rgba(231,186,98,var(--border-alpha)); border-radius: var(--radius); box-shadow: inset 0 0 0 1px rgba(255,245,214,.07),0 4px 13px rgba(0,0,0,.22); backdrop-filter: blur(var(--blur)); font: 500 var(--font) "Songti SC","STSong",serif; letter-spacing: var(--tracking); white-space: nowrap; }
+    .a { --row-w: 82%; --gap: 10px; --h: 42px; --alpha: .7; --border-alpha: .86; --radius: 999px; --blur: 7px; --font: 13px; --tracking: .06em; }
+    .b { --row-w: 76%; --gap: 8px; --h: 40px; --alpha: .76; --border-alpha: .8; --radius: 12px; --blur: 7px; --font: 12px; --tracking: .04em; }
+    .c { --row-w: 88%; --gap: 12px; --h: 44px; --alpha: .6; --border-alpha: .9; --radius: 999px; --blur: 9px; --font: 14px; --tracking: .06em; }
+    .d { --row-w: 76%; --gap: 8px; --h: 37px; --alpha: .82; --border-alpha: .68; --radius: 6px; --blur: 5px; --font: 11.5px; --tracking: .04em; }
+    .e { --row-w: 82%; --gap: 0; --h: 42px; --alpha: .74; --border-alpha: .84; --radius: 0; --blur: 8px; --font: 13px; --tracking: .05em; }
+    .e .actions { overflow: hidden; border: 1px solid rgba(231,186,98,.84); border-radius: 999px; background: rgba(48,31,20,.74); box-shadow: 0 4px 13px rgba(0,0,0,.22); backdrop-filter: blur(8px); }
+    .e .action { border: 0; border-radius: 0; background: transparent; box-shadow: none; backdrop-filter: none; }
+    .e .action + .action { border-left: 1px solid rgba(231,186,98,.5); }
+    .f { --row-w: 86%; --gap: 1px; --h: 42px; --alpha: .68; --border-alpha: 0; --radius: 0; --blur: 8px; --font: 13px; --tracking: .05em; }
+    .f .actions { padding: 3px; border: 1px solid rgba(231,186,98,.72); border-radius: 11px; background: rgba(24,16,11,.58); }
+    .f .action { border: 0; border-radius: 7px; box-shadow: none; }
+    .f .action:first-child { background: rgba(231,186,98,.18); }
+    .legal { width: 88%; margin: 12px auto 0; color: rgba(255,247,230,.74); font-size: 9px; line-height: 1.45; }
+    @media (max-width:1080px) { main { grid-template-columns: repeat(2,minmax(300px,1fr)); } }
+    @media (max-width:700px) { header { padding: 12px 14px; } header p,nav { display:none; } main { grid-template-columns:1fr; width:min(430px,calc(100% - 20px)); padding-top:12px; } }
+  </style>
+</head>
+<body>
+  <header><div><h1>丙款 · 单行操作六版</h1><p>保持山景透金风格；两个按钮全部并排。</p></div><nav><a href="#a">甲</a><a href="#b">乙</a><a href="#c">丙</a><a href="#d">丁</a><a href="#e">戊</a><a href="#f">己</a></nav></header>
+  <main>
+    <section class="version a" id="a"><span class="tag">推荐</span><h2>甲 · 均衡双钮</h2><p class="desc">宽度、字重和留白最稳，层级清楚。</p><div class="stage"><div class="card"><img src="art/slip-cards/01_灯火长明.png" alt="灯火长明"><div class="read-block"><p class="hint">签已落定 · 点击为我解签</p><button class="read">为我解签<i></i></button></div></div><div class="actions"><button class="action">分享到想法</button><button class="action">再来一签</button></div><p class="legal">本活动为传统文化趣味玩法，内容仅供娱乐参考，不构成任何运势预测或现实指导</p></div></section>
+    <section class="version b" id="b"><h2>乙 · 紧凑方圆</h2><p class="desc">整体最窄，小圆角更克制。</p><div class="stage"><div class="card"><img src="art/slip-cards/01_灯火长明.png" alt="灯火长明"><div class="read-block"><p class="hint">签已落定 · 点击为我解签</p><button class="read">为我解签<i></i></button></div></div><div class="actions"><button class="action">分享到想法</button><button class="action">再来一签</button></div><p class="legal">本活动为传统文化趣味玩法，内容仅供娱乐参考，不构成任何运势预测或现实指导</p></div></section>
+    <section class="version c" id="c"><h2>丙 · 舒展圆钮</h2><p class="desc">按钮更宽更亮，点击目标最充足。</p><div class="stage"><div class="card"><img src="art/slip-cards/01_灯火长明.png" alt="灯火长明"><div class="read-block"><p class="hint">签已落定 · 点击为我解签</p><button class="read">为我解签<i></i></button></div></div><div class="actions"><button class="action">分享到想法</button><button class="action">再来一签</button></div><p class="legal">本活动为传统文化趣味玩法，内容仅供娱乐参考，不构成任何运势预测或现实指导</p></div></section>
+    <section class="version d" id="d"><span class="tag">已缩小</span><h2>丁 · 轻巧书签</h2><p class="desc">按钮和文字同步收小，保留方正透金。</p><div class="stage"><div class="card"><img src="art/slip-cards/01_灯火长明.png" alt="灯火长明"><div class="read-block"><p class="hint">签已落定 · 点击为我解签</p><button class="read">为我解签<i></i></button></div></div><div class="actions"><button class="action">分享到想法</button><button class="action">再来一签</button></div><p class="legal">本活动为传统文化趣味玩法，内容仅供娱乐参考，不构成任何运势预测或现实指导</p></div></section>
+    <section class="version e" id="e"><h2>戊 · 一体分栏</h2><p class="desc">合成一条操作栏，中线区分两个动作。</p><div class="stage"><div class="card"><img src="art/slip-cards/01_灯火长明.png" alt="灯火长明"><div class="read-block"><p class="hint">签已落定 · 点击为我解签</p><button class="read">为我解签<i></i></button></div></div><div class="actions"><button class="action">分享到想法</button><button class="action">再来一签</button></div><p class="legal">本活动为传统文化趣味玩法，内容仅供娱乐参考，不构成任何运势预测或现实指导</p></div></section>
+    <section class="version f" id="f"><h2>己 · 内嵌双栏</h2><p class="desc">外框统一，分享按钮用浅金底轻强调。</p><div class="stage"><div class="card"><img src="art/slip-cards/01_灯火长明.png" alt="灯火长明"><div class="read-block"><p class="hint">签已落定 · 点击为我解签</p><button class="read">为我解签<i></i></button></div></div><div class="actions"><button class="action">分享到想法</button><button class="action">再来一签</button></div><p class="legal">本活动为传统文化趣味玩法，内容仅供娱乐参考，不构成任何运势预测或现实指导</p></div></section>
+  </main>
+</body>
+</html>
