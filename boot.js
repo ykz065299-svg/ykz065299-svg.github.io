@@ -513,6 +513,12 @@ function hostedCardUrl(slip) {
   return isZhihuCdn(url) ? url : "";
 }
 
+function hostedShareCardUrl(slip) {
+  const card = cardById(slip?.no);
+  const url = slip?.share_image_url || card?.share_url || "";
+  return isZhihuCdn(url) ? url : hostedCardUrl(slip);
+}
+
 function displayCardSrc(slip) {
   return hostedCardUrl(slip);
 }
@@ -1123,7 +1129,7 @@ async function copyShareText() {
 }
 
 async function downloadSlipImage() {
-  const src = displayCardSrc(lastDraw?.slip || {});
+  const src = hostedShareCardUrl(lastDraw?.slip || {});
   if (!src) return false;
   const name = `kanshan-${lastDraw?.slip?.no || "slip"}.png`;
   try {
@@ -1153,7 +1159,7 @@ function closeShareBackup() {
 function openShareBackup() {
   if (!shareBackup || !lastDraw) return;
   const s = lastDraw.slip || {};
-  const src = displayCardSrc(s);
+  const src = hostedShareCardUrl(s);
   const text = buildShareText(lastDraw);
   if (shareBackupText) shareBackupText.textContent = text;
   if (shareBackupArt) {
@@ -1182,10 +1188,10 @@ async function shareToThoughts() {
     slip_name: String(s.name || "").slice(0, 40),
   });
   if (!isPcShare()) {
-    let imageUrl = hostedCardUrl(s);
+    let imageUrl = hostedShareCardUrl(s);
     if (!imageUrl) {
       await loadSlipCards();
-      imageUrl = hostedCardUrl(s);
+      imageUrl = hostedShareCardUrl(s);
     }
     if (!imageUrl) {
       setHint("签卡图片尚未就绪，请稍后再试");
@@ -1448,7 +1454,7 @@ resetIdleCopy();
 
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("sw.js?v=432").catch(() => {});
+    navigator.serviceWorker.register("sw.js?v=433").catch(() => {});
   });
 }
 

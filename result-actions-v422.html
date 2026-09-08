@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>看山今日一签 · 操作区三版对照</title>
+  <style>
+    *{box-sizing:border-box}html{background:#19130d;color:#fff}body{margin:0;font-family:"PingFang SC","Microsoft YaHei",sans-serif;background:linear-gradient(rgba(20,14,8,.14),rgba(20,14,8,.28)),url("art/layers/layer-bg-empty.png?v=318") center/cover fixed;min-height:100vh}
+    header{position:sticky;top:0;z-index:9;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 24px;background:rgba(28,20,13,.88);backdrop-filter:blur(16px);border-bottom:1px solid rgba(235,191,104,.3)}
+    h1{margin:0;font:600 20px "Songti SC","STSong",serif;letter-spacing:.12em}.lead{margin:4px 0 0;color:#dcccae;font-size:12px}.jump{display:flex;gap:8px}.jump a{padding:7px 13px;border:1px solid rgba(232,190,106,.5);border-radius:999px;color:#f8e9c8;text-decoration:none;font-size:12px}
+    main{display:grid;grid-template-columns:repeat(3,minmax(330px,1fr));gap:20px;width:min(1320px,calc(100% - 30px));margin:0 auto;padding:24px 0 50px}.version{position:relative;padding:18px 12px 22px;border:1px solid rgba(236,197,123,.36);border-radius:18px;background:rgba(34,25,17,.42);box-shadow:0 18px 50px rgba(0,0,0,.2);text-align:center;overflow:hidden}
+    .tag{position:absolute;top:15px;left:16px;padding:5px 10px;border-radius:999px;background:#9a3526;color:#fff5df;font:600 12px "Songti SC",serif;letter-spacing:.12em}.version h2{margin:4px 0 3px;font:600 18px "Songti SC","STSong",serif;letter-spacing:.1em}.desc{margin:0 0 14px;color:#d9c8aa;font-size:12px}
+    .stage{display:flex;min-height:690px;flex-direction:column;align-items:center;justify-content:flex-start}.card{position:relative;width:var(--card);max-width:94%;aspect-ratio:1085/1450;filter:drop-shadow(0 14px 24px rgba(0,0,0,.34));container-type:inline-size}.card>img{display:block;width:100%;height:100%;object-fit:contain}.read-block{position:absolute;left:50%;bottom:var(--bottom);width:var(--read-w);transform:translateX(-50%);display:grid;gap:4px}.hint{margin:0;color:#6d2d23;font:600 var(--hint) "Songti SC","STSong",serif;letter-spacing:.06em;text-shadow:0 1px rgba(255,247,225,.75);white-space:nowrap}.read{height:var(--read-h);border:1px solid #e8bd70;border-radius:4px;background:linear-gradient(180deg,rgba(255,244,211,.18),transparent 42%),linear-gradient(90deg,#822117,#b83d28 50%,#822117);box-shadow:0 0 0 2px #6e2118,0 0 0 3px #e5b868,0 6px 12px rgba(94,24,17,.3);color:#fff0cd;font:600 var(--read-font) "Songti SC","STSong",serif;letter-spacing:.18em}.read i{display:inline-block;width:7px;height:7px;margin-left:8px;border-top:1.5px solid #e8bc6a;border-right:1.5px solid #e8bc6a;transform:rotate(45deg)}
+    .actions{width:var(--actions-w);display:grid;grid-template-columns:var(--action-cols);gap:9px;margin-top:var(--actions-top)}.action{height:var(--action-h);border:0;border-radius:999px;background:linear-gradient(180deg,#f6e4b4,#e4bc62);box-shadow:0 4px 12px rgba(50,30,9,.25);color:#21170d;font-family:inherit;font-size:var(--action-font);letter-spacing:.1em}.legal{width:92%;margin:12px auto 0;color:rgba(255,248,235,.78);font-size:10px;line-height:1.5}
+    .a{--card:370px;--read-w:54%;--bottom:3.5%;--hint:3.1cqw;--read-h:11cqw;--read-font:4.5cqw;--actions-w:76%;--action-cols:1fr;--action-h:42px;--action-font:14px;--actions-top:13px}
+    .b{--card:410px;--read-w:48%;--bottom:4.2%;--hint:2.8cqw;--read-h:9.5cqw;--read-font:3.9cqw;--actions-w:86%;--action-cols:1fr 1fr;--action-h:42px;--action-font:13px;--actions-top:14px}
+    .c{--card:390px;--read-w:51%;--bottom:5.2%;--hint:2.9cqw;--read-h:10cqw;--read-font:4.1cqw;--actions-w:72%;--action-cols:1fr;--action-h:38px;--action-font:13px;--actions-top:10px}.c .action{background:rgba(255,244,216,.92);border:1px solid rgba(190,146,67,.7);box-shadow:0 3px 10px rgba(50,30,9,.18)}
+    @media(max-width:1080px){main{grid-template-columns:1fr}.version{width:min(560px,100%);margin:auto}.stage{min-height:0}.jump{display:none}}
+  </style>
+</head>
+<body>
+  <header><div><h1>签卡与操作区 · 三版对照</h1><p class="lead">三版均为同屏显示三个操作；只调整比例、位置和层级。</p></div><nav class="jump"><a href="#a">甲</a><a href="#b">乙</a><a href="#c">丙</a></nav></header>
+  <main>
+    <section class="version a" id="a"><span class="tag">推荐</span><h2>甲 · 均衡收口</h2><p class="desc">签面放大，卡内按钮降一级；两个后续按钮竖排。</p><div class="stage"><div class="card"><img src="art/slip-cards/01_灯火长明.png" alt="灯火长明"><div class="read-block"><p class="hint">签已落定 · 点击为我解签</p><button class="read">为我解签<i></i></button></div></div><div class="actions"><button class="action">分享到想法</button><button class="action">再来一签</button></div><p class="legal">本活动为传统文化趣味玩法，内容仅供娱乐参考，不构成任何运势预测或现实指导</p></div></section>
+    <section class="version b" id="b"><span class="tag">签面最大</span><h2>乙 · 签面优先</h2><p class="desc">签名最醒目，卡内按钮最小；分享与再来一签横排。</p><div class="stage"><div class="card"><img src="art/slip-cards/01_灯火长明.png" alt="灯火长明"><div class="read-block"><p class="hint">签已落定 · 点击为我解签</p><button class="read">为我解签<i></i></button></div></div><div class="actions"><button class="action">分享到想法</button><button class="action">再来一签</button></div><p class="legal">本活动为传统文化趣味玩法，内容仅供娱乐参考，不构成任何运势预测或现实指导</p></div></section>
+    <section class="version c" id="c"><span class="tag">短屏友好</span><h2>丙 · 紧凑留白</h2><p class="desc">签面略大，三按钮更紧凑，适合高度较短的屏幕。</p><div class="stage"><div class="card"><img src="art/slip-cards/01_灯火长明.png" alt="灯火长明"><div class="read-block"><p class="hint">签已落定 · 点击为我解签</p><button class="read">为我解签<i></i></button></div></div><div class="actions"><button class="action">分享到想法</button><button class="action">再来一签</button></div><p class="legal">本活动为传统文化趣味玩法，内容仅供娱乐参考，不构成任何运势预测或现实指导</p></div></section>
+  </main>
+</body>
+</html>
