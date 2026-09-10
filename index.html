@@ -70,8 +70,8 @@ body:not(.ritual-visible) .page2-bg {
   inset: 0 auto auto 0;
   width: 100vw;
   min-width: 100%;
-  height: 200vh;
-  height: 200dvh;
+  height: 100vh;
+  height: 100dvh;
   z-index: 0;
   pointer-events: none;
   background: #070b16;
@@ -121,9 +121,8 @@ body:not(.ritual-visible) .page2-bg {
   );
 }
 .page2-bg {
-  top: 100vh;
-  top: 100dvh;
-  /* 首屏不拉二页图；下滑后再加 .ritual-assets-ready */
+  top: 0;
+  /* 活动直接进入抽签页，背景随首屏加载 */
   background-image: none;
   background-position: 50% 60%;
 }
@@ -1568,32 +1567,24 @@ body:has(.slip-scroll.is-read) {
 
     </style>
     <script>
-      // 只预加载当前设备封面
+      // 活动已取消封面，首屏直接预加载抽签背景
       (function () {
-        var portrait = window.matchMedia("(orientation: portrait)").matches;
         var link = document.createElement("link");
         link.rel = "preload";
         link.as = "image";
-        link.href = portrait ? "cover-mobile-v430.png" : "cover-pc-v430.png";
+        link.href = "art/layers/layer-bg-empty.png?v=318";
         document.head.appendChild(link);
       })();
     </script>
   </head>
-  <body>
+  <body class="ritual-visible ritual-assets-ready">
     <div class="world-bg" aria-hidden="true">
-      <div class="page-bg page1-bg"></div>
-      <div class="page-seam"></div>
       <div class="page-bg page2-bg" id="page2Bg"></div>
     </div>
 
     <button type="button" class="audio-toggle" id="audioToggle">氛围音 · 关</button>
 
     <main class="world">
-      <section class="page page-cover" id="pageCover">
-        <div class="cover-spacer" aria-hidden="true"></div>
-        <p class="scroll-cue" id="scrollCue">下滑 · 入山求签</p>
-      </section>
-
       <section class="page page-ritual" id="pageRitual">
         <div class="story-head" id="storyHead">
           <p class="phase" id="phaseText">静候开筒</p>
@@ -1693,6 +1684,6 @@ body:has(.slip-scroll.is-read) {
       </div>
     </div>
     <script src="https://unpkg.zhimg.com/zhihu-hybrid" async></script>
-    <script src="boot.js?v=439" defer></script>
+    <script src="boot.js?v=443" defer></script>
   </body>
 </html>

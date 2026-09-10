@@ -1,6 +1,6 @@
 /* v300 — 音效网络优先；避免大 wav 被坏缓存卡死无声 */
-const CACHE = "kanshan-v439";
-const SHELL = ["./cover-mobile-v430.png", "./cover-pc-v430.png"];
+const CACHE = "kanshan-v443";
+const SHELL = ["./art/layers/layer-bg-empty.png?v=318"];
 
 self.addEventListener("install", (e) => {
   e.waitUntil(

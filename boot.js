@@ -1454,7 +1454,7 @@ resetIdleCopy();
 
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("sw.js?v=439").catch(() => {});
+    navigator.serviceWorker.register("sw.js?v=443").catch(() => {});
   });
 }
 
